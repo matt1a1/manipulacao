@@ -3,56 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manipulação - RPG Virtual Table</title>
+    <title>Manipulação • Mesa Virtual de RPG</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap');
+
         :root {
-            --map-width: 1200px;
-            --map-height: 700px;
+            --map-width: 1280px;
+            --map-height: 720px;
         }
 
         * {
-            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 150ms;
+            transition-duration: 200ms;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
         }
 
         #map {
             width: var(--map-width);
             height: var(--map-height);
-            background-color: #1a1a2e;
+            background-color: #0f172a;
             background-image: 
-                linear-gradient(#334155 1px, transparent 0),
-                linear-gradient(90deg, #334155 1px, transparent 0);
+                linear-gradient(#1e2937 1px, transparent 0),
+                linear-gradient(90deg, #1e2937 1px, transparent 0);
             background-size: 50px 50px;
-            box-shadow: 0 0 0 8px #0f172a inset;
+            box-shadow: 0 25px 50px -12px rgb(15 23 42);
             position: relative;
             overflow: hidden;
-            border: 6px solid #1e2937;
-            border-radius: 12px;
+            border: 8px solid #1e2937;
+            border-radius: 16px;
         }
 
         .token {
             position: absolute;
-            width: 68px;
-            height: 68px;
+            width: 72px;
+            height: 72px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 9999px;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3),
-                        0 0 0 4px rgba(255,255,255,0.2) inset;
+            box-shadow: 
+                0 10px 15px -3px rgb(15 23 42),
+                0 0 0 5px rgba(255,255,255,0.15) inset;
             cursor: grab;
             user-select: none;
-            font-family: 'Press Start 2P', system-ui;
-            font-size: 10px;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 11px;
+            font-weight: 600;
             text-align: center;
             line-height: 1.1;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-            border: 3px solid rgba(255,255,255,0.3);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            border: 4px solid rgba(255,255,255,0.25);
             z-index: 10;
+            letter-spacing: -0.02em;
         }
 
         .token:active {
@@ -60,105 +67,112 @@
         }
 
         .token .label {
-            max-width: 52px;
+            max-width: 56px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            padding: 2px 4px;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 9999px;
         }
 
         .delete-btn {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -10px;
+            right: -10px;
             background: #ef4444;
             color: white;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 9999px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             cursor: pointer;
-            z-index: 20;
+            z-index: 30;
+            line-height: 1;
         }
 
         .library-card {
+            position: relative;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .library-card:hover {
-            transform: scale(1.05) rotate(2deg);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(15 23 42);
         }
 
         .map-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: calc(100vh - 4rem);
             background: linear-gradient(180deg, #0f172a 0%, #1e2937 100%);
         }
 
-        .header-glow {
-            text-shadow: 
-                0 0 10px #a78bfa,
-                0 0 20px #a78bfa;
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            color: #f1f5f9;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-white font-mono">
+<body class="bg-slate-950 text-slate-200">
+
     <div class="flex h-screen overflow-hidden">
         
         <!-- SIDEBAR - Biblioteca de Tokens -->
-        <div class="w-80 bg-slate-900 border-r border-slate-700 flex flex-col">
+        <div class="w-80 bg-slate-900 border-r border-slate-700 flex flex-col shadow-xl">
             
             <!-- Cabeçalho -->
-            <div class="p-6 border-b border-slate-700">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-violet-500 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🌀</div>
+            <div class="p-8 border-b border-slate-700">
+                <div class="flex items-center gap-4">
+                    <div class="w-9 h-9 bg-indigo-600 rounded-2xl flex items-center justify-center text-xl shadow-inner">🌀</div>
                     <div>
-                        <h1 class="text-3xl font-bold tracking-widest header-glow">MANIPULAÇÃO</h1>
-                        <p class="text-violet-400 text-xs tracking-[2px]">RPG VIRTUAL TABLE</p>
+                        <h1 class="header-title">MANIPULAÇÃO</h1>
+                        <p class="text-slate-400 text-sm tracking-widest">MESA VIRTUAL DE RPG</p>
                     </div>
                 </div>
             </div>
 
             <!-- Biblioteca -->
-            <div class="flex-1 p-6 overflow-y-auto">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold flex items-center gap-2">
-                        <span class="text-amber-400">📜</span>
-                        BIBLIOTECA DE TOKENS
+            <div class="flex-1 p-8 overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+                        Biblioteca de Tokens
                     </h2>
                     <button onclick="resetLibrary()" 
-                            class="text-xs bg-slate-800 hover:bg-red-900 text-red-400 px-3 py-1 rounded-lg flex items-center gap-1">
-                        <span>♻️</span> RESETAR
+                            class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 px-4 py-2 rounded-xl flex items-center gap-1 font-medium">
+                        RESTAURAR PADRÃO
                     </button>
                 </div>
 
-                <div id="library" class="grid grid-cols-2 gap-3"></div>
+                <div id="library" class="grid grid-cols-2 gap-4"></div>
             </div>
 
             <!-- Adicionar novo token -->
-            <div class="p-6 border-t border-slate-700 bg-slate-950">
-                <h3 class="text-sm font-bold mb-3 text-slate-400">ADICIONAR NOVO TOKEN</h3>
-                <div class="flex gap-2">
+            <div class="p-8 border-t border-slate-700 bg-slate-950">
+                <h3 class="text-sm font-medium text-slate-400 mb-4">ADICIONAR NOVO TOKEN</h3>
+                <div class="flex gap-3">
                     <input id="new-token-name" 
                            type="text" 
                            placeholder="Nome do token"
-                           class="flex-1 bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-400">
+                           class="flex-1 bg-slate-800 border border-slate-600 focus:border-indigo-500 rounded-2xl px-5 py-4 text-sm outline-none">
                     <input id="new-token-color" 
                            type="color" 
-                           value="#8b5cf6"
-                           class="w-14 h-12 bg-slate-800 border border-slate-600 rounded-xl cursor-pointer">
+                           value="#6366f1"
+                           class="w-14 h-12 bg-slate-800 border border-slate-600 rounded-2xl cursor-pointer">
                     <button onclick="addNewToken()"
-                            class="bg-violet-600 hover:bg-violet-500 px-6 rounded-2xl font-bold text-sm flex items-center">
+                            class="bg-indigo-600 hover:bg-indigo-500 px-8 rounded-2xl font-semibold text-sm flex items-center justify-center">
                         +
                     </button>
                 </div>
-                <p class="text-[10px] text-slate-500 mt-2">Clique em um token da biblioteca para colocar no mapa</p>
+                <p class="text-xs text-slate-500 mt-4">Clique em um token para posicioná-lo no mapa</p>
             </div>
         </div>
 
@@ -166,54 +180,49 @@
         <div class="flex-1 flex flex-col">
             
             <!-- Toolbar -->
-            <div class="h-16 bg-slate-950 border-b border-slate-700 px-6 flex items-center justify-between">
-                <div class="flex items-center gap-4">
+            <div class="h-16 bg-slate-900 border-b border-slate-700 px-8 flex items-center justify-between">
+                <div class="flex items-center gap-3">
                     <button onclick="uploadBackground()" 
-                            class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-2xl text-sm font-medium">
-                        <span class="text-xl">🖼️</span>
-                        MUDAR MAPA
+                            class="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 text-slate-200 px-6 py-3 rounded-2xl text-sm font-medium">
+                        📸 ALTERAR MAPA
                     </button>
                     
                     <button onclick="clearBackground()" 
-                            class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-5 py-2 rounded-2xl text-sm font-medium">
-                        <span class="text-xl">🧹</span>
-                        MAPA PADRÃO
+                            class="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 text-slate-200 px-6 py-3 rounded-2xl text-sm font-medium">
+                        🗺️ MAPA PADRÃO
                     </button>
 
                     <button onclick="clearMap()" 
-                            class="flex items-center gap-2 bg-red-900/70 hover:bg-red-900 px-5 py-2 rounded-2xl text-sm font-medium">
-                        <span class="text-xl">🗑️</span>
-                        LIMPAR MAPA
+                            class="flex items-center gap-3 bg-red-900/70 hover:bg-red-900 text-red-200 px-6 py-3 rounded-2xl text-sm font-medium">
+                        🗑️ LIMPAR MAPA
                     </button>
                 </div>
 
-                <div class="flex items-center gap-6">
-                    <div class="flex items-center gap-2 text-emerald-400">
-                        <div class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                        <span class="text-sm font-medium">ONLINE • PRONTO PARA MANIPULAR</span>
+                <div class="flex items-center gap-8">
+                    <div class="flex items-center gap-2 text-emerald-400 text-sm font-medium">
+                        <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full"></div>
+                        MESA PRONTA
                     </div>
 
                     <button onclick="saveState()" 
-                            class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 px-6 py-2 rounded-2xl text-sm font-bold">
+                            class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 px-7 py-3 rounded-2xl text-sm font-semibold">
                         💾 SALVAR SESSÃO
                     </button>
 
                     <button onclick="loadState()" 
-                            class="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded-2xl text-sm font-bold">
-                        📂 CARREGAR
+                            class="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-7 py-3 rounded-2xl text-sm font-semibold">
+                        📂 CARREGAR SESSÃO
                     </button>
 
                     <a href="https://github.com" target="_blank"
-                       class="flex items-center gap-2 text-slate-400 hover:text-white text-sm">
+                       class="flex items-center gap-2 text-slate-400 hover:text-slate-100 text-sm font-medium">
                         <span class="text-xl">🐙</span>
                         GitHub
                     </a>
                 </div>
 
-                <div class="text-xs text-slate-500 font-medium flex items-center gap-1">
-                    <span>Feito para</span>
-                    <span class="text-violet-400">Matt</span>
-                    <span class="px-2 py-px bg-violet-900/50 rounded">v1.0</span>
+                <div class="text-xs text-slate-400 font-medium">
+                    Manipulação v1.1 • Totalmente personalizável
                 </div>
             </div>
 
@@ -222,20 +231,16 @@
                 <div id="map" class="shadow-2xl mx-auto"></div>
             </div>
 
-            <!-- Rodapé do mapa -->
-            <div class="h-12 bg-slate-900 border-t border-slate-700 flex items-center px-8 text-xs text-slate-400 font-medium">
+            <!-- Rodapé -->
+            <div class="h-14 bg-slate-900 border-t border-slate-700 flex items-center px-8 text-xs text-slate-400 font-medium">
                 <div class="flex-1">
-                    Arraste os tokens • Clique no × para remover • Posições salvas automaticamente
+                    Arraste os tokens para mover • Clique no × para remover • Posição salva automaticamente
                 </div>
-                <div class="flex items-center gap-6">
-                    <div class="flex items-center gap-1">
-                        <span class="text-lg">🔄</span>
-                        <span>Modo: Livre</span>
+                <div class="flex items-center gap-8">
+                    <div onclick="toggleGrid()" class="cursor-pointer flex items-center gap-2 hover:text-slate-200">
+                        <span id="grid-status" class="font-semibold text-emerald-400">GRID: ATIVADO</span>
                     </div>
-                    <div onclick="toggleGrid()" class="cursor-pointer flex items-center gap-1 hover:text-amber-300">
-                        <span id="grid-status" class="text-amber-300">GRID: ATIVO</span>
-                    </div>
-                    <div class="text-violet-400">Manipulação © 2026 • Totalmente editável</div>
+                    <div class="text-slate-500">© 2026 • Desenvolvido para uso pessoal</div>
                 </div>
             </div>
         </div>
@@ -261,16 +266,7 @@
         let placedTokens = []
         let maxZ = 100
         let currentBgUrl = null
-
-        // ==================== TAILWIND INIT ====================
-        function initTailwind() {
-            tailwind.config = {
-                content: [],
-                theme: {
-                    extend: {}
-                }
-            }
-        }
+        let gridEnabled = true
 
         // ==================== RENDER BIBLIOTECA ====================
         function renderLibrary() {
@@ -279,23 +275,25 @@
 
             library.forEach(token => {
                 const card = document.createElement('div')
-                card.className = `library-card bg-slate-800 border border-slate-600 rounded-2xl p-3 flex flex-col items-center cursor-pointer hover:border-violet-400`
+                card.className = `library-card bg-slate-800 border border-slate-600 rounded-3xl p-5 flex flex-col items-center cursor-pointer`
                 card.innerHTML = `
-                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-3xl mb-2 shadow-inner" 
+                    <div class="w-14 h-14 rounded-3xl flex items-center justify-center text-3xl mb-3 shadow-inner" 
                          style="background-color: ${token.color}">
-                        ${token.name === 'BOSS' ? '👹' : token.name === 'NPC' ? '🧙' : '🧿'}
+                        ${token.name === 'BOSS' ? '👹' : token.name === 'NPC' ? '🧙' : '🔮'}
                     </div>
-                    <span class="text-sm font-bold text-white">${token.name}</span>
+                    <span class="text-base font-semibold text-slate-100">${token.name}</span>
+                    
                     <div onclick="event.stopImmediatePropagation(); removeFromLibrary(${token.id});" 
-                         class="absolute top-2 right-2 text-xs bg-red-500 w-5 h-5 rounded-full flex items-center justify-center text-white">×</div>
+                         class="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-2xl flex items-center justify-center text-xl leading-none shadow-md">
+                        ×
+                    </div>
                 `
                 card.onclick = () => addTokenToMap(token)
                 container.appendChild(card)
             })
 
-            // Mensagem se vazio
             if (library.length === 0) {
-                container.innerHTML = `<div class="col-span-2 text-center py-8 text-slate-400">Nenhum token na biblioteca.<br>Adicione novos abaixo!</div>`
+                container.innerHTML = `<div class="col-span-2 text-center py-12 text-slate-400 text-sm">Nenhum token cadastrado.<br>Utilize o campo abaixo para adicionar.</div>`
             }
         }
 
@@ -307,28 +305,26 @@
                 id: Date.now(),
                 name: token.name,
                 color: token.color,
-                left: Math.random() * 75 + 12 + '%',   // posição aleatória legal
-                top: Math.random() * 65 + 15 + '%'
+                left: `${15 + Math.random() * 70}%`,
+                top: `${15 + Math.random() * 65}%`
             }
             
             placedTokens.push(newToken)
             renderPlacedTokens()
             
-            // Feedback visual
+            // Feedback discreto
             const toast = document.createElement('div')
-            toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#a78bfa; color:white; padding:12px 24px; border-radius:9999px; box-shadow:0 10px 15px -3px rgb(167 139 250); font-size:13px; z-index:9999;'
-            toast.textContent = `✅ ${token.name} colocado no mapa!`
+            toast.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1e2937; color:#e0f2fe; padding:12px 28px; border-radius:9999px; box-shadow:0 10px 15px -3px rgb(15 23 42); font-size:13px; z-index:9999; border:1px solid #334155;'
+            toast.textContent = `${token.name} adicionado ao mapa`
             document.body.appendChild(toast)
-            setTimeout(() => toast.remove(), 1800)
+            setTimeout(() => toast.remove(), 1600)
         }
 
         // ==================== RENDER TOKENS NO MAPA ====================
         function renderPlacedTokens() {
             const map = document.getElementById('map')
-            
-            // Remove apenas os tokens (mantém background)
-            const existingTokens = map.querySelectorAll('.token')
-            existingTokens.forEach(el => el.remove())
+            const existing = map.querySelectorAll('.token')
+            existing.forEach(el => el.remove())
 
             placedTokens.forEach(tokenData => {
                 const tokenEl = document.createElement('div')
@@ -340,7 +336,6 @@
                     <div class="label">${tokenData.name}</div>
                     <div class="delete-btn" onclick="deleteToken(${tokenData.id}); event.stopImmediatePropagation();">×</div>
                 `
-                
                 map.appendChild(tokenEl)
                 makeDraggable(tokenEl, tokenData)
             })
@@ -349,18 +344,15 @@
         // ==================== DRAG AND DROP ====================
         function makeDraggable(element, tokenData) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0
-            
+
             element.onmousedown = dragMouseDown
 
             function dragMouseDown(e) {
                 if (e.target.classList.contains('delete-btn')) return
                 
-                // Trazer para frente
                 element.style.zIndex = ++maxZ
                 
-                e = e || window.event
                 e.preventDefault()
-                
                 pos3 = e.clientX
                 pos4 = e.clientY
                 
@@ -369,7 +361,6 @@
             }
 
             function elementDrag(e) {
-                e = e || window.event
                 e.preventDefault()
                 
                 pos1 = pos3 - e.clientX
@@ -382,30 +373,27 @@
                 let newLeft = element.offsetLeft - pos1
                 let newTop = element.offsetTop - pos2
                 
-                // Limites do mapa
                 newLeft = Math.max(0, Math.min(newLeft, mapRect.width - element.offsetWidth))
                 newTop = Math.max(0, Math.min(newTop, mapRect.height - element.offsetHeight))
                 
-                // Converter para porcentagem (para responsividade)
-                const leftPercent = (newLeft / mapRect.width) * 100
-                const topPercent = (newTop / mapRect.height) * 100
+                const leftPercent = Math.round((newLeft / mapRect.width) * 100)
+                const topPercent = Math.round((newTop / mapRect.height) * 100)
                 
-                element.style.left = leftPercent + '%'
-                element.style.top = topPercent + '%'
+                element.style.left = `${leftPercent}%`
+                element.style.top = `${topPercent}%`
                 
-                // Atualizar dados
-                tokenData.left = leftPercent + '%'
-                tokenData.top = topPercent + '%'
+                tokenData.left = `${leftPercent}%`
+                tokenData.top = `${topPercent}%`
             }
 
             function closeDragElement() {
                 document.onmouseup = null
                 document.onmousemove = null
-                saveState() // salva automaticamente após mover
+                saveState()
             }
         }
 
-        // ==================== DELETAR TOKEN DO MAPA ====================
+        // ==================== DELETAR TOKEN ====================
         function deleteToken(id) {
             placedTokens = placedTokens.filter(t => t.id !== id)
             renderPlacedTokens()
@@ -419,7 +407,7 @@
             const name = nameInput.value.trim()
             
             if (!name) {
-                alert('Digite um nome para o token!')
+                alert('Por favor, insira um nome para o token.')
                 return
             }
             
@@ -432,14 +420,12 @@
             library.unshift(newToken)
             renderLibrary()
             nameInput.value = ''
-            
-            // Salva automaticamente
             saveState()
         }
 
         // ==================== REMOVER DA BIBLIOTECA ====================
         function removeFromLibrary(id) {
-            if (confirm('Remover este token da biblioteca? Os tokens já colocados no mapa permanecem.')) {
+            if (confirm('Remover este token da biblioteca permanentemente?')) {
                 library = library.filter(t => t.id !== id)
                 renderLibrary()
                 saveState()
@@ -448,7 +434,7 @@
 
         // ==================== RESETAR BIBLIOTECA ====================
         function resetLibrary() {
-            if (confirm('Resetar toda a biblioteca para os tokens originais?')) {
+            if (confirm('Restaurar todos os tokens originais?')) {
                 library = [
                     { id: 1, name: "Alec", color: "#ef4444" },
                     { id: 2, name: "Franck", color: "#f59e0b" },
@@ -484,6 +470,8 @@
                     map.style.backgroundImage = `url('${currentBgUrl}')`
                     map.style.backgroundSize = 'cover'
                     map.style.backgroundPosition = 'center'
+                    gridEnabled = false
+                    updateGridStatus()
                     saveState()
                 }
                 reader.readAsDataURL(file)
@@ -491,106 +479,144 @@
             input.click()
         }
 
-        // ==================== VOLTAR PARA MAPA PADRÃO ====================
+        // ==================== MAPA PADRÃO ====================
         function clearBackground() {
             const map = document.getElementById('map')
             currentBgUrl = null
             map.style.backgroundImage = ''
-            map.style.backgroundColor = '#1a1a2e'
+            map.style.backgroundColor = '#0f172a'
             map.style.backgroundSize = '50px 50px'
+            gridEnabled = true
+            updateGridStatus()
             saveState()
         }
 
-        // ==================== LIMPAR TODO O MAPA ====================
+        // ==================== LIMPAR MAPA ====================
         function clearMap() {
-            if (confirm('Remover TODOS os tokens do mapa?')) {
+            if (confirm('Remover TODOS os tokens do mapa? Esta ação não pode ser desfeita.')) {
                 placedTokens = []
                 renderPlacedTokens()
             }
         }
 
-        // ==================== SALVAR ESTADO NO LOCALSTORAGE ====================
+        // ==================== SALVAR ESTADO ====================
         function saveState() {
             const state = {
                 library: library,
                 placedTokens: placedTokens,
-                background: currentBgUrl
+                background: currentBgUrl,
+                gridEnabled: gridEnabled
             }
-            localStorage.setItem('manipulacaoRPG', JSON.stringify(state))
+            localStorage.setItem('manipulacaoRPG_v1', JSON.stringify(state))
         }
 
         // ==================== CARREGAR ESTADO ====================
         function loadState() {
-            const saved = localStorage.getItem('manipulacaoRPG')
-            if (saved) {
-                const state = JSON.parse(saved)
-                
-                if (state.library) library = state.library
-                if (state.placedTokens) placedTokens = state.placedTokens
-                if (state.background) {
-                    currentBgUrl = state.background
-                    const map = document.getElementById('map')
-                    map.style.backgroundImage = `url('${currentBgUrl}')`
-                    map.style.backgroundSize = 'cover'
-                    map.style.backgroundPosition = 'center'
-                }
-                
-                renderLibrary()
-                renderPlacedTokens()
-                alert('✅ Sessão carregada com sucesso!')
-            } else {
-                alert('Nenhuma sessão salva ainda.')
+            const saved = localStorage.getItem('manipulacaoRPG_v1')
+            if (!saved) {
+                alert('Nenhuma sessão salva encontrada.')
+                return
             }
+            
+            const state = JSON.parse(saved)
+            
+            if (state.library) library = state.library
+            if (state.placedTokens) placedTokens = state.placedTokens
+            if (typeof state.gridEnabled !== 'undefined') gridEnabled = state.gridEnabled
+            
+            renderLibrary()
+            renderPlacedTokens()
+            
+            const map = document.getElementById('map')
+            if (state.background) {
+                currentBgUrl = state.background
+                map.style.backgroundImage = `url('${currentBgUrl}')`
+                map.style.backgroundSize = 'cover'
+                map.style.backgroundPosition = 'center'
+            } else {
+                currentBgUrl = null
+                map.style.backgroundImage = ''
+                map.style.backgroundColor = '#0f172a'
+                map.style.backgroundSize = '50px 50px'
+            }
+            
+            updateGridStatus()
+            alert('Sessão carregada com sucesso.')
         }
 
         // ==================== TOGGLE GRID ====================
         function toggleGrid() {
             const map = document.getElementById('map')
-            const status = document.getElementById('grid-status')
+            gridEnabled = !gridEnabled
             
-            if (map.style.backgroundImage.includes('linear-gradient')) {
-                map.style.backgroundImage = currentBgUrl ? `url('${currentBgUrl}')` : 'none'
-                status.textContent = 'GRID: DESATIVADO'
-                status.classList.remove('text-amber-300')
+            if (gridEnabled) {
+                if (currentBgUrl) {
+                    map.style.backgroundImage = `
+                        linear-gradient(#1e2937 1px, transparent 0),
+                        linear-gradient(90deg, #1e2937 1px, transparent 0),
+                        url('${currentBgUrl}')
+                    `
+                    map.style.backgroundSize = '50px 50px, 50px 50px, cover'
+                } else {
+                    map.style.backgroundImage = `
+                        linear-gradient(#1e2937 1px, transparent 0),
+                        linear-gradient(90deg, #1e2937 1px, transparent 0)
+                    `
+                    map.style.backgroundSize = '50px 50px'
+                }
             } else {
-                map.style.backgroundImage = currentBgUrl 
-                    ? `linear-gradient(#334155 1px, transparent 0), linear-gradient(90deg, #334155 1px, transparent 0), url('${currentBgUrl}')`
-                    : 'linear-gradient(#334155 1px, transparent 0), linear-gradient(90deg, #334155 1px, transparent 0)'
-                status.textContent = 'GRID: ATIVO'
-                status.classList.add('text-amber-300')
+                if (currentBgUrl) {
+                    map.style.backgroundImage = `url('${currentBgUrl}')`
+                    map.style.backgroundSize = 'cover'
+                } else {
+                    map.style.backgroundImage = 'none'
+                }
             }
-            map.style.backgroundSize = currentBgUrl ? 'cover, 50px 50px' : '50px 50px'
+            
+            updateGridStatus()
+            saveState()
+        }
+
+        function updateGridStatus() {
+            const statusEl = document.getElementById('grid-status')
+            statusEl.textContent = gridEnabled ? 'GRID: ATIVADO' : 'GRID: DESATIVADO'
+            statusEl.className = gridEnabled 
+                ? 'font-semibold text-emerald-400' 
+                : 'font-semibold text-slate-400'
         }
 
         // ==================== INICIALIZAÇÃO ====================
         function init() {
-            initTailwind()
             renderLibrary()
             
-            // Tenta carregar sessão salva
-            const saved = localStorage.getItem('manipulacaoRPG')
+            // Carregar sessão salva
+            const saved = localStorage.getItem('manipulacaoRPG_v1')
             if (saved) {
                 const state = JSON.parse(saved)
+                
                 if (state.library) library = state.library
                 if (state.placedTokens) placedTokens = state.placedTokens
-                if (state.background) currentBgUrl = state.background
+                if (typeof state.gridEnabled !== 'undefined') gridEnabled = state.gridEnabled
+                
                 renderLibrary()
                 renderPlacedTokens()
                 
-                // Aplica background se existir
-                if (currentBgUrl) {
-                    const map = document.getElementById('map')
+                const map = document.getElementById('map')
+                if (state.background) {
+                    currentBgUrl = state.background
                     map.style.backgroundImage = `url('${currentBgUrl}')`
                     map.style.backgroundSize = 'cover'
                     map.style.backgroundPosition = 'center'
                 }
+                
+                updateGridStatus()
+            } else {
+                updateGridStatus()
             }
             
-            console.log('%c✅ Site "Manipulação" carregado com sucesso!', 'color:#a78bfa; font-size:13px; font-family:monospace')
-            console.log('Tokens iniciais prontos. Totalmente personalizável e salvo no navegador.')
+            console.log('%c✅ Manipulação • Mesa Virtual de RPG inicializada com sucesso (estilo formal)', 'color:#6366f1; font-size:13px;')
         }
 
-        // Inicia tudo
         window.onload = init
     </script>
 </body>
