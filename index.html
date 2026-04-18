@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manipulação - RPG</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">MANIPULAÇÃO</div>
+        <div class="header-title">EDITOR DE MAPA RPG • MOVA OS BONECOS • CONTROLE TUDO</div>
+        
+        <div class="tools">
+            <button id="clear-btn">🗑️ LIMPAR TUDO</button>
+            <button id="save-btn">💾 SALVAR MAPA</button>
+            <button id="load-btn">📂 CARREGAR MAPA</button>
+            <label class="btn-upload">
+                📸 CAPTURAR TELA
+                <input type="file" id="load-json" accept=".json" style="display:none;">
+            </label>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="panel">
+                <h3>🌍 MAPA</h3>
+                <input type="file" id="bg-upload" accept="image/*">
+                <p class="hint">Carregue qualquer imagem como mapa</p>
+            </div>
+
+            <div class="panel">
+                <h3>🧬 BONECOS / TOKENS</h3>
+                <input type="file" id="token-upload" accept="image/*" multiple>
+                <p class="hint">Adicione seus próprios tokens (fotos, sprites...)</p>
+                
+                <h3 class="palette-title">📦 TOKENS PRONTOS (arraste)</h3>
+                <div id="palette" class="palette"></div>
+            </div>
+
+            <div class="panel">
+                <h3>⚙️ OPÇÕES</h3>
+                <label class="option-label">
+                    <input type="checkbox" id="grid-toggle" checked>
+                    Mostrar Grade
+                </label>
+                
+                <div class="snap-container">
+                    <label>Snap to Grid:</label>
+                    <input type="range" id="snap-range" min="0" max="100" value="50">
+                    <span id="snap-value">50px</span>
+                </div>
+                
+                <button id="undo-btn">↩️ DESFAZER ÚLTIMA AÇÃO</button>
+            </div>
+
+            <div class="info">
+                <strong>Como usar:</strong><br>
+                • Arraste tokens do painel para o mapa<br>
+                • Arraste os bonecos para mover<br>
+                • Clique direito no boneco → excluir<br>
+                • Duplo clique → redimensionar
+            </div>
+        </aside>
+
+        <!-- Mapa -->
+        <div id="map">
+            <div id="grid-overlay" class="grid-overlay"></div>
+            <div id="status">Mapa vazio • Arraste um boneco para começar</div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
