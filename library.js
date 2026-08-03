@@ -1,161 +1,393 @@
 // ==========================================
-// BIBLIOTECA DE TOKENS
+// MANIPULAÇÃO RPG
+// LIBRARY.JS
 // ==========================================
 
 
 const defaultLibrary = [
 
 
-    {
-        name:"Guerreiro",
-        color:"#2563eb"
-    },
+{
+    name:"Guerreiro",
+    color:"#ef4444",
+    size:60
+},
 
 
-    {
-        name:"Mago",
-        color:"#9333ea"
-    },
+{
+    name:"Mago",
+    color:"#6366f1",
+    size:60
+},
 
 
-    {
-        name:"Goblin",
-        color:"#16a34a"
-    },
+{
+    name:"Arqueiro",
+    color:"#22c55e",
+    size:60
+},
 
 
-    {
-        name:"Orc",
-        color:"#dc2626"
-    },
-
-
-    {
-        name:"Dragão",
-        color:"#7c2d12"
-    },
-
-
-    {
-        name:"Esqueleto",
-        color:"#94a3b8"
-    }
+{
+    name:"Monstro",
+    color:"#7c2d12",
+    size:70
+}
 
 
 ];
 
 
 
-let library =
-[
-    ...defaultLibrary
-];
+let tokenLibrary=[];
+
+
+
+const LIBRARY_KEY =
+"manipulacao_library";
+
+
 
 
 
 
 
 // ==========================================
-// RENDER BIBLIOTECA
+// INICIAR
 // ==========================================
+
+
+window.addEventListener(
+"load",
+loadLibrary
+);
+
+
+
+
+
+function loadLibrary(){
+
+
+
+const data =
+localStorage.getItem(
+LIBRARY_KEY
+);
+
+
+
+if(data){
+
+
+
+tokenLibrary =
+JSON.parse(data);
+
+
+
+}
+
+else{
+
+
+tokenLibrary =
+JSON.parse(
+JSON.stringify(
+defaultLibrary
+)
+);
+
+
+
+saveLibrary();
+
+
+
+}
+
+
+
+renderLibrary();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// SALVAR
+// ==========================================
+
+
+function saveLibrary(){
+
+
+
+localStorage.setItem(
+
+LIBRARY_KEY,
+
+JSON.stringify(
+tokenLibrary
+)
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// RENDER
+// ==========================================
+
 
 function renderLibrary(){
 
 
-    const container =
-    document.getElementById(
-        "libraryList"
-    );
+
+if(!DOM.library)
+return;
 
 
 
-    if(!container)
-        return;
+DOM.library.innerHTML="";
 
 
 
-    container.innerHTML="";
+
+
+tokenLibrary.forEach((item,index)=>{
 
 
 
-    library.forEach(item=>{
-
-
-        const card =
-        document.createElement(
-            "div"
-        );
+const card =
+document.createElement(
+"div"
+);
 
 
 
-        card.className =
-        "token-card";
+card.className =
+"token-card";
 
 
 
-        card.innerHTML = `
 
 
-        <div 
-        class="token-preview"
-        style="
-        background:${item.color}
-        "
-        >
+card.innerHTML=`
 
-        ${item.name[0]}
+<div class="token-preview"
+style="
+background:${item.color};
+width:${item.size}px;
+height:${item.size}px;
+">
 
-        </div>
+${item.name[0]}
 
-
-        <div class="token-info">
-
-        <div class="token-name">
-
-        ${item.name}
-
-        </div>
+</div>
 
 
-        <div class="token-type">
+<div class="token-info">
 
-        Criatura
-
-        </div>
-
-
-        </div>
+<div class="token-name">
+${item.name}
+</div>
 
 
-        `;
+<div class="token-type">
+${item.size}px
+</div>
+
+</div>
 
 
+<button class="delete-library">
+×
+</button>
 
-        card.onclick=()=>{
-
-
-            createToken({
-
-                name:item.name,
-
-                color:item.color
-
-            });
-
-
-        };
+`;
 
 
 
-        container.appendChild(
-            card
-        );
 
 
-    });
+
+card.onclick=function(e){
+
+
+
+if(
+e.target.classList.contains(
+"delete-library"
+)
+
+)
+return;
+
+
+
+createToken({
+
+
+
+name:item.name,
+
+
+color:item.color,
+
+
+size:item.size,
+
+
+image:item.image || null
+
+
+
+});
+
+
+
+};
+
+
+
+
+
+
+
+card
+.querySelector(
+".delete-library"
+)
+.onclick=function(e){
+
+
+
+e.stopPropagation();
+
+
+
+removeLibraryToken(index);
+
+
+
+};
+
+
+
+
+
+DOM.library.appendChild(card);
+
+
+
+});
+
 
 
 }
+
+
+
+
+
+
+
+
+
+// ==========================================
+// REMOVER
+// ==========================================
+
+
+function removeLibraryToken(index){
+
+
+
+tokenLibrary.splice(
+index,
+1
+);
+
+
+
+saveLibrary();
+
+
+
+renderLibrary();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// ADICIONAR
+// ==========================================
+
+
+function addToLibrary(token){
+
+
+
+tokenLibrary.push({
+
+
+name:token.name,
+
+
+color:token.color,
+
+
+size:token.size,
+
+
+image:token.image || null
+
+
+});
+
+
+
+saveLibrary();
+
+
+
+renderLibrary();
+
+
+
+}
+
+
+
+
 
 
 
@@ -165,45 +397,72 @@ function renderLibrary(){
 // RESTAURAR
 // ==========================================
 
+
 function resetLibrary(){
 
 
-    library =
-    [
-        ...defaultLibrary
-    ];
+
+tokenLibrary =
+JSON.parse(
+JSON.stringify(
+defaultLibrary
+)
+);
 
 
 
-    renderLibrary();
+saveLibrary();
 
 
 
-    toast(
-        "Biblioteca restaurada."
-    );
+renderLibrary();
+
+
+
+toast(
+"Biblioteca restaurada."
+);
+
+
 
 }
 
 
 
+
+
+
+
+
+
 // ==========================================
-// BOTÃO
+// BOTÃO RESTAURAR
 // ==========================================
+
 
 window.addEventListener(
 "load",
 ()=>{
 
 
-    document
-    .getElementById(
-        "resetLibrary"
-    )
-    ?.addEventListener(
-        "click",
-        resetLibrary
-    );
+const btn =
+document.getElementById(
+"resetLibrary"
+);
+
+
+
+if(btn){
+
+
+
+btn.onclick =
+resetLibrary;
+
+
+
+}
+
 
 
 });
