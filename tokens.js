@@ -7,6 +7,8 @@
 let tokens = [];
 
 
+
+
 // ==========================================
 // CRIAR TOKEN
 // ==========================================
@@ -15,7 +17,12 @@ let tokens = [];
 function createToken(data={}){
 
 
-const token = {
+saveHistory();
+
+
+
+const token={
+
 
 
 id:
@@ -24,17 +31,17 @@ Date.now()+Math.random(),
 
 
 name:
-data.name || "Novo Token",
+data.name || "Token",
 
 
 
 x:
-data.x || 200,
+data.x || 300,
 
 
 
 y:
-data.y || 200,
+data.y || 300,
 
 
 
@@ -53,17 +60,19 @@ data.image || null,
 
 
 
+rotation:0,
+
+
+
 hp:100,
 
 
-maxHp:100,
-
-
-rotation:0
+maxHp:100
 
 
 
 };
+
 
 
 
@@ -72,6 +81,7 @@ tokens.push(token);
 
 
 renderTokens();
+
 
 
 saveStorage();
@@ -84,10 +94,6 @@ toast(
 
 
 
-return token;
-
-
-
 }
 
 
@@ -95,8 +101,11 @@ return token;
 
 
 
+
+
+
 // ==========================================
-// RENDER
+// RENDER TOKENS
 // ==========================================
 
 
@@ -111,12 +120,17 @@ return;
 
 DOM.map
 .querySelectorAll(".token")
-.forEach(t=>t.remove());
+.forEach(
+e=>e.remove()
+);
+
+
 
 
 
 
 tokens.forEach(token=>{
+
 
 
 const el =
@@ -126,14 +140,13 @@ document.createElement(
 
 
 
-el.className =
-"token";
+
+el.className="token";
 
 
 
 el.dataset.id =
 token.id;
-
 
 
 
@@ -171,10 +184,15 @@ rotate(${token.rotation}deg)
 
 
 
-// imagem
+
+// =======================
+// IMAGEM
+// =======================
+
 
 
 if(token.image){
+
 
 
 const img =
@@ -183,8 +201,10 @@ document.createElement(
 );
 
 
+
 img.src =
 token.image;
+
 
 
 el.appendChild(img);
@@ -196,25 +216,26 @@ el.appendChild(img);
 else{
 
 
-const fallback =
+const div =
 document.createElement(
 "div"
 );
 
 
-fallback.className =
+
+div.className =
 "fallback";
 
 
 
-fallback.innerText =
+div.innerHTML =
 token.name
 .charAt(0)
 .toUpperCase();
 
 
 
-el.appendChild(fallback);
+el.appendChild(div);
 
 
 
@@ -226,7 +247,10 @@ el.appendChild(fallback);
 
 
 
-// nome
+
+// =======================
+// NOME
+// =======================
 
 
 const name =
@@ -240,7 +264,8 @@ name.className =
 "tokenName";
 
 
-name.innerText =
+
+name.innerHTML =
 token.name;
 
 
@@ -251,12 +276,68 @@ el.appendChild(name);
 
 
 
-// seleção
 
 
-el.addEventListener(
-"click",
-e=>{
+
+
+
+// =======================
+// HP
+// =======================
+
+
+
+const hp =
+document.createElement(
+"div"
+);
+
+
+
+hp.className =
+"hpBar";
+
+
+
+const fill =
+document.createElement(
+"div"
+);
+
+
+
+fill.className =
+"hpFill";
+
+
+
+fill.style.width =
+
+(token.hp/token.maxHp*100)
++"%";
+
+
+
+hp.appendChild(fill);
+
+
+
+el.appendChild(hp);
+
+
+
+
+
+
+
+
+
+// =======================
+// CLICK
+// =======================
+
+
+el.onclick=function(e){
 
 
 e.stopPropagation();
@@ -279,9 +360,33 @@ renderSelection();
 
 
 
-}
+};
 
+
+
+
+
+
+
+
+// =======================
+// DUPLO CLICK
+// =======================
+
+
+el.ondblclick=function(){
+
+
+
+rotateToken(
+token.id
 );
+
+
+
+};
+
+
 
 
 
@@ -302,12 +407,14 @@ DOM.map.appendChild(el);
 
 
 
+
+
 // ==========================================
-// ADICIONAR IMAGEM
+// ALTERAR IMAGEM
 // ==========================================
 
 
-function chooseTokenImage(id){
+function changeTokenImage(id){
 
 
 
@@ -318,18 +425,16 @@ document.createElement(
 
 
 
-input.type =
-"file";
+input.type="file";
 
 
-input.accept =
-"image/*";
+input.accept="image/*";
 
 
 
 
-input.onchange =
-e=>{
+input.onchange=function(e){
+
 
 
 const file =
@@ -342,15 +447,13 @@ return;
 
 
 
-
 const reader =
 new FileReader();
 
 
 
+reader.onload=function(){
 
-reader.onload =
-()=>{
 
 
 const token =
@@ -363,14 +466,17 @@ t=>t.id===id
 if(token){
 
 
+
 token.image =
 reader.result;
+
 
 
 renderTokens();
 
 
 saveStorage();
+
 
 
 }
@@ -389,12 +495,13 @@ reader.readAsDataURL(file);
 
 
 
-
 input.click();
 
 
 
 }
+
+
 
 
 
@@ -431,12 +538,12 @@ Number(size);
 renderTokens();
 
 
-
 saveStorage();
 
 
 
 }
+
 
 
 
@@ -466,8 +573,7 @@ return;
 
 
 
-token.color =
-color;
+token.color=color;
 
 
 
@@ -482,46 +588,6 @@ saveStorage();
 }
 
 
-
-
-
-
-
-// ==========================================
-// REMOVER TOKEN
-// ==========================================
-
-
-function removeToken(id){
-
-
-
-saveHistory();
-
-
-
-tokens =
-tokens.filter(
-t=>t.id!==id
-);
-
-
-
-renderTokens();
-
-
-
-saveStorage();
-
-
-
-toast(
-"Token removido."
-);
-
-
-
-}
 
 
 
@@ -572,12 +638,56 @@ saveStorage();
 
 
 
+
 // ==========================================
-// ATUALIZAR HP
+// DELETAR
 // ==========================================
 
 
-function updateTokenHP(id,value){
+function deleteToken(id){
+
+
+
+saveHistory();
+
+
+
+tokens =
+tokens.filter(
+t=>t.id!==id
+);
+
+
+
+renderTokens();
+
+
+
+saveStorage();
+
+
+
+toast(
+"Token excluído."
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// HP
+// ==========================================
+
+
+function damageToken(id,value){
 
 
 
@@ -593,19 +703,54 @@ return;
 
 
 
-token.hp =
-Math.max(
+token.hp = Math.max(
+
 0,
-Math.min(
-token.maxHp,
-value
-)
+
+token.hp-value
+
 );
 
 
 
 renderTokens();
 
+
+saveStorage();
+
+
+
+}
+
+
+
+function healToken(id,value){
+
+
+
+const token =
+tokens.find(
+t=>t.id===id
+);
+
+
+
+if(!token)
+return;
+
+
+
+token.hp = Math.min(
+
+token.maxHp,
+
+token.hp+value
+
+);
+
+
+
+renderTokens();
 
 
 saveStorage();
