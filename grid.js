@@ -1,7 +1,24 @@
 // ==========================================
+// GRID SYSTEM
 // MANIPULAÇÃO RPG
-// GRID.JS
 // ==========================================
+
+
+const Grid = {
+
+    enabled:true,
+
+    size:50,
+
+    sizes:[
+        25,
+        50,
+        75,
+        100
+    ]
+
+};
+
 
 
 
@@ -9,53 +26,33 @@
 // INICIAR GRID
 // ==========================================
 
+window.addEventListener("load",()=>{
 
-window.addEventListener(
-"load",
-initGrid
-);
+    initGrid();
 
-
+});
 
 
 
 function initGrid(){
 
+    const button =
+    document.getElementById("toggleGrid");
 
 
-const button =
-document.getElementById(
-"toggleGrid"
-);
+    if(button){
+
+        button.addEventListener(
+            "click",
+            toggleGrid
+        );
+
+    }
 
 
-
-if(button){
-
-
-button.onclick=function(){
-
-
-
-toggleGrid();
-
-
-
-};
-
-
+    applyGrid();
 
 }
-
-
-
-applyGrid();
-
-
-
-}
-
-
 
 
 
@@ -63,55 +60,36 @@ applyGrid();
 
 
 // ==========================================
-// MOSTRAR / ESCONDER GRID
+// ATIVAR / DESATIVAR GRID
 // ==========================================
 
 
 function toggleGrid(){
 
 
-
-App.gridVisible =
-!App.gridVisible;
-
+    Grid.enabled =
+    !Grid.enabled;
 
 
-applyGrid();
+    App.gridVisible =
+    Grid.enabled;
 
 
-
-saveStorage();
+    applyGrid();
 
 
 
-if(App.gridVisible){
+    toast(
 
+        Grid.enabled
 
+        ? "Grid ativado."
 
-toast(
-"Grid ativado."
-);
+        : "Grid desativado."
 
-
+    );
 
 }
-
-else{
-
-
-toast(
-"Grid desativado."
-);
-
-
-
-}
-
-
-
-}
-
-
 
 
 
@@ -127,43 +105,45 @@ toast(
 function applyGrid(){
 
 
-
-if(!DOM.map)
-return;
-
+    if(!DOM.map)
+        return;
 
 
 
-if(
-App.gridVisible
-){
+    DOM.map.classList.remove(
+
+        "grid25",
+        "grid50",
+        "grid75",
+        "grid100",
+        "no-grid"
+
+    );
 
 
 
-DOM.map.classList.add(
-"grid50"
-);
+    if(!Grid.enabled){
 
+
+        DOM.map.classList.add(
+            "no-grid"
+        );
+
+
+        return;
+
+    }
+
+
+
+    DOM.map.classList.add(
+
+        "grid"+Grid.size
+
+    );
 
 
 }
-
-else{
-
-
-DOM.map.style.backgroundImage =
-"none";
-
-
-
-}
-
-
-
-}
-
-
-
 
 
 
@@ -171,27 +151,34 @@ DOM.map.style.backgroundImage =
 
 
 // ==========================================
-// ALTERAR TAMANHO
+// ALTERAR TAMANHO DO GRID
 // ==========================================
 
 
 function changeGridSize(size){
 
 
-
-App.gridSize =
-size;
-
-
-
-DOM.map.style.backgroundSize =
-
-size+"px "+size+"px";
+    if(
+        !Grid.sizes.includes(size)
+    )
+        return;
 
 
 
-saveStorage();
+    Grid.size=size;
 
+
+    App.gridSize=size;
+
+
+
+    applyGrid();
+
+
+
+    toast(
+        "Grid alterado para "+size+"px"
+    );
 
 
 }
@@ -201,38 +188,229 @@ saveStorage();
 
 
 
+// ==========================================
+// PRÓXIMO TAMANHO
+// ==========================================
+
+
+function nextGridSize(){
+
+
+    let index =
+    Grid.sizes.indexOf(
+        Grid.size
+    );
+
+
+    index++;
+
+
+    if(index>=Grid.sizes.length){
+
+        index=0;
+
+    }
+
+
+
+    changeGridSize(
+
+        Grid.sizes[index]
+
+    );
+
+
+}
+
+
+
 
 
 
 // ==========================================
-// RESET GRID
+// SNAP DOS TOKENS
 // ==========================================
 
 
-function resetGrid(){
+function snapPosition(x,y){
+
+
+    if(!App.snapGrid){
+
+        return {
+
+            x:x,
+
+            y:y
+
+        };
+
+    }
 
 
 
-App.gridSize=50;
+    return {
+
+
+        x:
+        Math.round(
+            x / Grid.size
+        ) * Grid.size,
+
+
+        y:
+        Math.round(
+            y / Grid.size
+        ) * Grid.size
+
+
+    };
+
+
+}
 
 
 
-App.gridVisible=true;
 
 
 
-applyGrid();
+// ==========================================
+// ATIVAR / DESATIVAR SNAP
+// ==========================================
+
+
+function toggleSnap(){
+
+
+    App.snapGrid =
+    !App.snapGrid;
 
 
 
-saveStorage();
+    toast(
+
+        App.snapGrid
+
+        ? "Snap ativado."
+
+        : "Snap desativado."
+
+    );
+
+}
 
 
 
-toast(
-"Grid restaurado."
-);
 
 
+
+// ==========================================
+// POSIÇÃO DA CÉLULA
+// ==========================================
+
+
+function getGridCell(x,y){
+
+
+    return {
+
+
+        x:
+        Math.floor(
+            x / Grid.size
+        ),
+
+
+        y:
+        Math.floor(
+            y / Grid.size
+        )
+
+
+    };
+
+}
+
+
+
+
+
+
+// ==========================================
+// SALVAR CONFIGURAÇÃO
+// ==========================================
+
+
+function saveGrid(){
+
+
+    localStorage.setItem(
+
+        "grid",
+
+        JSON.stringify({
+
+            enabled:Grid.enabled,
+
+            size:Grid.size
+
+        })
+
+    );
+
+
+}
+
+
+
+
+
+
+// ==========================================
+// CARREGAR CONFIGURAÇÃO
+// ==========================================
+
+
+function loadGrid(){
+
+
+    const data =
+    localStorage.getItem(
+        "grid"
+    );
+
+
+
+    if(!data)
+        return;
+
+
+
+    const config =
+    JSON.parse(data);
+
+
+
+    Grid.enabled =
+    config.enabled;
+
+
+
+    Grid.size =
+    config.size;
+
+
+
+    App.gridSize =
+    config.size;
+
+
+
+    App.gridVisible =
+    config.enabled;
+
+
+
+    applyGrid();
 
 }
