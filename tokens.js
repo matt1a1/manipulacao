@@ -3,7 +3,8 @@
 // ==========================================
 
 
-let tokens=[];
+let tokens = [];
+
 
 
 
@@ -11,10 +12,15 @@ let tokens=[];
 // CRIAR TOKEN
 // ==========================================
 
-function createToken(data={}){
+
+function createToken(data){
 
 
-const token={
+saveHistory();
+
+
+
+const token = {
 
 
 id:
@@ -23,7 +29,7 @@ Date.now()+Math.random(),
 
 
 name:
-data.name || "Novo Token",
+data.name || "Token",
 
 
 
@@ -37,31 +43,43 @@ data.image || null,
 
 
 
+x:
+300,
+
+
+
+y:
+300,
+
+
+
 size:
-Number(data.size) || 60,
+data.size || 60,
 
 
 
-x:300,
-
-y:300,
-
-
-
-rotation:0,
+hp:
+data.hp || 100,
 
 
 
-hp:100,
-
-maxHp:100,
-
+maxHp:
+data.maxHp || 100,
 
 
-status:[]
+
+rotation:
+0,
+
+
+
+status:
+[]
+
 
 
 };
+
 
 
 
@@ -69,14 +87,8 @@ tokens.push(token);
 
 
 
-if(typeof saveHistory==="function")
-{
-saveHistory();
-}
-
-
-
 renderTokens();
+
 
 
 saveStorage();
@@ -99,26 +111,17 @@ toast(
 // RENDER TOKENS
 // ==========================================
 
+
 function renderTokens(){
 
 
-const map =
-document.getElementById(
-"map"
-);
 
-
-
-if(!map)
+if(!DOM.map)
 return;
 
 
 
-map
-.querySelectorAll(".token")
-.forEach(
-t=>t.remove()
-);
+DOM.map.innerHTML="";
 
 
 
@@ -126,90 +129,89 @@ t=>t.remove()
 tokens.forEach(token=>{
 
 
-const element =
-document.createElement(
-"div"
-);
+const el =
+document.createElement("div");
 
 
 
-element.className =
-"token";
+el.className =
+"token spawn";
 
 
 
-element.dataset.id =
+el.dataset.id =
 token.id;
 
 
 
-element.style.left =
+
+// TAMANHO INDIVIDUAL
+
+
+el.style.width =
+token.size+"px";
+
+
+el.style.height =
+token.size+"px";
+
+
+
+// POSIÇÃO
+
+
+el.style.left =
 token.x+"px";
 
 
-
-element.style.top =
+el.style.top =
 token.y+"px";
 
 
 
-element.style.width =
-token.size+"px";
+// ROTAÇÃO
 
 
-
-element.style.height =
-token.size+"px";
-
-
-
-element.style.background =
-token.color;
-
-
-
-element.style.transform =
+el.style.transform =
 `
 rotate(${token.rotation}deg)
 `;
 
 
 
+// COR
+
+
+el.style.background =
+token.color;
+
+
 
 
 // IMAGEM
+
 
 if(token.image){
 
 
 const img =
-document.createElement(
-"img"
-);
+document.createElement("img");
 
 
 img.src =
 token.image;
 
 
-element.appendChild(
-img
-);
+el.appendChild(img);
 
 
-}
 
+}else{
 
-// SEM IMAGEM
-
-else{
 
 
 const fallback =
-document.createElement(
-"div"
-);
-
+document.createElement("div");
 
 
 fallback.className =
@@ -219,15 +221,14 @@ fallback.className =
 
 fallback.innerText =
 token.name
-.charAt(0)
+.substring(0,2)
 .toUpperCase();
 
 
 
-element.appendChild(
+el.appendChild(
 fallback
 );
-
 
 
 }
@@ -237,25 +238,65 @@ fallback
 
 // NOME
 
-const label =
-document.createElement(
-"div"
-);
+
+const name =
+document.createElement("div");
 
 
-
-label.className =
+name.className =
 "tokenName";
 
 
-
-label.innerText =
+name.innerText =
 token.name;
 
 
 
-element.appendChild(
-label
+el.appendChild(name);
+
+
+
+
+
+
+// VIDA
+
+
+const hp =
+document.createElement("div");
+
+
+hp.className =
+"hpBar";
+
+
+
+const hpFill =
+document.createElement("div");
+
+
+hpFill.className =
+"hpFill";
+
+
+
+hpFill.style.width =
+
+(
+(token.hp/token.maxHp)*100
+)
++"%";
+
+
+
+hp.appendChild(
+hpFill
+);
+
+
+
+el.appendChild(
+hp
 );
 
 
@@ -263,9 +304,69 @@ label
 
 
 
-// CLICK
 
-element.addEventListener(
+// STATUS
+
+
+if(
+token.status &&
+token.status.length
+){
+
+
+const status =
+document.createElement("div");
+
+
+status.className =
+"statusContainer";
+
+
+
+token.status.forEach(s=>{
+
+
+if(s){
+
+
+const icon =
+document.createElement("div");
+
+
+icon.className =
+"status";
+
+
+icon.innerText =
+s;
+
+
+status.appendChild(icon);
+
+
+}
+
+
+
+});
+
+
+
+el.appendChild(status);
+
+
+
+}
+
+
+
+
+
+
+// CLIQUE
+
+
+el.addEventListener(
 "click",
 e=>{
 
@@ -274,11 +375,11 @@ e.stopPropagation();
 
 
 
-if(typeof addSelection==="function")
-{
-
+if(!e.shiftKey){
 
 clearSelection();
+
+}
 
 
 
@@ -291,8 +392,6 @@ token.id
 renderSelection();
 
 
-}
-
 
 });
 
@@ -300,8 +399,11 @@ renderSelection();
 
 
 
-map.appendChild(
-element
+
+
+
+DOM.map.appendChild(
+el
 );
 
 
@@ -310,8 +412,110 @@ element
 
 
 
-renderSelection();
+}
 
+
+
+
+
+// ==========================================
+// ATUALIZAR TOKEN
+// ==========================================
+
+
+function updateToken(id,data){
+
+
+const token =
+tokens.find(
+t=>t.id===id
+);
+
+
+
+if(!token)
+return;
+
+
+
+Object.assign(
+token,
+data
+);
+
+
+
+renderTokens();
+
+
+
+saveStorage();
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// REMOVER TOKEN
+// ==========================================
+
+
+function removeToken(id){
+
+
+saveHistory();
+
+
+
+tokens =
+tokens.filter(
+t=>
+t.id!==id
+);
+
+
+
+clearSelection();
+
+
+
+renderTokens();
+
+
+
+saveStorage();
+
+
+
+toast(
+"Token removido."
+);
+
+
+
+}
+
+
+
+
+
+// ==========================================
+// PEGAR TOKEN
+// ==========================================
+
+
+function getToken(id){
+
+
+return tokens.find(
+t=>t.id===id
+);
 
 
 }
