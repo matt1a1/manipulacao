@@ -5,30 +5,38 @@
 
 
 // ==========================================
-// APP
+// CONFIGURAÇÃO DA APLICAÇÃO
 // ==========================================
 
 const App = {
 
-    version:"2.1.0",
+
+    version:"2.0.0",
+
 
     zoom:1,
 
-    minZoom:0.3,
+
+    minZoom:0.30,
+
 
     maxZoom:4,
 
 
     gridSize:50,
 
+
     snapGrid:true,
+
 
     gridVisible:true,
 
 
     fogEnabled:false,
 
+
     measureMode:false,
+
 
 
     selectedTokens:[],
@@ -39,25 +47,35 @@ const App = {
 
     history:[],
 
+
     redoHistory:[],
+
 
 
     mouse:{
 
+
         x:0,
 
+
         y:0
+
 
     },
 
 
+
     mapOffset:{
+
 
         x:0,
 
+
         y:0
 
+
     }
+
 
 };
 
@@ -65,26 +83,48 @@ const App = {
 
 
 
+
+
 // ==========================================
-// DOM
+// VARIÁVEIS GLOBAIS
 // ==========================================
 
-const DOM = {
+
+let tokens = [];
+
+
+
+
+
+
+// ==========================================
+// ELEMENTOS DOM
+// ==========================================
+
+
+const DOM={
 
 
     map:null,
 
+
     wrapper:null,
+
 
     sidebar:null,
 
+
     zoomLabel:null,
+
 
     loading:null,
 
+
     library:null,
 
+
     initiative:null,
+
 
     contextMenu:null
 
@@ -97,15 +137,22 @@ const DOM = {
 
 
 
+
+
 // ==========================================
-// START
+// INICIAR SISTEMA
 // ==========================================
 
 
 window.addEventListener(
-    "load",
-    init
+
+"load",
+
+init
+
 );
+
+
 
 
 
@@ -114,45 +161,55 @@ window.addEventListener(
 function init(){
 
 
+
     cacheDOM();
+
+
+
+    loadStorage();
+
 
 
     registerEvents();
 
 
-    if(typeof loadStorage==="function"){
-
-        loadStorage();
-
-    }
-
-
 
     if(typeof renderLibrary==="function"){
 
+
         renderLibrary();
 
+
     }
+
 
 
 
     if(typeof renderTokens==="function"){
 
+
         renderTokens();
 
+
     }
+
 
 
 
     updateZoom();
 
 
+
     hideLoading();
 
 
+
     toast(
-        "Mesa carregada."
+
+        "Mesa carregada com sucesso."
+
     );
+
 
 
 }
@@ -164,67 +221,94 @@ function init(){
 
 
 
+
 // ==========================================
-// CACHE DOM
+// PEGAR ELEMENTOS HTML
 // ==========================================
 
 
 function cacheDOM(){
 
 
+
     DOM.map =
+
     document.getElementById(
+
         "map"
+
     );
 
 
 
     DOM.wrapper =
+
     document.getElementById(
+
         "mapWrapper"
+
     );
 
 
 
     DOM.sidebar =
+
     document.getElementById(
+
         "sidebar"
+
     );
 
 
 
     DOM.zoomLabel =
+
     document.getElementById(
+
         "zoomValue"
+
     );
 
 
 
     DOM.loading =
+
     document.getElementById(
+
         "loading"
+
     );
 
 
 
     DOM.library =
+
     document.getElementById(
+
         "libraryList"
+
     );
 
 
 
     DOM.initiative =
+
     document.getElementById(
+
         "initiativeList"
+
     );
 
 
 
     DOM.contextMenu =
+
     document.getElementById(
+
         "contextMenu"
+
     );
+
 
 
 }
@@ -234,12 +318,15 @@ function cacheDOM(){
 
 
 
+
+
 // ==========================================
-// EVENTOS
+// EVENTOS GERAIS
 // ==========================================
 
 
 function registerEvents(){
+
 
 
     window.addEventListener(
@@ -272,45 +359,14 @@ function registerEvents(){
 
 
 
-    document.addEventListener(
-
-        "click",
-
-        ()=>{
-
-            if(typeof closeContextMenu==="function"){
-
-                closeContextMenu();
-
-            }
-
-        }
-
-    );
-
-
-
-    if(DOM.wrapper){
-
-
-        DOM.wrapper.addEventListener(
-
-            "wheel",
-
-            zoomWheel,
-
-            {
-                passive:false
-            }
-
-        );
-
-
-    }
-
-
-
 }
+
+
+
+
+
+
+
 
 // ==========================================
 // HISTÓRICO
@@ -320,7 +376,9 @@ function registerEvents(){
 function saveHistory(){
 
 
+
     const state={
+
 
 
         zoom:App.zoom,
@@ -332,10 +390,15 @@ function saveHistory(){
         snap:App.snapGrid,
 
 
+
         tokens:
+
         JSON.parse(
+
             JSON.stringify(tokens)
+
         )
+
 
 
     };
@@ -346,11 +409,17 @@ function saveHistory(){
 
 
 
+
+
     if(App.history.length>50){
+
 
         App.history.shift();
 
+
     }
+
+
 
 
 
@@ -365,23 +434,34 @@ function saveHistory(){
 
 
 
+
+
 // ==========================================
-// UNDO
+// DESFAZER
 // ==========================================
 
 
 function undo(){
 
 
+
     if(App.history.length===0){
 
+
+
         toast(
+
             "Nada para desfazer."
+
         );
+
 
         return;
 
+
     }
+
+
 
 
 
@@ -398,11 +478,14 @@ function undo(){
         snap:App.snapGrid,
 
 
-        tokens:
-        JSON.parse(
-            JSON.stringify(tokens)
-        )
 
+        tokens:
+
+        JSON.parse(
+
+            JSON.stringify(tokens)
+
+        )
 
     };
 
@@ -412,51 +495,52 @@ function undo(){
 
 
 
+
+
     const state =
+
     App.history.pop();
 
 
 
 
-    App.zoom =
-    state.zoom;
+
+    App.zoom=state.zoom;
 
 
-
-    App.gridVisible =
-    state.grid;
+    App.gridVisible=state.grid;
 
 
-
-    App.snapGrid =
-    state.snap;
+    App.snapGrid=state.snap;
 
 
 
     tokens =
+
     JSON.parse(
+
         JSON.stringify(
+
             state.tokens
+
         )
+
     );
 
 
 
 
-    if(typeof renderTokens==="function"){
 
-        renderTokens();
-
-    }
+    renderTokens();
 
 
 
     updateZoom();
 
 
-    toast(
-        "Desfeito."
-    );
+
+    saveStorage();
+
 
 
 }
@@ -468,28 +552,39 @@ function undo(){
 
 
 
+
 // ==========================================
-// REDO
+// REFAZER
 // ==========================================
 
 
 function redo(){
 
 
+
     if(App.redoHistory.length===0){
 
+
+
         toast(
+
             "Nada para refazer."
+
         );
 
+
         return;
+
 
     }
 
 
 
 
+
+
     const current={
+
 
 
         zoom:App.zoom,
@@ -501,10 +596,15 @@ function redo(){
         snap:App.snapGrid,
 
 
+
         tokens:
+
         JSON.parse(
+
             JSON.stringify(tokens)
+
         )
+
 
 
     };
@@ -517,42 +617,43 @@ function redo(){
 
 
 
-    const state =
+    const state=
+
     App.redoHistory.pop();
 
 
 
 
-    App.zoom =
-    state.zoom;
+
+    App.zoom=state.zoom;
+
+
+    App.gridVisible=state.grid;
+
+
+    App.snapGrid=state.snap;
 
 
 
-    App.gridVisible =
-    state.grid;
 
 
+    tokens=
 
-    App.snapGrid =
-    state.snap;
-
-
-
-    tokens =
     JSON.parse(
+
         JSON.stringify(
+
             state.tokens
+
         )
+
     );
 
 
 
 
-    if(typeof renderTokens==="function"){
 
-        renderTokens();
-
-    }
+    renderTokens();
 
 
 
@@ -560,9 +661,8 @@ function redo(){
 
 
 
-    toast(
-        "Refeito."
-    );
+    saveStorage();
+
 
 
 }
@@ -583,23 +683,27 @@ function redo(){
 function clearSelection(){
 
 
+
     App.selectedTokens=[];
 
 
 
     document
-    .querySelectorAll(
-        ".token"
-    )
+
+    .querySelectorAll(".token")
+
     .forEach(el=>{
 
 
         el.classList.remove(
+
             "selected"
+
         );
 
 
     });
+
 
 
 }
@@ -613,33 +717,18 @@ function clearSelection(){
 function addSelection(id){
 
 
+
     if(
+
         !App.selectedTokens.includes(id)
+
     ){
+
 
         App.selectedTokens.push(id);
 
+
     }
-
-
-}
-
-
-
-
-
-
-
-function removeSelection(id){
-
-
-    App.selectedTokens =
-
-    App.selectedTokens.filter(
-
-        t=>t!==id
-
-    );
 
 
 }
@@ -653,6 +742,7 @@ function removeSelection(id){
 function selectAll(){
 
 
+
     clearSelection();
 
 
@@ -661,7 +751,9 @@ function selectAll(){
 
 
         App.selectedTokens.push(
+
             token.id
+
         );
 
 
@@ -680,20 +772,21 @@ function selectAll(){
 
 
 
-
 function renderSelection(){
 
 
 
     document
-    .querySelectorAll(
-        ".token"
-    )
+
+    .querySelectorAll(".token")
+
     .forEach(el=>{
 
 
         el.classList.remove(
+
             "selected"
+
         );
 
 
@@ -702,14 +795,16 @@ function renderSelection(){
 
 
 
+
     App.selectedTokens.forEach(id=>{
 
 
-        const el =
+
+        const el=
 
         document.querySelector(
 
-            `.token[data-id="${id}"]`
+        `.token[data-id="${id}"]`
 
         );
 
@@ -718,9 +813,13 @@ function renderSelection(){
         if(el){
 
 
+
             el.classList.add(
+
                 "selected"
+
             );
+
 
 
         }
@@ -741,18 +840,68 @@ function renderSelection(){
 
 
 // ==========================================
-// DELETAR
+// COPIAR / COLAR
 // ==========================================
 
 
-function deleteSelection(){
+function copySelection(){
 
 
-    if(
-        App.selectedTokens.length===0
-    )
-        return;
 
+    App.clipboard=[];
+
+
+
+    App.selectedTokens.forEach(id=>{
+
+
+
+        const token=
+
+        tokens.find(
+
+            t=>t.id===id
+
+        );
+
+
+
+        if(token){
+
+
+
+            App.clipboard.push(
+
+                structuredClone(token)
+
+            );
+
+
+        }
+
+
+
+    });
+
+
+
+    toast(
+
+        "Copiado."
+
+    );
+
+
+}
+
+
+
+
+
+
+
+
+function pasteSelection(){
 
 
 
@@ -760,46 +909,48 @@ function deleteSelection(){
 
 
 
-    tokens =
-
-    tokens.filter(token=>
-
-
-        !App.selectedTokens.includes(
-            token.id
-        )
-
-
-    );
+    App.clipboard.forEach(token=>{
 
 
 
-    clearSelection();
+        tokens.push({
 
 
 
-    if(typeof renderTokens==="function"){
-
-        renderTokens();
-
-    }
+            ...token,
 
 
 
-    if(typeof saveStorage==="function"){
-
-        saveStorage();
-
-    }
+            id:Date.now()+Math.random(),
 
 
 
-    toast(
-        "Token removido."
-    );
+            x:token.x+50,
+
+
+            y:token.y+50
+
+
+
+        });
+
+
+
+    });
+
+
+
+
+
+    renderTokens();
+
+
+
+    saveStorage();
 
 
 }
+
 
 
 
@@ -815,453 +966,17 @@ function deleteSelection(){
 function duplicateSelection(){
 
 
-    if(
-        App.selectedTokens.length===0
-    )
-        return;
+
+    copySelection();
 
 
 
-    saveHistory();
+    pasteSelection();
 
-
-
-    let copies=[];
-
-
-
-
-    App.selectedTokens.forEach(id=>{
-
-
-        const original =
-
-        tokens.find(
-
-            t=>t.id===id
-
-        );
-
-
-
-        if(!original)
-            return;
-
-
-
-
-        copies.push({
-
-            ...original,
-
-
-            id:
-            Date.now()+Math.random(),
-
-
-            x:
-            original.x+40,
-
-
-            y:
-            original.y+40
-
-
-        });
-
-
-
-    });
-
-
-
-
-
-    tokens.push(
-        ...copies
-    );
-
-
-
-    renderTokens();
-
-
-
-    saveStorage();
-
-
-
-    toast(
-        "Duplicado."
-    );
 
 
 }
 
-
-
-
-
-
-
-// ==========================================
-// COPIAR
-// ==========================================
-
-
-function copySelection(){
-
-
-    if(
-        App.selectedTokens.length===0
-    )
-        return;
-
-
-
-
-    App.clipboard=[];
-
-
-
-
-    App.selectedTokens.forEach(id=>{
-
-
-        const token =
-
-        tokens.find(
-
-            t=>t.id===id
-
-        );
-
-
-
-        if(token){
-
-
-            App.clipboard.push(
-
-                JSON.parse(
-
-                    JSON.stringify(token)
-
-                )
-
-            );
-
-
-        }
-
-
-    });
-
-
-
-
-    toast(
-        "Copiado."
-    );
-
-
-}
-
-
-
-
-
-
-// ==========================================
-// COLAR
-// ==========================================
-
-
-function pasteSelection(){
-
-
-    if(
-        App.clipboard.length===0
-    )
-        return;
-
-
-
-
-    saveHistory();
-
-
-
-
-    App.clipboard.forEach(token=>{
-
-
-        tokens.push({
-
-            ...token,
-
-
-            id:
-            Date.now()+Math.random(),
-
-
-            x:
-            token.x+50,
-
-
-            y:
-            token.y+50
-
-
-        });
-
-
-    });
-
-
-
-
-
-    renderTokens();
-
-
-
-    saveStorage();
-
-
-
-    toast(
-        "Colado."
-    );
-
-
-}
-
-// ==========================================
-// CRIAR TOKEN
-// ==========================================
-
-
-function createToken(){
-
-
-    const nameInput =
-    document.getElementById(
-        "tokenName"
-    );
-
-
-    const colorInput =
-    document.getElementById(
-        "tokenColor"
-    );
-
-
-    const imageInput =
-    document.getElementById(
-        "tokenImage"
-    );
-
-
-    const sizeInput =
-    document.getElementById(
-        "tokenSize"
-    );
-
-
-
-    const name =
-    nameInput.value.trim()
-    ||
-    "Novo Token";
-
-
-
-    const color =
-    colorInput.value;
-
-
-
-    const size =
-    Number(
-        sizeInput.value
-    );
-
-
-
-
-    saveHistory();
-
-
-
-
-
-    const token={
-
-
-        id:
-        Date.now(),
-
-
-        name:name,
-
-
-        color:color,
-
-
-        size:size,
-
-
-        image:null,
-
-
-        x:200,
-
-
-        y:200,
-
-
-        hp:100,
-
-
-        shield:0,
-
-
-        rotation:0
-
-
-    };
-
-
-
-
-
-    if(
-        imageInput.files.length
-    ){
-
-
-        const reader =
-        new FileReader();
-
-
-
-        reader.onload=function(e){
-
-
-            token.image =
-            e.target.result;
-
-
-
-            tokens.push(token);
-
-
-
-            renderTokens();
-
-
-
-            saveStorage();
-
-
-
-        };
-
-
-
-        reader.readAsDataURL(
-
-            imageInput.files[0]
-
-        );
-
-
-    }
-
-    else{
-
-
-        tokens.push(token);
-
-
-
-        renderTokens();
-
-
-
-        saveStorage();
-
-
-    }
-
-
-
-
-
-
-    nameInput.value="";
-
-
-
-    imageInput.value="";
-
-
-
-    toast(
-        "Token criado."
-    );
-
-
-}
-
-
-
-
-
-
-// ==========================================
-// ATUALIZAR TAMANHO DO TOKEN
-// ==========================================
-
-
-const sizeSlider =
-document.getElementById(
-    "tokenSize"
-);
-
-
-
-if(sizeSlider){
-
-
-    sizeSlider.addEventListener(
-
-        "input",
-
-        ()=>{
-
-
-            const value =
-            document.getElementById(
-                "tokenSizeValue"
-            );
-
-
-            if(value){
-
-                value.textContent =
-                sizeSlider.value+"px";
-
-            }
-
-
-        }
-
-    );
-
-
-}
 
 
 
@@ -1279,6 +994,7 @@ function updateViewport(){
 
     updateZoom();
 
+
 }
 
 
@@ -1288,14 +1004,19 @@ function updateViewport(){
 function updateZoom(){
 
 
+
     if(!DOM.map)
+
         return;
 
 
 
-    DOM.map.style.transform =
+
+
+    DOM.map.style.transform=
 
     `translate(-50%,-50%) scale(${App.zoom})`;
+
 
 
 
@@ -1303,12 +1024,10 @@ function updateZoom(){
     if(DOM.zoomLabel){
 
 
-        DOM.zoomLabel.textContent =
 
-        Math.round(
-            App.zoom*100
-        )
-        +"%";
+        DOM.zoomLabel.textContent=
+
+        Math.round(App.zoom*100)+"%";
 
 
     }
@@ -1317,122 +1036,6 @@ function updateZoom(){
 }
 
 
-
-
-
-
-
-function zoomWheel(e){
-
-
-    e.preventDefault();
-
-
-
-    if(e.deltaY<0){
-
-        App.zoom+=0.1;
-
-    }
-
-    else{
-
-        App.zoom-=0.1;
-
-    }
-
-
-
-    App.zoom = Math.max(
-
-        App.minZoom,
-
-        Math.min(
-
-            App.maxZoom,
-
-            App.zoom
-
-        )
-
-    );
-
-
-
-    updateZoom();
-
-
-}
-
-
-
-
-
-
-// ==========================================
-// BOTÕES DE ZOOM
-// ==========================================
-
-
-const zoomIn =
-document.getElementById(
-    "zoomIn"
-);
-
-
-if(zoomIn){
-
-
-    zoomIn.onclick=()=>{
-
-
-        App.zoom+=0.1;
-
-
-        updateZoom();
-
-
-    };
-
-
-}
-
-
-
-
-
-
-const zoomOut =
-document.getElementById(
-    "zoomOut"
-);
-
-
-if(zoomOut){
-
-
-    zoomOut.onclick=()=>{
-
-
-        App.zoom-=0.1;
-
-
-        App.zoom=Math.max(
-
-            App.minZoom,
-
-            App.zoom
-
-        );
-
-
-        updateZoom();
-
-
-    };
-
-
-}
 
 
 
@@ -1449,53 +1052,28 @@ function keyboard(e){
 
 
 
-    if(
-        e.target.tagName==="INPUT"
-    )
+    if(e.target.tagName==="INPUT")
+
         return;
 
 
 
 
-    switch(e.key){
+
+    if(e.key==="Delete"){
+
+
+        deleteSelection();
+
+
+    }
 
 
 
-        case "Delete":
+    if(e.key==="Escape"){
 
 
-            deleteSelection();
-
-
-        break;
-
-
-
-
-        case "Escape":
-
-
-            clearSelection();
-
-
-        break;
-
-
-
-
-        case " ":
-
-
-            if(
-                typeof startPan==="function"
-            ){
-
-                startPan();
-
-            }
-
-
-        break;
+        clearSelection();
 
 
     }
@@ -1509,64 +1087,32 @@ function keyboard(e){
 
 
 
-        switch(
-            e.key.toLowerCase()
-        ){
+        if(e.key==="z")
+
+            undo();
 
 
 
-            case "c":
+        if(e.key==="y")
 
-                copySelection();
-
-            break;
+            redo();
 
 
 
-            case "v":
+        if(e.key==="c")
 
-                pasteSelection();
-
-            break;
+            copySelection();
 
 
 
-            case "z":
+        if(e.key==="v")
 
-                undo();
+            pasteSelection();
 
-            break;
-
-
-
-            case "y":
-
-                redo();
-
-            break;
-
-
-
-            case "d":
-
-                duplicateSelection();
-
-            break;
-
-
-
-            case "a":
-
-                selectAll();
-
-            break;
-
-
-
-        }
 
 
     }
+
 
 
 }
@@ -1576,24 +1122,22 @@ function keyboard(e){
 
 
 
+
 function keyboardUp(e){
 
 
-    if(
-        e.key===" "
-    ){
+
+    if(e.key===" "){
 
 
-        if(
-            typeof stopPan==="function"
-        ){
+        if(typeof stopPan==="function")
 
             stopPan();
 
-        }
 
 
     }
+
 
 
 }
@@ -1613,12 +1157,17 @@ function keyboardUp(e){
 function hideLoading(){
 
 
+
     if(!DOM.loading)
+
         return;
 
 
 
+
+
     setTimeout(()=>{
+
 
 
         DOM.loading.style.opacity="0";
@@ -1638,6 +1187,7 @@ function hideLoading(){
     },600);
 
 
+
 }
 
 
@@ -1648,16 +1198,20 @@ function hideLoading(){
 
 
 // ==========================================
-// TOAST
+// NOTIFICAÇÃO
 // ==========================================
 
 
-function toast(message){
+function toast(msg){
 
 
-    const div =
+
+    const div=
+
     document.createElement(
+
         "div"
+
     );
 
 
@@ -1666,14 +1220,11 @@ function toast(message){
 
 
 
-    div.textContent =
-    message;
+    div.textContent=msg;
 
 
 
-    document.body.appendChild(
-        div
-    );
+    document.body.appendChild(div);
 
 
 
@@ -1682,64 +1233,13 @@ function toast(message){
     setTimeout(()=>{
 
 
-        div.classList.add(
-            "hide"
-        );
+
+        div.remove();
 
 
 
-        setTimeout(()=>{
+    },2500);
 
-
-            div.remove();
-
-
-        },300);
-
-
-
-    },2200);
 
 
 }
-
-
-
-
-
-
-
-// ==========================================
-// EVENTO BOTÃO CRIAR TOKEN
-// ==========================================
-
-
-window.addEventListener(
-"load",
-()=>{
-
-
-    const button =
-    document.getElementById(
-        "createToken"
-    );
-
-
-
-    if(button){
-
-
-        button.addEventListener(
-
-            "click",
-
-            createToken
-
-        );
-
-
-    }
-
-
-
-});
