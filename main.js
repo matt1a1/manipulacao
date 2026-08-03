@@ -1,50 +1,56 @@
 // ==========================================
 // MANIPULAÇÃO RPG
-// MAIN.JS - CORE
+// MAIN.JS
 // ==========================================
 
 
 // ==========================================
-// ESTADO GLOBAL
+// APP
 // ==========================================
 
 const App = {
 
+
     version:"2.0.0",
+
 
     zoom:1,
 
-    minZoom:0.3,
+
+    minZoom:.30,
+
 
     maxZoom:4,
 
 
     gridSize:50,
 
-    gridVisible:true,
 
     snapGrid:true,
 
 
+    gridVisible:true,
+
+
     fogEnabled:false,
+
 
     measureMode:false,
 
 
+
     selectedTokens:[],
+
 
     clipboard:[],
 
 
+
     history:[],
+
 
     redoHistory:[],
 
-
-    mapOffset:{
-        x:0,
-        y:0
-    },
 
 
     mouse:{
@@ -53,44 +59,73 @@ const App = {
     },
 
 
-    isPanning:false
+
+    mapOffset:{
+        x:0,
+        y:0
+    }
+
 
 };
 
 
 
+
+
+
 // ==========================================
-// DOM GLOBAL
+// DOM
 // ==========================================
 
-const DOM={
+
+const DOM = {
+
 
     map:null,
 
-    mapWrapper:null,
 
-    zoomValue:null,
+    wrapper:null,
+
+
+    sidebar:null,
+
+
+    zoomLabel:null,
+
 
     loading:null,
 
+
+    library:null,
+
+
+    initiative:null,
+
+
     contextMenu:null
+
 
 };
 
 
 
+
+
+
 // ==========================================
-// START
+// INICIAR
 // ==========================================
 
+
 window.addEventListener(
-    "load",
-    startApp
+"load",
+init
 );
 
 
 
-function startApp(){
+
+function init(){
 
 
     cacheDOM();
@@ -99,19 +134,13 @@ function startApp(){
     registerEvents();
 
 
-    if(typeof loadStorage==="function")
-        loadStorage();
+    loadStorage();
 
 
-
-    if(typeof renderLibrary==="function")
-        renderLibrary();
+    renderLibrary();
 
 
-
-    if(typeof renderTokens==="function")
-        renderTokens();
-
+    renderTokens();
 
 
     updateZoom();
@@ -121,11 +150,14 @@ function startApp(){
 
 
     toast(
-        "Manipulação RPG carregado."
+    "Mesa carregada com sucesso."
     );
 
 
 }
+
+
+
 
 
 
@@ -134,38 +166,62 @@ function startApp(){
 // CACHE
 // ==========================================
 
+
 function cacheDOM(){
 
 
     DOM.map =
-    document.getElementById("map");
-
-
-    DOM.mapWrapper =
     document.getElementById(
-        "mapWrapper"
+    "map"
     );
 
 
-    DOM.zoomValue =
+    DOM.wrapper =
     document.getElementById(
-        "zoomValue"
+    "mapWrapper"
+    );
+
+
+    DOM.sidebar =
+    document.getElementById(
+    "sidebar"
+    );
+
+
+    DOM.zoomLabel =
+    document.getElementById(
+    "zoomValue"
     );
 
 
     DOM.loading =
     document.getElementById(
-        "loading"
+    "loading"
+    );
+
+
+    DOM.library =
+    document.getElementById(
+    "libraryList"
+    );
+
+
+    DOM.initiative =
+    document.getElementById(
+    "initiativeList"
     );
 
 
     DOM.contextMenu =
     document.getElementById(
-        "contextMenu"
+    "contextMenu"
     );
 
 
 }
+
+
+
 
 
 
@@ -174,50 +230,36 @@ function cacheDOM(){
 // EVENTOS
 // ==========================================
 
+
 function registerEvents(){
 
 
-    window.addEventListener(
-        "resize",
-        updateZoom
-    );
-
-
-    document.addEventListener(
-        "keydown",
-        keyboard
-    );
-
-
-    document.addEventListener(
-        "keyup",
-        keyboardUp
-    );
-
-
-    document.addEventListener(
-        "click",
-        ()=>{
-            
-            if(typeof closeContextMenu==="function")
-                closeContextMenu();
-
-        }
-    );
+window.addEventListener(
+"resize",
+updateViewport
+);
 
 
 
-    if(DOM.mapWrapper){
+document.addEventListener(
+"keydown",
+keyboard
+);
 
-        DOM.mapWrapper.addEventListener(
-            "wheel",
-            zoomWheel,
-            {
-                passive:false
-            }
-        );
 
-    }
+
+document.addEventListener(
+"keyup",
+keyboardUp
+);
+
+
+
+document.addEventListener(
+"click",
+closeContextMenu
+);
+
 
 
 }
@@ -225,60 +267,66 @@ function registerEvents(){
 
 
 
+
+
+
+
 // ==========================================
-// HISTÓRICO
+// HISTÓRIA
 // ==========================================
-
-function createState(){
-
-    return {
-
-        zoom:App.zoom,
-
-        grid:App.gridVisible,
-
-        snap:App.snapGrid,
-
-
-        tokens:
-        JSON.parse(
-            JSON.stringify(
-                tokens || []
-            )
-        ),
-
-
-        selection:
-        [
-            ...App.selectedTokens
-        ]
-
-    };
-
-}
-
-
 
 
 function saveHistory(){
 
 
-    App.history.push(
-        createState()
-    );
+const state={
 
 
-    if(App.history.length>50){
-
-        App.history.shift();
-
-    }
+zoom:App.zoom,
 
 
-    App.redoHistory=[];
+offset:
+{
+x:App.mapOffset.x,
+y:App.mapOffset.y
+},
+
+
+grid:App.gridVisible,
+
+
+snap:App.snapGrid,
+
+
+tokens:
+JSON.parse(
+JSON.stringify(tokens)
+)
+
+
+
+};
+
+
+
+App.history.push(state);
+
+
+
+if(App.history.length>50)
+
+App.history.shift();
+
+
+
+App.redoHistory=[];
+
 
 
 }
+
+
+
 
 
 
@@ -287,41 +335,109 @@ function saveHistory(){
 // UNDO
 // ==========================================
 
+
 function undo(){
 
 
-    if(App.history.length===0){
+if(!App.history.length){
 
-        toast(
-            "Nada para desfazer."
-        );
+toast(
+"Nada para desfazer."
+);
 
-        return;
-
-    }
-
-
-
-    App.redoHistory.push(
-        createState()
-    );
-
-
-
-    const state =
-    App.history.pop();
-
-
-
-    restoreState(state);
-
-
-
-    toast(
-        "Desfeito."
-    );
+return;
 
 }
+
+
+
+const current={
+
+
+zoom:App.zoom,
+
+
+offset:
+{
+x:App.mapOffset.x,
+y:App.mapOffset.y
+},
+
+
+grid:App.gridVisible,
+
+
+snap:App.snapGrid,
+
+
+tokens:
+JSON.parse(
+JSON.stringify(tokens)
+)
+
+
+};
+
+
+
+App.redoHistory.push(current);
+
+
+
+
+const state =
+App.history.pop();
+
+
+
+
+App.zoom =
+state.zoom;
+
+
+
+App.mapOffset =
+state.offset;
+
+
+
+App.gridVisible =
+state.grid;
+
+
+
+App.snapGrid =
+state.snap;
+
+
+
+tokens =
+JSON.parse(
+JSON.stringify(
+state.tokens
+)
+);
+
+
+
+renderTokens();
+
+
+updateZoom();
+
+
+
+toast(
+"Desfeito."
+);
+
+
+
+}
+
+
+
+
 
 
 
@@ -330,86 +446,107 @@ function undo(){
 // REDO
 // ==========================================
 
+
 function redo(){
 
 
-    if(App.redoHistory.length===0){
-
-        toast(
-            "Nada para refazer."
-        );
-
-        return;
-
-    }
+if(!App.redoHistory.length){
 
 
+toast(
+"Nada para refazer."
+);
 
-    App.history.push(
-        createState()
-    );
+
+return;
+
+
+}
 
 
 
-    const state =
-    App.redoHistory.pop();
+const current={
+
+
+zoom:App.zoom,
+
+
+offset:App.mapOffset,
+
+
+grid:App.gridVisible,
+
+
+snap:App.snapGrid,
+
+
+tokens:
+JSON.parse(
+JSON.stringify(tokens)
+)
+
+
+};
 
 
 
-    restoreState(state);
+App.history.push(current);
 
 
 
-    toast(
-        "Refeito."
-    );
+
+const state =
+App.redoHistory.pop();
+
+
+
+App.zoom =
+state.zoom;
+
+
+
+App.mapOffset =
+state.offset;
+
+
+
+App.gridVisible =
+state.grid;
+
+
+
+App.snapGrid =
+state.snap;
+
+
+
+tokens =
+JSON.parse(
+JSON.stringify(
+state.tokens
+)
+);
+
+
+
+renderTokens();
+
+
+updateZoom();
+
+
+
+toast(
+"Refeito."
+);
+
+
 
 }
 
 
 
 
-function restoreState(state){
-
-
-    App.zoom =
-    state.zoom;
-
-
-    App.gridVisible =
-    state.grid;
-
-
-    App.snapGrid =
-    state.snap;
-
-
-
-    tokens =
-    JSON.parse(
-        JSON.stringify(
-            state.tokens
-        )
-    );
-
-
-
-    App.selectedTokens =
-    [
-        ...state.selection
-    ];
-
-
-
-    if(typeof renderTokens==="function")
-        renderTokens();
-
-
-
-    updateZoom();
-
-
-}
 
 
 
@@ -417,27 +554,29 @@ function restoreState(state){
 // SELEÇÃO
 // ==========================================
 
+
 function clearSelection(){
 
 
-    App.selectedTokens=[];
+App.selectedTokens=[];
 
 
 
-    document
-    .querySelectorAll(
-        ".token"
-    )
-    .forEach(t=>{
+document
+.querySelectorAll(".token")
+.forEach(t=>{
 
-        t.classList.remove(
-            "selected"
-        );
+t.classList.remove(
+"selected"
+);
 
-    });
+
+});
 
 
 }
+
+
 
 
 
@@ -445,15 +584,16 @@ function clearSelection(){
 function addSelection(id){
 
 
-    if(
-        !App.selectedTokens.includes(id)
-    ){
+if(
+!App.selectedTokens.includes(id)
+)
 
-        App.selectedTokens.push(id);
+App.selectedTokens.push(id);
 
-    }
 
 }
+
+
 
 
 
@@ -461,37 +601,48 @@ function addSelection(id){
 function removeSelection(id){
 
 
-    App.selectedTokens =
-    App.selectedTokens.filter(
-        t=>t!==id
-    );
+App.selectedTokens =
+App.selectedTokens.filter(
+t=>t!==id
+);
 
 
 }
+
+
+
+
 
 
 
 function selectAll(){
 
 
-    clearSelection();
+clearSelection();
 
 
 
-    tokens.forEach(t=>{
-
-        App.selectedTokens.push(
-            t.id
-        );
-
-    });
+tokens.forEach(t=>{
 
 
+App.selectedTokens.push(
+t.id
+);
 
-    renderSelection();
+
+});
+
+
+
+renderSelection();
+
 
 
 }
+
+
+
+
 
 
 
@@ -499,135 +650,46 @@ function selectAll(){
 function renderSelection(){
 
 
-    document
-    .querySelectorAll(
-        ".token"
-    )
-    .forEach(t=>{
-
-        t.classList.remove(
-            "selected"
-        );
-
-    });
+document
+.querySelectorAll(".token")
+.forEach(t=>{
 
 
+t.classList.remove(
+"selected"
+);
 
-    App.selectedTokens.forEach(id=>{
 
-
-        const token =
-        document.querySelector(
-            `.token[data-id="${id}"]`
-        );
+});
 
 
 
-        if(token){
-
-            token.classList.add(
-                "selected"
-            );
-
-        }
+App.selectedTokens.forEach(id=>{
 
 
-    });
+const el =
+document.querySelector(
+`.token[data-id="${id}"]`
+);
+
+
+
+if(el)
+
+el.classList.add(
+"selected"
+);
+
+
+
+});
+
 
 
 }
 
 
 
-
-// ==========================================
-// COPIAR / COLAR
-// ==========================================
-
-
-function copySelection(){
-
-
-    App.clipboard=[];
-
-
-
-    App.selectedTokens.forEach(id=>{
-
-
-        const token =
-        tokens.find(
-            t=>t.id===id
-        );
-
-
-        if(token){
-
-            App.clipboard.push(
-                structuredClone(token)
-            );
-
-        }
-
-
-    });
-
-
-
-    toast(
-        "Copiado."
-    );
-
-
-}
-
-
-
-
-
-function pasteSelection(){
-
-
-    if(
-        App.clipboard.length===0
-    )
-        return;
-
-
-
-    saveHistory();
-
-
-
-    App.clipboard.forEach(t=>{
-
-
-        tokens.push({
-
-            ...t,
-
-            id:
-            Date.now()+Math.random(),
-
-            x:t.x+50,
-
-            y:t.y+50
-
-        });
-
-
-    });
-
-
-
-    renderTokens();
-
-
-    saveStorage();
-
-
-
-}
 
 
 
@@ -636,40 +698,239 @@ function pasteSelection(){
 // DELETE
 // ==========================================
 
+
 function deleteSelection(){
 
 
-    if(
-        App.selectedTokens.length===0
-    )
-    return;
+if(!App.selectedTokens.length)
+
+return;
 
 
 
-    saveHistory();
+saveHistory();
 
 
 
-    tokens =
-    tokens.filter(
-        t=>
-        !App.selectedTokens.includes(
-            t.id
-        )
-    );
+tokens =
+tokens.filter(
+t=>
+!App.selectedTokens.includes(
+t.id
+)
+);
 
 
 
-    clearSelection();
+clearSelection();
 
 
-    renderTokens();
+
+renderTokens();
 
 
-    saveStorage();
+
+saveStorage();
+
+
+
+toast(
+"Token removido."
+);
+
 
 
 }
+
+
+
+
+
+
+
+// ==========================================
+// COPIAR
+// ==========================================
+
+
+function copySelection(){
+
+
+App.clipboard=[];
+
+
+
+App.selectedTokens.forEach(id=>{
+
+
+const t =
+tokens.find(
+x=>x.id===id
+);
+
+
+
+if(t)
+
+App.clipboard.push(
+JSON.parse(
+JSON.stringify(t)
+)
+);
+
+
+});
+
+
+
+toast(
+"Copiado."
+);
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// COLAR
+// ==========================================
+
+
+function pasteSelection(){
+
+
+if(!App.clipboard.length)
+
+return;
+
+
+
+saveHistory();
+
+
+
+App.clipboard.forEach(t=>{
+
+
+tokens.push({
+
+
+...t,
+
+
+id:
+Date.now()+Math.random(),
+
+
+x:t.x+50,
+
+
+y:t.y+50
+
+
+});
+
+
+
+});
+
+
+
+renderTokens();
+
+
+saveStorage();
+
+
+
+toast(
+"Colado."
+);
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// DUPLICAR
+// ==========================================
+
+
+function duplicateSelection(){
+
+
+if(!App.selectedTokens.length)
+
+return;
+
+
+
+saveHistory();
+
+
+
+App.selectedTokens.forEach(id=>{
+
+
+const t =
+tokens.find(
+x=>x.id===id
+);
+
+
+
+if(t)
+
+
+tokens.push({
+
+
+...t,
+
+
+id:
+Date.now()+Math.random(),
+
+
+x:t.x+40,
+
+
+y:t.y+40
+
+
+});
+
+
+
+});
+
+
+
+renderTokens();
+
+
+saveStorage();
+
+
+}
+
+
+
+
+
+
 
 
 
@@ -677,180 +938,24 @@ function deleteSelection(){
 // ZOOM
 // ==========================================
 
+
 function updateZoom(){
 
 
-    if(!DOM.map)
-        return;
+if(typeof applyZoom==="function"){
 
 
-
-    DOM.map.style.transform =
-    `
-    translate(-50%,-50%)
-    scale(${App.zoom})
-    `;
+applyZoom();
 
 
-
-    if(DOM.zoomValue){
-
-        DOM.zoomValue.textContent =
-        Math.round(
-            App.zoom*100
-        )+"%";
-
-    }
+}
 
 
 }
 
 
 
-function zoomWheel(e){
 
-
-    e.preventDefault();
-
-
-
-    App.zoom +=
-    e.deltaY < 0
-    ?0.1
-    :-0.1;
-
-
-
-    App.zoom =
-    Math.max(
-        App.minZoom,
-        Math.min(
-            App.maxZoom,
-            App.zoom
-        )
-    );
-
-
-    updateZoom();
-
-
-}
-
-
-
-// ==========================================
-// TECLADO
-// ==========================================
-
-function keyboard(e){
-
-
-    if(
-        e.ctrlKey
-    ){
-
-
-        switch(
-            e.key.toLowerCase()
-        ){
-
-
-            case "z":
-
-                e.preventDefault();
-
-                undo();
-
-            break;
-
-
-            case "y":
-
-                e.preventDefault();
-
-                redo();
-
-            break;
-
-
-            case "c":
-
-                e.preventDefault();
-
-                copySelection();
-
-            break;
-
-
-            case "v":
-
-                e.preventDefault();
-
-                pasteSelection();
-
-            break;
-
-
-        }
-
-
-    }
-
-
-
-
-    switch(e.key){
-
-
-        case "Delete":
-
-            deleteSelection();
-
-        break;
-
-
-
-        case "Escape":
-
-            clearSelection();
-
-        break;
-
-
-
-        case " ":
-
-            e.preventDefault();
-
-            if(typeof startPan==="function")
-                startPan();
-
-        break;
-
-
-
-    }
-
-
-
-}
-
-
-
-function keyboardUp(e){
-
-
-    if(
-        e.code==="Space"
-    ){
-
-        if(typeof stopPan==="function")
-            stopPan();
-
-    }
-
-
-}
 
 
 
@@ -859,30 +964,33 @@ function keyboardUp(e){
 // LOADING
 // ==========================================
 
+
 function hideLoading(){
 
 
-    if(!DOM.loading)
-        return;
+setTimeout(()=>{
+
+
+if(!DOM.loading)
+return;
 
 
 
-    setTimeout(()=>{
-
-
-        DOM.loading.style.opacity=0;
+DOM.loading.style.opacity="0";
 
 
 
-        setTimeout(()=>{
-
-            DOM.loading.remove();
-
-        },500);
+setTimeout(()=>{
 
 
+DOM.loading.remove();
 
-    },600);
+
+},500);
+
+
+
+},600);
 
 
 
@@ -891,50 +999,156 @@ function hideLoading(){
 
 
 
+
+
+
 // ==========================================
 // TOAST
 // ==========================================
 
-function toast(msg){
+
+function toast(message){
 
 
-    const div =
-    document.createElement(
-        "div"
-    );
-
-
-    div.className="toast";
-
-
-    div.textContent=msg;
+const div =
+document.createElement(
+"div"
+);
 
 
 
-    document.body.appendChild(
-        div
-    );
+div.className="toast";
+
+
+div.innerText =
+message;
 
 
 
-    setTimeout(()=>{
-
-
-        div.classList.add(
-            "hide"
-        );
+document.body.appendChild(
+div
+);
 
 
 
-        setTimeout(()=>{
-
-            div.remove();
-
-        },300);
+setTimeout(()=>{
 
 
+div.classList.add(
+"hide"
+);
 
-    },2000);
+
+
+setTimeout(()=>{
+
+
+div.remove();
+
+
+
+},300);
+
+
+
+},2200);
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// TECLADO
+// ==========================================
+
+
+function keyboard(e){
+
+
+
+if(e.key==="Delete")
+
+deleteSelection();
+
+
+
+if(e.key==="Escape")
+
+clearSelection();
+
+
+
+
+if(e.ctrlKey){
+
+
+switch(
+e.key.toLowerCase()
+){
+
+
+case "c":
+
+copySelection();
+
+break;
+
+
+
+case "v":
+
+pasteSelection();
+
+break;
+
+
+
+case "z":
+
+undo();
+
+break;
+
+
+
+case "y":
+
+redo();
+
+break;
+
+
+
+case "d":
+
+duplicateSelection();
+
+break;
+
+
+
+}
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+function keyboardUp(e){
+
 
 
 }
