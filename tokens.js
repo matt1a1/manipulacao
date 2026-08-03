@@ -1,11 +1,10 @@
 // ==========================================
-// TOKENS RPG
+// MANIPULAÇÃO RPG
+// TOKENS.JS
 // ==========================================
 
 
 let tokens = [];
-
-
 
 
 // ==========================================
@@ -13,11 +12,7 @@ let tokens = [];
 // ==========================================
 
 
-function createToken(data){
-
-
-saveHistory();
-
+function createToken(data={}){
 
 
 const token = {
@@ -29,7 +24,22 @@ Date.now()+Math.random(),
 
 
 name:
-data.name || "Token",
+data.name || "Novo Token",
+
+
+
+x:
+data.x || 200,
+
+
+
+y:
+data.y || 200,
+
+
+
+size:
+data.size || 50,
 
 
 
@@ -43,43 +53,17 @@ data.image || null,
 
 
 
-x:
-300,
+hp:100,
 
 
-
-y:
-300,
+maxHp:100,
 
 
-
-size:
-data.size || 60,
-
-
-
-hp:
-data.hp || 100,
-
-
-
-maxHp:
-data.maxHp || 100,
-
-
-
-rotation:
-0,
-
-
-
-status:
-[]
+rotation:0
 
 
 
 };
-
 
 
 
@@ -88,7 +72,6 @@ tokens.push(token);
 
 
 renderTokens();
-
 
 
 saveStorage();
@@ -101,14 +84,19 @@ toast(
 
 
 
+return token;
+
+
+
 }
 
 
 
 
 
+
 // ==========================================
-// RENDER TOKENS
+// RENDER
 // ==========================================
 
 
@@ -121,7 +109,9 @@ return;
 
 
 
-DOM.map.innerHTML="";
+DOM.map
+.querySelectorAll(".token")
+.forEach(t=>t.remove());
 
 
 
@@ -130,12 +120,14 @@ tokens.forEach(token=>{
 
 
 const el =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 
 
 el.className =
-"token spawn";
+"token";
 
 
 
@@ -145,23 +137,9 @@ token.id;
 
 
 
-// TAMANHO INDIVIDUAL
-
-
-el.style.width =
-token.size+"px";
-
-
-el.style.height =
-token.size+"px";
-
-
-
-// POSIÇÃO
-
-
 el.style.left =
 token.x+"px";
+
 
 
 el.style.top =
@@ -169,7 +147,19 @@ token.y+"px";
 
 
 
-// ROTAÇÃO
+el.style.width =
+token.size+"px";
+
+
+
+el.style.height =
+token.size+"px";
+
+
+
+el.style.background =
+token.color;
+
 
 
 el.style.transform =
@@ -179,23 +169,18 @@ rotate(${token.rotation}deg)
 
 
 
-// COR
 
 
-el.style.background =
-token.color;
-
-
-
-
-// IMAGEM
+// imagem
 
 
 if(token.image){
 
 
 const img =
-document.createElement("img");
+document.createElement(
+"img"
+);
 
 
 img.src =
@@ -206,12 +191,15 @@ el.appendChild(img);
 
 
 
-}else{
+}
 
+else{
 
 
 const fallback =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 
 fallback.className =
@@ -221,14 +209,13 @@ fallback.className =
 
 fallback.innerText =
 token.name
-.substring(0,2)
+.charAt(0)
 .toUpperCase();
 
 
 
-el.appendChild(
-fallback
-);
+el.appendChild(fallback);
+
 
 
 }
@@ -236,11 +223,17 @@ fallback
 
 
 
-// NOME
+
+
+
+// nome
 
 
 const name =
-document.createElement("div");
+document.createElement(
+"div"
+);
+
 
 
 name.className =
@@ -258,112 +251,7 @@ el.appendChild(name);
 
 
 
-
-// VIDA
-
-
-const hp =
-document.createElement("div");
-
-
-hp.className =
-"hpBar";
-
-
-
-const hpFill =
-document.createElement("div");
-
-
-hpFill.className =
-"hpFill";
-
-
-
-hpFill.style.width =
-
-(
-(token.hp/token.maxHp)*100
-)
-+"%";
-
-
-
-hp.appendChild(
-hpFill
-);
-
-
-
-el.appendChild(
-hp
-);
-
-
-
-
-
-
-
-// STATUS
-
-
-if(
-token.status &&
-token.status.length
-){
-
-
-const status =
-document.createElement("div");
-
-
-status.className =
-"statusContainer";
-
-
-
-token.status.forEach(s=>{
-
-
-if(s){
-
-
-const icon =
-document.createElement("div");
-
-
-icon.className =
-"status";
-
-
-icon.innerText =
-s;
-
-
-status.appendChild(icon);
-
-
-}
-
-
-
-});
-
-
-
-el.appendChild(status);
-
-
-
-}
-
-
-
-
-
-
-// CLIQUE
+// seleção
 
 
 el.addEventListener(
@@ -375,11 +263,9 @@ e.stopPropagation();
 
 
 
-if(!e.shiftKey){
+if(!e.ctrlKey)
 
 clearSelection();
-
-}
 
 
 
@@ -393,18 +279,14 @@ renderSelection();
 
 
 
-});
+}
 
-
-
-
-
-
-
-
-DOM.map.appendChild(
-el
 );
+
+
+
+
+DOM.map.appendChild(el);
 
 
 
@@ -418,12 +300,115 @@ el
 
 
 
+
+
 // ==========================================
-// ATUALIZAR TOKEN
+// ADICIONAR IMAGEM
 // ==========================================
 
 
-function updateToken(id,data){
+function chooseTokenImage(id){
+
+
+
+const input =
+document.createElement(
+"input"
+);
+
+
+
+input.type =
+"file";
+
+
+input.accept =
+"image/*";
+
+
+
+
+input.onchange =
+e=>{
+
+
+const file =
+e.target.files[0];
+
+
+
+if(!file)
+return;
+
+
+
+
+const reader =
+new FileReader();
+
+
+
+
+reader.onload =
+()=>{
+
+
+const token =
+tokens.find(
+t=>t.id===id
+);
+
+
+
+if(token){
+
+
+token.image =
+reader.result;
+
+
+renderTokens();
+
+
+saveStorage();
+
+
+}
+
+
+
+};
+
+
+
+reader.readAsDataURL(file);
+
+
+
+};
+
+
+
+
+input.click();
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// ALTERAR TAMANHO
+// ==========================================
+
+
+function resizeToken(id,size){
+
 
 
 const token =
@@ -438,10 +423,51 @@ return;
 
 
 
-Object.assign(
-token,
-data
+token.size =
+Number(size);
+
+
+
+renderTokens();
+
+
+
+saveStorage();
+
+
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// ALTERAR COR
+// ==========================================
+
+
+function changeTokenColor(id,color){
+
+
+
+const token =
+tokens.find(
+t=>t.id===id
 );
+
+
+
+if(!token)
+return;
+
+
+
+token.color =
+color;
 
 
 
@@ -469,19 +495,15 @@ saveStorage();
 function removeToken(id){
 
 
+
 saveHistory();
 
 
 
 tokens =
 tokens.filter(
-t=>
-t.id!==id
+t=>t.id!==id
 );
-
-
-
-clearSelection();
 
 
 
@@ -505,17 +527,89 @@ toast(
 
 
 
+
+
+
 // ==========================================
-// PEGAR TOKEN
+// ROTACIONAR
 // ==========================================
 
 
-function getToken(id){
+function rotateToken(id){
 
 
-return tokens.find(
+
+const token =
+tokens.find(
 t=>t.id===id
 );
+
+
+
+if(!token)
+return;
+
+
+
+token.rotation +=45;
+
+
+
+renderTokens();
+
+
+
+saveStorage();
+
+
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// ATUALIZAR HP
+// ==========================================
+
+
+function updateTokenHP(id,value){
+
+
+
+const token =
+tokens.find(
+t=>t.id===id
+);
+
+
+
+if(!token)
+return;
+
+
+
+token.hp =
+Math.max(
+0,
+Math.min(
+token.maxHp,
+value
+)
+);
+
+
+
+renderTokens();
+
+
+
+saveStorage();
+
 
 
 }
