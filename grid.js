@@ -1,15 +1,74 @@
 // ==========================================
-// GRID / FOG / RÉGUA
+// MANIPULAÇÃO RPG
+// GRID.JS
 // ==========================================
 
 
 
+// ==========================================
+// INICIALIZAÇÃO
+// ==========================================
+
+
+window.addEventListener(
+"load",
+()=>{
+
+    initGrid();
+
+}
+
+);
+
+
+
+
+
+function initGrid(){
+
+
+    const button =
+    document.getElementById(
+    "toggleGrid"
+    );
+
+
+
+    if(button){
+
+
+        button.addEventListener(
+        "click",
+        toggleGrid
+        );
+
+
+    }
+
+
+
+    updateGrid();
+
+
+
+}
+
+
+
+
+
+
 
 // ==========================================
-// GRID
+// MOSTRAR / ESCONDER GRID
 // ==========================================
+
 
 function toggleGrid(){
+
+
+    saveHistory();
+
 
 
     App.gridVisible =
@@ -17,41 +76,106 @@ function toggleGrid(){
 
 
 
+    updateGrid();
+
+
+
+    saveStorage();
+
+
+
+    toast(
+
+    App.gridVisible
+
+    ?
+
+    "Grid ativado."
+
+    :
+
+    "Grid desativado."
+
+    );
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// ATUALIZAR GRID
+// ==========================================
+
+
+function updateGrid(){
+
+
     if(!DOM.map)
-        return;
+    return;
 
 
 
     if(App.gridVisible){
 
 
-        DOM.map.style.backgroundImage =
-
-        `
-
-        linear-gradient(
-        rgba(255,255,255,.04) 1px,
-        transparent 1px
-        ),
-
-        linear-gradient(
-        90deg,
-        rgba(255,255,255,.04) 1px,
-        transparent 1px
-        )
-
-        `;
+        DOM.map.classList.add(
+        "grid50"
+        );
 
 
     }
+
     else{
 
 
-        DOM.map.style.backgroundImage =
-        "none";
+        DOM.map.classList.remove(
+        "grid50"
+        );
 
 
     }
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// ALTERAR TAMANHO
+// ==========================================
+
+
+function setGridSize(size){
+
+
+    App.gridSize =
+    size;
+
+
+
+    DOM.map.classList.remove(
+    "grid25",
+    "grid50",
+    "grid75",
+    "grid100"
+    );
+
+
+
+    DOM.map.classList.add(
+    "grid"+size
+    );
 
 
 
@@ -66,65 +190,58 @@ function toggleGrid(){
 
 
 
+
+
 // ==========================================
-// FOG OF WAR
+// SNAP
 // ==========================================
 
 
-function toggleFog(){
-
-
-    App.fogEnabled =
-    !App.fogEnabled;
+function snapPosition(x,y){
 
 
 
-    let fog =
-    document.getElementById(
-        "fogCanvas"
-    );
+if(!App.snapGrid)
+
+return {
+
+x:x,
+
+y:y
+
+};
 
 
 
-    if(!fog){
 
-
-        fog =
-        document.createElement(
-            "div"
-        );
-
-
-        fog.id =
-        "fogCanvas";
-
-
-        DOM.map.appendChild(
-            fog
-        );
-
-
-    }
+const grid =
+App.gridSize;
 
 
 
-    fog.style.display =
-    App.fogEnabled
-    ?
-    "block"
-    :
-    "none";
+return {
+
+
+x:
+Math.round(
+x/grid
+)
+*
+grid,
 
 
 
-    if(App.fogEnabled){
+y:
+Math.round(
+y/grid
+)
+*
+grid
 
 
-        fog.style.background =
-        "rgba(0,0,0,.8)";
 
+};
 
-    }
 
 
 }
@@ -136,38 +253,36 @@ function toggleFog(){
 
 
 // ==========================================
-// RÉGUA
+// ATIVAR/DESATIVAR SNAP
 // ==========================================
 
 
-let measureStart=null;
+function toggleSnap(){
+
+
+App.snapGrid =
+!App.snapGrid;
 
 
 
-function toggleMeasure(){
+toast(
+
+App.snapGrid
+
+?
+
+"Snap ativado."
+
+:
+
+"Snap desativado."
+
+);
 
 
-    App.measureMode =
-    !App.measureMode;
 
+saveStorage();
 
-
-    if(App.measureMode){
-
-
-        toast(
-            "Clique no mapa para medir."
-        );
-
-
-    }
-    else{
-
-
-        removeMeasure();
-
-
-    }
 
 
 }
@@ -176,99 +291,44 @@ function toggleMeasure(){
 
 
 
-document.addEventListener(
-"click",
-e=>{
 
 
-    if(
-        !App.measureMode
-    )
-        return;
+// ==========================================
+// CALCULAR POSIÇÃO DO MOUSE
+// ==========================================
+
+
+function getMapPosition(event){
 
 
 
-    if(
-        !e.target.closest(
-            "#map"
-        )
-    )
-        return;
+const rect =
+DOM.map.getBoundingClientRect();
 
 
 
 
-    if(!measureStart){
-
-
-        measureStart={
-
-            x:e.offsetX,
-
-            y:e.offsetY
-
-        };
-
-
-        return;
-
-    }
+let x =
+(event.clientX - rect.left)
+/
+App.zoom;
 
 
 
-
-    const distance =
-
-    Math.sqrt(
-
-        Math.pow(
-            e.offsetX-measureStart.x,
-            2
-        )
-
-        +
-
-        Math.pow(
-            e.offsetY-measureStart.y,
-            2
-        )
-
-    );
-
-
-
-    toast(
-
-        "Distância: "
-        +
-        Math.round(distance/50)
-        +
-        " quadrados"
-
-    );
-
-
-
-    measureStart=null;
-
-
-});
+let y =
+(event.clientY - rect.top)
+/
+App.zoom;
 
 
 
 
 
+return snapPosition(
+x,
+y
+);
 
-function removeMeasure(){
-
-
-    document
-    .querySelectorAll(
-        "#measureLine,#measureText"
-    )
-    .forEach(
-        e=>e.remove()
-    );
 
 
 }
@@ -277,45 +337,61 @@ function removeMeasure(){
 
 
 
+
+
 // ==========================================
-// EVENTOS
+// GRID DINÂMICO COM ZOOM
 // ==========================================
 
-window.addEventListener(
-"load",
-()=>{
 
-
-    document
-    .getElementById(
-        "toggleGrid"
-    )
-    ?.addEventListener(
-        "click",
-        toggleGrid
-    );
+function refreshGridZoom(){
 
 
 
-    document
-    .getElementById(
-        "toggleFog"
-    )
-    ?.addEventListener(
-        "click",
-        toggleFog
-    );
+if(!DOM.map)
+return;
 
 
 
-    document
-    .getElementById(
-        "toggleMeasure"
-    )
-    ?.addEventListener(
-        "click",
-        toggleMeasure
-    );
+
+const size =
+App.gridSize *
+App.zoom;
 
 
-});
+
+DOM.map.style.backgroundSize =
+
+`${size}px ${size}px`;
+
+
+
+}
+
+
+
+
+
+
+// Atualiza quando zoom mudar
+
+const oldUpdateZoom =
+window.updateZoom;
+
+
+
+window.updateZoom =
+function(){
+
+
+if(oldUpdateZoom)
+
+oldUpdateZoom();
+
+
+
+refreshGridZoom();
+
+
+
+};
