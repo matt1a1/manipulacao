@@ -1,17 +1,37 @@
 /* ==========================================
-   MAPA
+   MAPA - MANIPULAÇÃO RPG
 ========================================== */
 
+
+/* ==========================================
+   MAIN
+========================================== */
+
+
 #main{
+
     display:flex;
+
     flex-direction:column;
+
     width:100%;
+
     height:100vh;
+
     overflow:hidden;
+
     background:#0b1120;
+
 }
 
-/* Área onde fica o mapa */
+
+
+
+
+/* ==========================================
+   ÁREA DO MAPA
+========================================== */
+
 
 #workspace{
 
@@ -22,15 +42,28 @@
     overflow:hidden;
 
     background:
-    radial-gradient(circle at center,#1e293b,#020617);
+
+    radial-gradient(
+        circle at center,
+        #1e293b,
+        #020617
+    );
 
 }
 
-/* Container responsável pelo zoom */
+
+
+
+
+/* ==========================================
+   WRAPPER DO MAPA
+========================================== */
+
 
 #mapWrapper{
 
     width:100%;
+
     height:100%;
 
     overflow:hidden;
@@ -43,385 +76,699 @@
 
 }
 
+
+
 #mapWrapper.grabbing{
 
     cursor:grabbing;
 
 }
 
+
+
+
+
 /* ==========================================
-   MAPA
+   MAPA PRINCIPAL
 ========================================== */
+
 
 #map{
 
+
     position:absolute;
 
+
     left:50%;
+
     top:50%;
 
+
+
     width:3000px;
+
     height:3000px;
 
-    transform:translate(-50%,-50%) scale(1);
 
-    transform-origin:center center;
+
+    transform:
+
+    translate(-50%,-50%)
+
+    scale(1);
+
+
+
+    transform-origin:center;
+
+
 
     background-color:#0f172a;
+
+
 
     background-image:
 
     linear-gradient(
-        rgba(255,255,255,.04) 1px,
+
+        rgba(255,255,255,.05) 1px,
+
         transparent 1px
+
     ),
 
+
     linear-gradient(
+
         90deg,
-        rgba(255,255,255,.04) 1px,
+
+        rgba(255,255,255,.05) 1px,
+
         transparent 1px
+
     );
+
+
 
     background-size:50px 50px;
 
+
+
     transition:
-    transform .08s linear,
+
+    transform .1s linear,
+
     background .25s;
+
+
 
 }
 
+
+
+
+
 /* ==========================================
-   GRID
+   TAMANHOS DO GRID
 ========================================== */
+
 
 #map.grid25{
 
+
     background-size:25px 25px;
 
+
 }
+
+
 
 #map.grid50{
 
+
     background-size:50px 50px;
 
+
 }
+
+
 
 #map.grid75{
 
+
     background-size:75px 75px;
 
+
 }
+
+
 
 #map.grid100{
 
+
     background-size:100px 100px;
 
+
 }
+
+
+
+
+/* SEM GRID */
+
+
+#map.no-grid{
+
+
+    background-image:none;
+
+
+}
+
+
+
+
+
+
 
 /* ==========================================
    MAPA COM IMAGEM
 ========================================== */
 
+
 #map.image{
+
 
     background-repeat:no-repeat;
 
+
     background-position:center;
+
 
     background-size:cover;
 
+
 }
 
+
+
+
+
 /* ==========================================
-   SOMBRA NAS BORDAS
+   BORDA DE SOMBRA
 ========================================== */
+
 
 #workspace::before{
 
-content:"";
 
-position:absolute;
+    content:"";
 
-left:0;
-top:0;
 
-width:100%;
-height:100%;
+    position:absolute;
 
-pointer-events:none;
 
-box-shadow:
+    inset:0;
 
-inset 0 0 120px rgba(0,0,0,.55);
 
-z-index:20;
+
+    pointer-events:none;
+
+
+
+    box-shadow:
+
+    inset 0 0 120px rgba(0,0,0,.65);
+
+
+
+    z-index:20;
+
 
 }
 
+
+
+
+
+
+
 /* ==========================================
-   EFEITO DE PAN
+   PAN
 ========================================== */
+
 
 .panning{
 
-cursor:grabbing !important;
+
+    cursor:grabbing !important;
+
 
 }
+
+
+
+
+
+
 
 /* ==========================================
    RÉGUA
 ========================================== */
 
+
 #measureLine{
 
-position:absolute;
 
-height:3px;
+    position:absolute;
 
-background:#22c55e;
 
-transform-origin:left center;
+    height:3px;
 
-pointer-events:none;
 
-z-index:500;
 
-box-shadow:
+    background:#22c55e;
 
-0 0 15px rgba(34,197,94,.8);
+
+
+    transform-origin:left center;
+
+
+
+    pointer-events:none;
+
+
+
+    z-index:500;
+
+
+
+    box-shadow:
+
+    0 0 15px rgba(34,197,94,.8);
+
+
 
 }
+
+
+
+
 
 #measureText{
 
-position:absolute;
 
-padding:6px 10px;
+    position:absolute;
 
-background:#111827;
 
-border-radius:8px;
 
-font-size:13px;
+    padding:6px 10px;
 
-color:white;
 
-border:1px solid #22c55e;
 
-pointer-events:none;
+    background:#111827;
 
-z-index:600;
+
+
+    color:white;
+
+
+
+    border-radius:8px;
+
+
+
+    border:1px solid #22c55e;
+
+
+
+    font-size:13px;
+
+
+
+    pointer-events:none;
+
+
+
+    z-index:600;
+
+
 
 }
+
+
+
+
+
+
 
 /* ==========================================
    FOG OF WAR
 ========================================== */
 
+
 #fogCanvas{
 
-position:absolute;
 
-left:0;
-top:0;
+    position:absolute;
 
-width:100%;
-height:100%;
 
-pointer-events:none;
+    left:0;
 
-z-index:300;
+
+    top:0;
+
+
+
+    width:100%;
+
+
+    height:100%;
+
+
+
+    pointer-events:none;
+
+
+
+    z-index:300;
+
 
 }
 
+
+
+
+
+
+
 /* ==========================================
-   SELEÇÃO
+   SELEÇÃO DE ÁREA
 ========================================== */
+
 
 #selectionBox{
 
-position:absolute;
 
-border:2px dashed #6366f1;
+    position:absolute;
 
-background:
 
-rgba(99,102,241,.15);
 
-display:none;
+    border:
 
-z-index:900;
+    2px dashed #6366f1;
+
+
+
+    background:
+
+    rgba(99,102,241,.15);
+
+
+
+    display:none;
+
+
+
+    z-index:900;
+
+
 
 }
+
+
+
+
+
+
 
 /* ==========================================
    COORDENADAS
 ========================================== */
 
+
 #coordinates{
 
-position:absolute;
 
-bottom:15px;
+    position:absolute;
 
-right:15px;
 
-background:#111827;
 
-padding:8px 14px;
+    bottom:15px;
 
-border-radius:12px;
 
-font-size:13px;
+    right:15px;
 
-color:#94a3b8;
 
-border:1px solid #334155;
 
-z-index:500;
+    padding:8px 14px;
+
+
+
+    background:#111827;
+
+
+
+    color:#94a3b8;
+
+
+
+    border-radius:12px;
+
+
+
+    border:
+
+    1px solid #334155;
+
+
+
+    font-size:13px;
+
+
+
+    z-index:700;
+
+
 
 }
+
+
+
+
+
+
 
 /* ==========================================
    MINI MAPA
 ========================================== */
 
+
 #miniMap{
 
-position:absolute;
 
-right:20px;
+    position:absolute;
 
-top:20px;
 
-width:230px;
 
-height:150px;
+    right:20px;
 
-background:#111827;
 
-border-radius:16px;
+    top:20px;
 
-overflow:hidden;
 
-border:2px solid #334155;
 
-box-shadow:
+    width:230px;
 
-0 15px 40px rgba(0,0,0,.5);
 
-z-index:600;
+    height:150px;
+
+
+
+    background:#111827;
+
+
+
+    border-radius:16px;
+
+
+
+    border:
+
+    2px solid #334155;
+
+
+
+    overflow:hidden;
+
+
+
+    box-shadow:
+
+    0 15px 40px rgba(0,0,0,.5);
+
+
+
+    z-index:600;
+
+
 
 }
+
+
 
 #miniMap canvas{
 
-width:100%;
 
-height:100%;
+    width:100%;
+
+
+    height:100%;
+
 
 }
+
+
+
+
+
+
+
 
 /* ==========================================
    FPS
 ========================================== */
 
+
 #fps{
 
-position:absolute;
 
-left:20px;
+    position:absolute;
 
-top:20px;
 
-padding:8px 12px;
 
-border-radius:12px;
+    left:20px;
 
-background:#111827;
 
-font-size:13px;
+    top:20px;
 
-color:#22c55e;
 
-border:1px solid #334155;
 
-z-index:600;
+    padding:8px 12px;
+
+
+
+    border-radius:12px;
+
+
+
+    background:#111827;
+
+
+
+    color:#22c55e;
+
+
+
+    border:
+
+    1px solid #334155;
+
+
+
+    font-size:13px;
+
+
+
+    z-index:600;
+
+
 
 }
 
+
+
+
+
+
+
 /* ==========================================
-   ZOOM
+   INDICADOR DE ZOOM
 ========================================== */
+
 
 #zoomIndicator{
 
-position:absolute;
 
-bottom:20px;
+    position:absolute;
 
-left:50%;
 
-transform:translateX(-50%);
 
-padding:10px 18px;
+    bottom:20px;
 
-background:#111827;
 
-border-radius:999px;
+    left:50%;
 
-font-weight:700;
 
-color:white;
 
-border:1px solid #334155;
+    transform:
 
-box-shadow:
+    translateX(-50%);
 
-0 10px 30px rgba(0,0,0,.5);
 
-opacity:0;
 
-transition:.3s;
+    padding:10px 18px;
 
-z-index:800;
+
+
+    background:#111827;
+
+
+
+    color:white;
+
+
+
+    border-radius:999px;
+
+
+
+    font-weight:700;
+
+
+
+    border:
+
+    1px solid #334155;
+
+
+
+    opacity:0;
+
+
+
+    transition:.3s;
+
+
+
+    z-index:800;
+
+
 
 }
+
+
 
 #zoomIndicator.show{
 
-opacity:1;
+
+    opacity:1;
+
 
 }
+
+
+
+
 
 /* ==========================================
-   ANIMAÇÃO
+   RESPONSIVO
 ========================================== */
 
-@keyframes zoomPulse{
 
-0%{
+@media(max-width:900px){
 
-transform:translate(-50%,0) scale(.9);
 
-}
+    #map{
 
-50%{
 
-transform:translate(-50%,0) scale(1.08);
+        width:2000px;
 
-}
 
-100%{
+        height:2000px;
 
-transform:translate(-50%,0) scale(1);
 
-}
+    }
 
-}
-
-#zoomIndicator.show{
-
-animation:zoomPulse .25s;
 
 }
