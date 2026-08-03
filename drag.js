@@ -1,11 +1,24 @@
 // ==========================================
-// DRAG TOKENS RPG
+// MANIPULAÇÃO RPG
+// DRAG.JS
 // ==========================================
 
 
 let draggingToken = null;
 
 let dragOffset = {
+
+    x:0,
+
+    y:0
+
+};
+
+
+let isPanning=false;
+
+
+let panStart={
 
     x:0,
 
@@ -21,92 +34,35 @@ let dragOffset = {
 // ==========================================
 
 
+window.addEventListener(
+"load",
+initDrag
+);
+
+
+
+function initDrag(){
+
+
 document.addEventListener(
 "mousedown",
-e=>{
-
-
-
-const tokenElement =
-e.target.closest(".token");
-
-
-
-if(!tokenElement)
-return;
-
-
-
-// BOTÃO DIREITO
-if(e.button===2)
-return;
-
-
-
-const id =
-Number(
-tokenElement.dataset.id
+mouseDown
 );
 
 
 
-draggingToken =
-tokens.find(
-t=>t.id===id
+document.addEventListener(
+"mousemove",
+mouseMove
 );
 
 
 
-if(!draggingToken)
-return;
-
-
-
-saveHistory();
-
-
-
-
-// posição relativa ao token
-
-dragOffset.x =
-
-e.clientX -
-
-tokenElement.getBoundingClientRect().left;
-
-
-
-dragOffset.y =
-
-e.clientY -
-
-tokenElement.getBoundingClientRect().top;
-
-
-
-tokenElement.classList.add(
-"dragging"
+document.addEventListener(
+"mouseup",
+mouseUp
 );
 
-
-
-
-
-// seleção
-
-if(
-!App.selectedTokens.includes(id)
-){
-
-
-clearSelection();
-
-
-addSelection(id);
-
-
-renderSelection();
 
 
 }
@@ -114,11 +70,117 @@ renderSelection();
 
 
 
-e.preventDefault();
 
 
 
-});
+
+
+// ==========================================
+// MOUSE DOWN
+// ==========================================
+
+
+function mouseDown(e){
+
+
+
+const token =
+e.target.closest(
+".token"
+);
+
+
+
+if(token){
+
+
+
+const id =
+Number(
+token.dataset.id
+);
+
+
+
+const data =
+tokens.find(
+t=>t.id==id
+);
+
+
+
+if(!data)
+return;
+
+
+
+if(
+!App.selectedTokens.includes(id)
+){
+
+
+
+clearSelection();
+
+
+
+addSelection(id);
+
+
+
+renderSelection();
+
+
+
+}
+
+
+
+draggingToken=data;
+
+
+
+dragOffset.x =
+e.clientX-data.x;
+
+
+
+dragOffset.y =
+e.clientY-data.y;
+
+
+
+saveHistory();
+
+
+
+return;
+
+
+
+}
+
+
+
+
+
+
+if(e.button===1 || e.key===" "){
+
+
+
+startPan();
+
+
+
+}
+
+
+
+
+}
+
+
 
 
 
@@ -131,64 +193,27 @@ e.preventDefault();
 // ==========================================
 
 
-document.addEventListener(
-"mousemove",
-e=>{
+function mouseMove(e){
 
 
 
-if(!draggingToken)
-return;
-
-
-
-
-
-const rect =
-DOM.map.getBoundingClientRect();
-
-
+if(draggingToken){
 
 
 
 let x =
-
-(
-e.clientX -
-
-rect.left -
-
-dragOffset.x
-)
-
-/
-App.zoom;
+e.clientX-dragOffset.x;
 
 
 
 let y =
+e.clientY-dragOffset.y;
 
-(
-e.clientY -
-
-rect.top -
-
-dragOffset.y
-)
-
-/
-App.zoom;
-
-
-
-
-
-
-// SNAP GRID
 
 
 
 if(App.snapGrid){
+
 
 
 x =
@@ -213,60 +238,38 @@ App.gridSize;
 
 
 
-
-
-
-
-// mover selecionados juntos
-
-
-if(
-App.selectedTokens.length > 1 &&
-App.selectedTokens.includes(
-draggingToken.id
-)
-
-){
-
-
-
-const oldX =
-draggingToken.x;
-
-
-
-const oldY =
-draggingToken.y;
-
-
-
 const dx =
-x-oldX;
+x-draggingToken.x;
 
 
 
 const dy =
-y-oldY;
+y-draggingToken.y;
+
 
 
 
 App.selectedTokens.forEach(id=>{
 
 
-const t =
+
+const token =
 tokens.find(
-token=>token.id===id
+t=>t.id===id
 );
 
 
 
-if(t){
+if(token){
 
 
-t.x += dx;
+
+token.x += dx;
 
 
-t.y += dy;
+
+token.y += dy;
+
 
 
 }
@@ -274,24 +277,6 @@ t.y += dy;
 
 
 });
-
-
-
-}else{
-
-
-
-draggingToken.x=x;
-
-
-
-draggingToken.y=y;
-
-
-
-}
-
-
 
 
 
@@ -300,7 +285,57 @@ renderTokens();
 
 
 
-});
+return;
+
+
+
+}
+
+
+
+
+
+
+if(isPanning){
+
+
+
+const dx =
+e.movementX;
+
+
+
+const dy =
+e.movementY;
+
+
+
+App.mapOffset.x += dx;
+
+
+
+App.mapOffset.y += dy;
+
+
+
+DOM.map.style.left =
+
+`calc(50% + ${App.mapOffset.x}px)`;
+
+
+
+DOM.map.style.top =
+
+`calc(50% + ${App.mapOffset.y}px)`;
+
+
+
+}
+
+
+
+}
+
 
 
 
@@ -314,32 +349,11 @@ renderTokens();
 // ==========================================
 
 
-document.addEventListener(
-"mouseup",
-e=>{
+function mouseUp(){
 
 
 
-if(!draggingToken)
-return;
-
-
-
-
-const el =
-document.querySelector(
-`.token[data-id="${draggingToken.id}"]`
-);
-
-
-
-if(el){
-
-el.classList.remove(
-"dragging"
-);
-
-}
+if(draggingToken){
 
 
 
@@ -351,35 +365,65 @@ saveStorage();
 
 
 
-});
+}
 
 
 
+isPanning=false;
 
 
 
+DOM.wrapper.classList.remove(
+"grabbing"
+);
 
-
-// ==========================================
-// IMPEDIR MENU DIREITO
-// ==========================================
-
-
-document.addEventListener(
-"contextmenu",
-e=>{
-
-
-if(
-e.target.closest(".token")
-){
-
-
-e.preventDefault();
 
 
 }
 
 
 
-});
+
+
+
+
+
+
+// ==========================================
+// PAN
+// ==========================================
+
+
+function startPan(){
+
+
+
+isPanning=true;
+
+
+
+DOM.wrapper.classList.add(
+"grabbing"
+);
+
+
+
+}
+
+
+
+function stopPan(){
+
+
+
+isPanning=false;
+
+
+
+DOM.wrapper.classList.remove(
+"grabbing"
+);
+
+
+
+}
