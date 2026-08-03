@@ -1,0 +1,359 @@
+/* ==========================================
+   TOOLBAR
+========================================== */
+
+#toolbar{
+
+    height:72px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 20px;
+
+    background:rgba(15,23,42,.95);
+
+    backdrop-filter:blur(16px);
+
+    border-bottom:1px solid #334155;
+
+    box-shadow:
+        0 5px 25px rgba(0,0,0,.35);
+
+    z-index:999;
+
+}
+
+/* ==========================================
+   GRUPOS
+========================================== */
+
+#toolbar .left,
+#toolbar .center,
+#toolbar .right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+/* ==========================================
+   BOTÕES
+========================================== */
+
+#toolbar button{
+
+    min-width:48px;
+
+    height:48px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#1e293b;
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:
+        background .2s,
+        transform .15s,
+        box-shadow .2s;
+
+}
+
+#toolbar button:hover{
+
+    background:#6366f1;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+
+        0 10px 20px rgba(99,102,241,.35);
+
+}
+
+#toolbar button:active{
+
+    transform:scale(.95);
+
+}
+
+/* ==========================================
+   BOTÕES IMPORTANTES
+========================================== */
+
+#save{
+
+    background:#16a34a;
+
+}
+
+#save:hover{
+
+    background:#22c55e;
+
+}
+
+#load{
+
+    background:#2563eb;
+
+}
+
+#load:hover{
+
+    background:#3b82f6;
+
+}
+
+#clearMap{
+
+    background:#b91c1c;
+
+}
+
+#clearMap:hover{
+
+    background:#dc2626;
+
+}
+
+/* ==========================================
+   ZOOM
+========================================== */
+
+#zoomValue{
+
+    min-width:70px;
+
+    text-align:center;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    color:#f8fafc;
+
+    padding:10px;
+
+    border-radius:12px;
+
+    background:#111827;
+
+    border:1px solid #334155;
+
+}
+
+/* ==========================================
+   SEPARADOR
+========================================== */
+
+.toolbarDivider{
+
+    width:1px;
+
+    height:38px;
+
+    background:#334155;
+
+    margin:0 8px;
+
+}
+
+/* ==========================================
+   TOOLTIP
+========================================== */
+
+button[data-tooltip]{
+
+    position:relative;
+
+}
+
+button[data-tooltip]::after{
+
+    content:attr(data-tooltip);
+
+    position:absolute;
+
+    bottom:-42px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    background:#111827;
+
+    color:white;
+
+    padding:6px 10px;
+
+    border-radius:8px;
+
+    white-space:nowrap;
+
+    font-size:12px;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:.2s;
+
+    border:1px solid #334155;
+
+}
+
+button[data-tooltip]:hover::after{
+
+    opacity:1;
+
+}
+
+/* ==========================================
+   STATUS
+========================================== */
+
+.toolbarStatus{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:10px 14px;
+
+    border-radius:999px;
+
+    background:#111827;
+
+    border:1px solid #334155;
+
+}
+
+.toolbarStatus .dot{
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+
+    background:#22c55e;
+
+    animation:pulseStatus 1.5s infinite;
+
+}
+
+@keyframes pulseStatus{
+
+0%{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+50%{
+
+transform:scale(1.4);
+
+opacity:.5;
+
+}
+
+100%{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+}
+
+/* ==========================================
+   PESQUISA
+========================================== */
+
+.toolbarSearch{
+
+    position:relative;
+
+}
+
+.toolbarSearch input{
+
+    width:240px;
+
+    height:42px;
+
+    border-radius:12px;
+
+    border:1px solid #334155;
+
+    background:#0f172a;
+
+    color:white;
+
+    padding:0 14px;
+
+}
+
+.toolbarSearch input:focus{
+
+    border-color:#6366f1;
+
+}
+
+/* ==========================================
+   RESPONSIVO
+========================================== */
+
+@media(max-width:1200px){
+
+    #toolbar{
+
+        flex-wrap:wrap;
+
+        height:auto;
+
+        padding:12px;
+
+        gap:12px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    #toolbar{
+
+        justify-content:center;
+
+    }
+
+    .toolbarSearch{
+
+        display:none;
+
+    }
+
+}
