@@ -1,13 +1,11 @@
 /* ==========================================
-   TOKENS
+   TOKENS RPG
 ========================================== */
+
 
 .token{
 
     position:absolute;
-
-    width:80px;
-    height:80px;
 
     border-radius:50%;
 
@@ -17,301 +15,493 @@
 
     user-select:none;
 
+
     border:4px solid rgba(255,255,255,.25);
 
+
     box-shadow:
-        0 8px 20px rgba(0,0,0,.45);
+    0 8px 20px rgba(0,0,0,.45);
+
 
     transition:
-        transform .15s ease,
-        box-shadow .2s ease,
-        border .2s ease;
+
+    transform .15s ease,
+
+    box-shadow .2s ease,
+
+    border .2s ease;
+
 
     z-index:50;
 
+
 }
 
-/* ==============================
-IMAGEM
-============================== */
+
+
+
+/* ==========================================
+   IMAGEM DO TOKEN
+========================================== */
+
 
 .token img{
 
+
     width:100%;
+
     height:100%;
+
 
     object-fit:cover;
 
+
     pointer-events:none;
+
 
 }
 
-/* ==============================
-TOKEN SEM IMAGEM
-============================== */
 
-.token .fallback{
+
+
+
+
+/* ==========================================
+   TOKEN SEM IMAGEM
+========================================== */
+
+
+.fallback{
+
 
     width:100%;
+
     height:100%;
+
 
     display:flex;
 
-    justify-content:center;
+
     align-items:center;
 
-    font-size:26px;
-    font-weight:bold;
+    justify-content:center;
+
+
+    font-size:35%;
+
+
+    font-weight:800;
+
 
     color:white;
 
+
+    text-transform:uppercase;
+
+
 }
 
-/* ==============================
-HOVER
-============================== */
+
+
+
+
+
+/* ==========================================
+   HOVER
+========================================== */
+
 
 .token:hover{
 
-    transform:scale(1.08);
+
+    transform:
+    scale(1.08);
+
 
     box-shadow:
-        0 0 25px rgba(255,255,255,.25),
-        0 15px 25px rgba(0,0,0,.5);
+
+    0 0 25px rgba(99,102,241,.7),
+
+    0 15px 30px rgba(0,0,0,.5);
+
 
 }
 
-/* ==============================
-ARRASTANDO
-============================== */
+
+
+
+
+
+/* ==========================================
+   ARRASTANDO
+========================================== */
+
 
 .token.dragging{
 
+
     cursor:grabbing;
 
-    transform:scale(1.15);
+
+    transform:
+    scale(1.15);
+
 
     box-shadow:
 
-        0 0 45px rgba(99,102,241,.9);
+    0 0 45px rgba(99,102,241,.9);
+
 
 }
 
-/* ==============================
-SELECIONADO
-============================== */
+
+
+
+
+
+/* ==========================================
+   SELECIONADO
+========================================== */
+
 
 .token.selected{
 
-    border:4px solid #facc15;
+
+    border:
+
+    4px solid #facc15;
+
+
 
     box-shadow:
 
-        0 0 35px rgba(250,204,21,.7);
+    0 0 35px rgba(250,204,21,.8);
+
+
 
 }
 
-/* ==============================
-ROTAÇÃO
-============================== */
 
-.token.rotating{
 
-    transition:none;
 
-}
 
-/* ==============================
-LABEL
-============================== */
+
+/* ==========================================
+   NOME
+========================================== */
+
 
 .tokenName{
 
+
     position:absolute;
+
 
     left:50%;
 
-    bottom:-24px;
 
-    transform:translateX(-50%);
+    bottom:-25px;
+
+
+
+    transform:
+
+    translateX(-50%);
+
+
 
     background:#111827;
+
+
 
     color:white;
 
+
+
     padding:4px 12px;
+
+
 
     border-radius:999px;
 
+
+
     font-size:12px;
+
+
 
     font-weight:700;
 
+
+
     white-space:nowrap;
+
+
 
     pointer-events:none;
 
+
+
 }
 
-/* ==============================
-HP
-============================== */
+
+
+
+
+
+/* ==========================================
+   HP
+========================================== */
+
 
 .hpBar{
 
+
     position:absolute;
+
 
     bottom:0;
 
+
     left:0;
 
+
     width:100%;
+
 
     height:8px;
 
+
     background:#7f1d1d;
 
+
 }
+
+
 
 .hpFill{
 
-    width:100%;
 
     height:100%;
+
+
+    width:100%;
+
 
     background:#22c55e;
 
-    transition:width .2s;
+
+    transition:.2s;
+
 
 }
 
-/* ==============================
-ESCUDO
-============================== */
+
+
+
+
+
+/* ==========================================
+   ESCUDO
+========================================== */
+
 
 .shieldBar{
 
+
     position:absolute;
+
 
     top:0;
 
+
     left:0;
 
+
     width:100%;
+
 
     height:6px;
 
+
     background:#1e3a8a;
 
+
 }
+
+
 
 .shieldFill{
 
+
     width:100%;
+
 
     height:100%;
 
+
     background:#3b82f6;
+
 
 }
 
-/* ==============================
-STATUS
-============================== */
+
+
+
+
+
+/* ==========================================
+   STATUS
+========================================== */
+
 
 .statusContainer{
 
+
     position:absolute;
+
 
     top:-8px;
 
+
     right:-8px;
 
+
     display:flex;
+
 
     flex-direction:column;
 
+
     gap:4px;
 
+
 }
+
+
 
 .status{
 
+
     width:22px;
+
 
     height:22px;
 
+
     border-radius:50%;
+
 
     background:#111827;
 
+
     border:2px solid white;
+
 
     display:flex;
 
+
     align-items:center;
+
 
     justify-content:center;
 
+
+    color:white;
+
+
     font-size:12px;
+
 
 }
 
-/* ==============================
-AURA
-============================== */
+
+
+
+
+
+/* ==========================================
+   AURAS
+========================================== */
+
 
 .tokenAura{
 
+
     position:absolute;
 
-    width:110px;
 
-    height:110px;
+    width:120px;
+
+
+    height:120px;
+
 
     border-radius:50%;
 
+
     left:50%;
+
 
     top:50%;
 
-    transform:translate(-50%,-50%);
+
+    transform:
+    translate(-50%,-50%);
+
 
     pointer-events:none;
 
+
     opacity:.35;
 
+
 }
+
+
 
 .auraBlue{
 
-    background:rgba(59,130,246,.35);
+background:rgba(59,130,246,.35);
 
 }
+
+
 
 .auraRed{
 
-    background:rgba(239,68,68,.35);
+background:rgba(239,68,68,.35);
 
 }
+
+
 
 .auraGreen{
 
-    background:rgba(34,197,94,.35);
+background:rgba(34,197,94,.35);
 
 }
+
+
 
 .auraPurple{
 
-    background:rgba(168,85,247,.35);
+background:rgba(168,85,247,.35);
 
 }
 
-/* ==============================
-ANIMAÇÕES
-============================== */
+
+
+
+
+
+/* ==========================================
+   ANIMAÇÃO NASCIMENTO
+========================================== */
+
 
 @keyframes tokenSpawn{
+
 
 0%{
 
@@ -321,11 +511,15 @@ transform:scale(.2);
 
 }
 
+
+
 60%{
 
 transform:scale(1.15);
 
 }
+
+
 
 100%{
 
@@ -335,144 +529,93 @@ transform:scale(1);
 
 }
 
+
 }
+
+
 
 .token.spawn{
 
-animation:tokenSpawn .35s;
+
+animation:
+
+tokenSpawn .35s;
+
 
 }
 
-/* ==============================
-PULSO
-============================== */
 
-@keyframes pulse{
 
-0%{
 
-box-shadow:0 0 0 rgba(99,102,241,.7);
 
-}
 
-50%{
+/* ==========================================
+   TOKEN ATIVO
+========================================== */
 
-box-shadow:0 0 40px rgba(99,102,241,.8);
-
-}
-
-100%{
-
-box-shadow:0 0 0 rgba(99,102,241,.7);
-
-}
-
-}
 
 .token.active{
 
-animation:pulse 1.5s infinite;
+
+animation:
+
+tokenPulse 1.5s infinite;
+
 
 }
 
-/* ==============================
-EXCLUIR
-============================== */
 
-.deleteButton{
 
-position:absolute;
 
-right:-8px;
+@keyframes tokenPulse{
 
-top:-8px;
 
-width:26px;
+0%{
 
-height:26px;
-
-border-radius:50%;
-
-background:#ef4444;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-color:white;
-
-font-weight:bold;
-
-cursor:pointer;
-
-opacity:0;
-
-transition:.2s;
+box-shadow:
+0 0 0 rgba(99,102,241,.4);
 
 }
 
-.token:hover .deleteButton{
 
-opacity:1;
 
-}
+50%{
 
-/* ==============================
-INICIATIVA
-============================== */
-
-.initiative{
-
-position:absolute;
-
-left:-8px;
-
-top:-8px;
-
-width:24px;
-
-height:24px;
-
-border-radius:50%;
-
-background:#6366f1;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-color:white;
-
-font-size:11px;
-
-font-weight:bold;
+box-shadow:
+0 0 35px rgba(99,102,241,.9);
 
 }
 
-/* ==============================
-RESPONSIVO
-============================== */
+
+
+100%{
+
+box-shadow:
+0 0 0 rgba(99,102,241,.4);
+
+}
+
+
+}
+
+
+
+
+
+
+/* ==========================================
+   RESPONSIVO
+========================================== */
+
 
 @media(max-width:900px){
 
-.token{
 
-width:64px;
+.tokenName{
 
-height:64px;
-
-}
-
-.tokenAura{
-
-width:90px;
-
-height:90px;
+font-size:10px;
 
 }
+
 
 }
