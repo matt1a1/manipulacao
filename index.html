@@ -4,17 +4,9 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Manipulação RPG</title>
-
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 
 <link rel="stylesheet" href="style.css">
@@ -25,13 +17,14 @@
 <link rel="stylesheet" href="animations.css">
 
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+
 </head>
 
 
 <body>
 
-
-<!-- LOADING -->
 
 <div id="loading">
 
@@ -45,11 +38,9 @@
 
 
 
+
 <div id="app">
 
-
-
-<!-- ================= SIDEBAR ================= -->
 
 
 <aside id="sidebar">
@@ -66,7 +57,6 @@
 
 
 
-
 <section class="library">
 
 
@@ -74,13 +64,9 @@
 
 <h2>Biblioteca</h2>
 
-
 <button id="resetLibrary">
-
 Restaurar
-
 </button>
-
 
 </div>
 
@@ -94,10 +80,6 @@ Restaurar
 
 
 
-
-<!-- CRIAR TOKEN -->
-
-
 <section class="create-token">
 
 
@@ -106,24 +88,22 @@ Restaurar
 
 
 <input
-type="text"
 id="tokenName"
+type="text"
 placeholder="Nome do Token">
 
 
 
-
-
 <input
-type="color"
 id="tokenColor"
+type="color"
 value="#6366f1">
 
 
 
 
 
-<label class="token-label">
+<label>
 
 Imagem do Token
 
@@ -131,15 +111,16 @@ Imagem do Token
 
 
 <input
-type="file"
 id="tokenImage"
+type="file"
 accept="image/*">
 
 
 
 
 
-<label class="token-label">
+
+<label>
 
 Tamanho:
 
@@ -147,18 +128,15 @@ Tamanho:
 50px
 </span>
 
-
 </label>
 
 
-
 <input
-type="range"
 id="tokenSize"
+type="range"
 min="30"
 max="150"
 value="50">
-
 
 
 
@@ -171,9 +149,8 @@ Adicionar Token
 </button>
 
 
+
 </section>
-
-
 
 
 
@@ -186,38 +163,26 @@ Adicionar Token
 <h3>Ferramentas</h3>
 
 
-
 <button id="toggleGrid">
-
 Grid
-
 </button>
-
 
 
 
 <button id="toggleFog">
-
 Fog
-
 </button>
-
 
 
 
 <button id="toggleMeasure">
-
 Régua
-
 </button>
 
 
 
-
 <button id="initiative">
-
 Iniciativa
-
 </button>
 
 
@@ -228,57 +193,33 @@ Iniciativa
 
 </aside>
 
-
-
-
-
-
-
-
-
-<!-- ================= MAIN ================= -->
-
+  <!-- ================= MAIN ================= -->
 
 <main id="main">
 
 
-
-
-
 <header id="toolbar">
-
 
 
 <div class="left">
 
 
 <button id="uploadMap">
-
 🖼️ Mapa
-
 </button>
-
 
 
 <button id="defaultMap">
-
 🌎 Padrão
-
 </button>
-
 
 
 <button id="clearMap">
-
 🗑 Limpar
-
 </button>
 
 
-
 </div>
-
-
 
 
 
@@ -287,51 +228,32 @@ Iniciativa
 <div class="center">
 
 
-
 <button id="undo">
-
 ↶
-
 </button>
-
 
 
 <button id="redo">
-
 ↷
-
 </button>
-
 
 
 <button id="copy">
-
 📄
-
 </button>
-
 
 
 <button id="paste">
-
 📋
-
 </button>
-
 
 
 <button id="duplicate">
-
 ➕
-
 </button>
 
 
-
 </div>
-
-
-
 
 
 
@@ -340,49 +262,33 @@ Iniciativa
 <div class="right">
 
 
-
 <button id="zoomOut">
-
 ➖
-
 </button>
-
 
 
 
 <span id="zoomValue">
-
 100%
-
 </span>
 
 
 
-
 <button id="zoomIn">
-
 ➕
-
 </button>
 
 
 
-
-
 <button id="save">
-
 💾 Salvar
-
 </button>
 
 
 
 <button id="load">
-
 📂 Carregar
-
 </button>
-
 
 
 
@@ -390,9 +296,6 @@ Iniciativa
 
 
 </header>
-
-
-
 
 
 
@@ -408,17 +311,13 @@ Iniciativa
 
 <div id="map">
 
-
 </div>
 
 
 </div>
-
 
 
 </section>
-
-
 
 
 
@@ -429,36 +328,26 @@ Iniciativa
 
 
 <div>
-
 Espaço = mover mapa
-
 </div>
 
 
 <div>
-
 Scroll = Zoom
-
 </div>
 
 
 <div>
-
 Delete = remover
-
 </div>
 
 
 <div>
-
 CTRL+C / CTRL+V
-
 </div>
 
 
 </footer>
-
-
 
 
 
@@ -471,51 +360,40 @@ CTRL+C / CTRL+V
 
 
 
-
-
-<!-- ================= CONTEXT MENU ================= -->
+<!-- ================= MENU DIREITO ================= -->
 
 
 <div id="contextMenu">
 
 
 <button id="renameToken">
-
 Renomear
-
 </button>
 
 
 
 <button id="changeColor">
-
 Cor
-
 </button>
 
 
 
 <button id="changeImage">
-
 Imagem
-
 </button>
 
 
 
 <button id="rotateToken">
-
 Rotacionar
-
 </button>
 
 
 
 <button id="deleteToken">
-
 Excluir
-
 </button>
+
 
 
 </div>
@@ -526,20 +404,15 @@ Excluir
 
 
 
-
-
-<!-- INICIATIVA -->
+<!-- ================= INICIATIVA ================= -->
 
 
 <div id="initiativePanel">
 
 
 <h2>
-
 Ordem de Iniciativa
-
 </h2>
-
 
 
 <div id="initiativeList">
@@ -547,7 +420,6 @@ Ordem de Iniciativa
 </div>
 
 
-
 </div>
 
 
@@ -556,9 +428,7 @@ Ordem de Iniciativa
 
 
 
-
-
-<!-- INPUTS ESCONDIDOS -->
+<!-- ================= INPUTS ================= -->
 
 
 <input
@@ -572,27 +442,26 @@ hidden>
 
 
 
+<!-- ================= JAVASCRIPT ================= -->
 
-<!-- SCRIPTS -->
 
+<script src="js/main.js"></script>
 
-<script src="main.js"></script>
+<script src="js/library.js"></script>
 
-<script src="library.js"></script>
+<script src="js/drag.js"></script>
 
-<script src="drag.js"></script>
+<script src="js/zoom.js"></script>
 
-<script src="zoom.js"></script>
+<script src="js/storage.js"></script>
 
-<script src="storage.js"></script>
+<script src="js/grid.js"></script>
 
-<script src="grid.js"></script>
+<script src="js/contextMenu.js"></script>
 
-<script src="contextMenu.js"></script>
+<script src="js/ui.js"></script>
 
-<script src="ui.js"></script>
-
-<script src="tokens.js"></script>
+<script src="js/tokens.js"></script>
 
 
 
