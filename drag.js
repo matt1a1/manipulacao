@@ -1,10 +1,12 @@
 // ==========================================
-// MANIPULAÇÃO RPG
 // DRAG.JS
+// MANIPULAÇÃO RPG
 // ==========================================
 
 
+
 let draggingToken = null;
+
 
 let dragOffset = {
 
@@ -15,10 +17,20 @@ let dragOffset = {
 };
 
 
-let isPanning=false;
+
+let panning = false;
 
 
-let panStart={
+let panStart = {
+
+    x:0,
+
+    y:0
+
+};
+
+
+let mapStart = {
 
     x:0,
 
@@ -29,44 +41,77 @@ let panStart={
 
 
 
+
+
+
 // ==========================================
 // INICIAR
 // ==========================================
 
 
 window.addEventListener(
+
 "load",
-initDrag
-);
+
+()=>{
+
+
+    registerDrag();
+
+
+});
 
 
 
-function initDrag(){
-
-
-document.addEventListener(
-"mousedown",
-mouseDown
-);
 
 
 
-document.addEventListener(
-"mousemove",
-mouseMove
-);
+
+// ==========================================
+// REGISTRAR EVENTOS
+// ==========================================
+
+
+function registerDrag(){
 
 
 
-document.addEventListener(
-"mouseup",
-mouseUp
-);
+    if(!DOM.map)
+        return;
+
+
+
+    DOM.map.addEventListener(
+
+        "mousedown",
+
+        mouseDown
+
+    );
+
+
+
+    document.addEventListener(
+
+        "mousemove",
+
+        mouseMove
+
+    );
+
+
+
+    document.addEventListener(
+
+        "mouseup",
+
+        mouseUp
+
+    );
 
 
 
 }
-
 
 
 
@@ -84,97 +129,165 @@ function mouseDown(e){
 
 
 
-const token =
-e.target.closest(
-".token"
-);
+    const tokenElement =
+
+    e.target.closest(
+        ".token"
+    );
 
 
 
-if(token){
+
+
+    // ======================
+    // TOKEN
+    // ======================
+
+
+    if(tokenElement){
 
 
 
-const id =
-Number(
-token.dataset.id
-);
+        const id =
+
+        Number(
+            tokenElement.dataset.id
+        );
 
 
 
-const data =
-tokens.find(
-t=>t.id==id
-);
+        const token =
+
+        tokens.find(
+
+            t=>t.id===id
+
+        );
 
 
 
-if(!data)
-return;
+        if(!token)
+            return;
 
 
 
-if(
-!App.selectedTokens.includes(id)
-){
+
+
+        saveHistory();
 
 
 
-clearSelection();
+
+
+        if(
+            !e.ctrlKey
+            &&
+            !App.selectedTokens.includes(id)
+        ){
+
+
+            clearSelection();
+
+
+            addSelection(id);
 
 
 
-addSelection(id);
-
-
-
-renderSelection();
-
-
-
-}
-
-
-
-draggingToken=data;
-
-
-
-dragOffset.x =
-e.clientX-data.x;
-
-
-
-dragOffset.y =
-e.clientY-data.y;
-
-
-
-saveHistory();
-
-
-
-return;
-
-
-
-}
+        }
 
 
 
 
 
 
-if(e.button===1 || e.key===" "){
+
+        draggingToken = token;
 
 
 
-startPan();
+
+
+        dragOffset.x =
+
+        e.clientX -
+
+        token.x;
 
 
 
-}
+        dragOffset.y =
 
+        e.clientY -
+
+        token.y;
+
+
+
+
+
+        tokenElement.classList.add(
+
+            "dragging"
+
+        );
+
+
+
+        return;
+
+
+
+    }
+
+
+
+
+
+
+
+    // ======================
+    // PAN MAPA
+    // ======================
+
+
+    if(e.button===0){
+
+
+        if(
+            e.target===DOM.map
+            ||
+            e.target===DOM.wrapper
+        ){
+
+
+
+            startPan();
+
+
+
+            panStart.x=e.clientX;
+
+
+            panStart.y=e.clientY;
+
+
+
+            mapStart.x=
+
+            App.mapOffset.x;
+
+
+
+            mapStart.y=
+
+            App.mapOffset.y;
+
+
+
+        }
+
+
+    }
 
 
 
@@ -197,140 +310,149 @@ function mouseMove(e){
 
 
 
-if(draggingToken){
+    // =====================
+    // TOKEN
+    // =====================
 
 
 
-let x =
-e.clientX-dragOffset.x;
+    if(draggingToken){
 
 
 
-let y =
-e.clientY-dragOffset.y;
+        let x =
 
+        e.clientX -
 
+        dragOffset.x;
 
 
-if(App.snapGrid){
 
+        let y =
 
+        e.clientY -
 
-x =
-Math.round(
-x/App.gridSize
-)
-*
-App.gridSize;
+        dragOffset.y;
 
 
 
-y =
-Math.round(
-y/App.gridSize
-)
-*
-App.gridSize;
 
 
 
-}
 
+        if(App.snapGrid){
 
 
-const dx =
-x-draggingToken.x;
 
+            x =
 
+            Math.round(
 
-const dy =
-y-draggingToken.y;
+                x/App.gridSize
 
+            )
 
+            *
 
+            App.gridSize;
 
-App.selectedTokens.forEach(id=>{
 
 
+            y =
 
-const token =
-tokens.find(
-t=>t.id===id
-);
+            Math.round(
 
+                y/App.gridSize
 
+            )
 
-if(token){
+            *
 
+            App.gridSize;
 
 
-token.x += dx;
 
+        }
 
 
-token.y += dy;
 
 
 
-}
 
 
+        draggingToken.x=x;
 
-});
 
+        draggingToken.y=y;
 
 
 
-renderTokens();
 
 
+        renderTokens();
 
-return;
 
 
+        return;
 
-}
 
+    }
 
 
 
 
 
-if(isPanning){
 
 
 
-const dx =
-e.movementX;
 
+    // =====================
+    // PAN
+    // =====================
 
 
-const dy =
-e.movementY;
 
+    if(panning){
 
 
-App.mapOffset.x += dx;
 
+        const dx =
 
+        e.clientX -
 
-App.mapOffset.y += dy;
+        panStart.x;
 
 
 
-DOM.map.style.left =
+        const dy =
 
-`calc(50% + ${App.mapOffset.x}px)`;
+        e.clientY -
 
+        panStart.y;
 
 
-DOM.map.style.top =
 
-`calc(50% + ${App.mapOffset.y}px)`;
 
 
+        App.mapOffset.x =
 
-}
+        mapStart.x + dx;
+
+
+
+        App.mapOffset.y =
+
+        mapStart.y + dy;
+
+
+
+
+
+        updateMapPosition();
+
+
+
+    }
 
 
 
@@ -353,34 +475,63 @@ function mouseUp(){
 
 
 
-if(draggingToken){
+    if(draggingToken){
 
 
 
-draggingToken=null;
+        const el =
+
+        document.querySelector(
+
+            `.token[data-id="${draggingToken.id}"]`
+
+        );
 
 
 
-saveStorage();
+        if(el){
+
+
+            el.classList.remove(
+
+                "dragging"
+
+            );
+
+
+        }
+
+
+
+
+
+        draggingToken=null;
+
+
+
+        saveStorage();
+
+
+
+        toast(
+            "Token movido."
+        );
+
+
+
+    }
+
+
+
+
+
+
+
+    stopPan();
 
 
 
 }
-
-
-
-isPanning=false;
-
-
-
-DOM.wrapper.classList.remove(
-"grabbing"
-);
-
-
-
-}
-
 
 
 
@@ -397,32 +548,85 @@ DOM.wrapper.classList.remove(
 function startPan(){
 
 
-
-isPanning=true;
-
+    panning=true;
 
 
-DOM.wrapper.classList.add(
-"grabbing"
-);
 
+    if(DOM.wrapper){
+
+
+        DOM.wrapper.classList.add(
+
+            "grabbing"
+
+        );
+
+
+    }
 
 
 }
 
 
 
+
+
+
+
 function stopPan(){
 
 
-
-isPanning=false;
-
+    panning=false;
 
 
-DOM.wrapper.classList.remove(
-"grabbing"
-);
+
+    if(DOM.wrapper){
+
+
+        DOM.wrapper.classList.remove(
+
+            "grabbing"
+
+        );
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// ATUALIZAR POSIÇÃO DO MAPA
+// ==========================================
+
+
+function updateMapPosition(){
+
+
+
+    if(!DOM.map)
+        return;
+
+
+
+
+
+    DOM.map.style.marginLeft =
+
+    App.mapOffset.x+"px";
+
+
+
+    DOM.map.style.marginTop =
+
+    App.mapOffset.y+"px";
 
 
 
