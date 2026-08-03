@@ -1,5 +1,6 @@
 // ==========================================
-// STORAGE RPG
+// MANIPULAÇÃO RPG
+// STORAGE.JS
 // ==========================================
 
 
@@ -17,12 +18,17 @@ const STORAGE_KEY =
 function saveStorage(){
 
 
+const data={
 
-const data = {
 
 
 version:
 App.version,
+
+
+
+tokens:
+tokens,
 
 
 
@@ -31,33 +37,27 @@ App.zoom,
 
 
 
-gridVisible:
+grid:
 App.gridVisible,
 
 
 
-snapGrid:
+snap:
 App.snapGrid,
 
 
 
-fogEnabled:
+fog:
 App.fogEnabled,
 
 
 
-measureMode:
-App.measureMode,
-
-
-
-tokens:
-tokens
+mapOffset:
+App.mapOffset
 
 
 
 };
-
 
 
 
@@ -80,6 +80,7 @@ JSON.stringify(data)
 
 
 
+
 // ==========================================
 // CARREGAR
 // ==========================================
@@ -90,20 +91,23 @@ function loadStorage(){
 
 
 const save =
-
 localStorage.getItem(
 STORAGE_KEY
 );
 
 
 
+
 if(!save){
+
 
 
 return;
 
 
+
 }
+
 
 
 
@@ -118,132 +122,41 @@ JSON.parse(save);
 
 
 
-
-// CONFIGURAÇÕES
-
+if(data.tokens){
 
 
-if(data.zoom)
+
+tokens =
+data.tokens;
+
+
+
+}
+
+
+
+
+if(data.zoom){
+
+
 
 App.zoom =
 data.zoom;
 
 
 
-if(
-data.gridVisible !== undefined
-)
+}
+
+
+
+
+
+if(data.grid !== undefined){
+
+
 
 App.gridVisible =
-data.gridVisible;
-
-
-
-
-if(
-data.snapGrid !== undefined
-)
-
-App.snapGrid =
-data.snapGrid;
-
-
-
-
-if(
-data.fogEnabled !== undefined
-)
-
-App.fogEnabled =
-data.fogEnabled;
-
-
-
-
-if(
-data.measureMode !== undefined
-)
-
-App.measureMode =
-data.measureMode;
-
-
-
-
-
-
-
-// TOKENS
-
-
-
-if(
-Array.isArray(data.tokens)
-){
-
-
-
-tokens =
-data.tokens.map(t=>({
-
-
-
-id:
-t.id || Date.now()+Math.random(),
-
-
-
-name:
-t.name || "Token",
-
-
-
-color:
-t.color || "#6366f1",
-
-
-
-image:
-t.image || null,
-
-
-
-x:
-t.x || 100,
-
-
-
-y:
-t.y || 100,
-
-
-
-size:
-t.size || 60,
-
-
-
-hp:
-t.hp ?? 100,
-
-
-
-maxHp:
-t.maxHp ?? 100,
-
-
-
-rotation:
-t.rotation || 0,
-
-
-
-status:
-t.status || []
-
-
-
-}));
+data.grid;
 
 
 
@@ -253,19 +166,70 @@ t.status || []
 
 
 
-}catch(error){
+if(data.snap !== undefined){
+
+
+
+App.snapGrid =
+data.snap;
+
+
+
+}
+
+
+
+
+
+if(data.fog !== undefined){
+
+
+
+App.fogEnabled =
+data.fog;
+
+
+
+}
+
+
+
+
+
+if(data.mapOffset){
+
+
+
+App.mapOffset =
+data.mapOffset;
+
+
+
+}
+
+
+
+toast(
+"Save carregado."
+);
+
+
+
+}
+
+catch(e){
 
 
 
 console.error(
 "Erro ao carregar save:",
-error
+e
 );
 
 
 
 toast(
-"Erro ao carregar dados."
+"Erro no carregamento."
 );
 
 
@@ -283,43 +247,10 @@ toast(
 
 
 
-// ==========================================
-// LIMPAR SAVE
-// ==========================================
-
-
-function clearStorage(){
-
-
-
-localStorage.removeItem(
-STORAGE_KEY
-);
-
-
-
-tokens=[];
-
-
-
-renderTokens();
-
-
-
-toast(
-"Dados apagados."
-);
-
-
-
-}
-
-
-
 
 
 // ==========================================
-// EXPORTAR MESA
+// EXPORTAR SAVE
 // ==========================================
 
 
@@ -328,7 +259,6 @@ function exportSave(){
 
 
 const data =
-
 localStorage.getItem(
 STORAGE_KEY
 );
@@ -337,11 +267,13 @@ STORAGE_KEY
 
 const blob =
 new Blob(
+
 [data],
+
 {
-type:
-"application/json"
+type:"application/json"
 }
+
 );
 
 
@@ -364,8 +296,8 @@ a.href=url;
 
 
 
-a.download=
-"mesa-manipulacao.json";
+a.download =
+"mesa-rpg-save.json";
 
 
 
@@ -373,9 +305,7 @@ a.click();
 
 
 
-URL.revokeObjectURL(
-url
-);
+URL.revokeObjectURL(url);
 
 
 
@@ -385,8 +315,12 @@ url
 
 
 
+
+
+
+
 // ==========================================
-// IMPORTAR MESA
+// IMPORTAR SAVE
 // ==========================================
 
 
@@ -413,17 +347,7 @@ reader.result
 
 
 
-loadStorage();
-
-
-
-renderTokens();
-
-
-
-toast(
-"Mesa importada."
-);
+location.reload();
 
 
 
@@ -431,9 +355,49 @@ toast(
 
 
 
-reader.readAsText(
-file
+reader.readAsText(file);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// LIMPAR TUDO
+// ==========================================
+
+
+function clearStorage(){
+
+
+
+if(
+confirm(
+"Apagar toda a mesa?"
+)
+
+){
+
+
+
+localStorage.removeItem(
+STORAGE_KEY
 );
+
+
+
+location.reload();
+
+
+
+}
 
 
 
