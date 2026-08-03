@@ -1,31 +1,204 @@
 // ==========================================
-// ZOOM RPG
+// MANIPULAÇÃO RPG
+// ZOOM.JS
 // ==========================================
 
 
-let zoomTimeout;
+// ==========================================
+// INICIAR
+// ==========================================
+
+
+window.addEventListener(
+"load",
+initZoom
+);
+
+
+
+function initZoom(){
+
+
+
+const plus =
+document.getElementById(
+"zoomIn"
+);
+
+
+
+const minus =
+document.getElementById(
+"zoomOut"
+);
+
+
+
+
+if(plus){
+
+
+plus.onclick=function(){
+
+
+changeZoom(
+0.1
+);
+
+
+};
+
+
+}
+
+
+
+
+
+if(minus){
+
+
+minus.onclick=function(){
+
+
+changeZoom(
+-0.1
+);
+
+
+};
+
+
+}
+
+
+
+
+
+updateZoom();
+
+
+
+}
+
+
+
+
+
 
 
 
 
 // ==========================================
-// APLICAR ZOOM
+// ALTERAR ZOOM
 // ==========================================
 
 
-function applyZoom(){
+function changeZoom(value){
+
+
+
+App.zoom += value;
+
+
+
+if(App.zoom<App.minZoom){
+
+
+
+App.zoom =
+App.minZoom;
+
+
+
+}
+
+
+
+if(App.zoom>App.maxZoom){
+
+
+
+App.zoom =
+App.maxZoom;
+
+
+
+}
+
+
+
+updateZoom();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// ZOOM PELO MOUSE
+// ==========================================
+
+
+function mouseZoom(e){
+
+
+
+e.preventDefault();
+
+
+
+changeZoom(
+
+e.deltaY < 0
+?
+0.1
+:
+-0.1
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// ATUALIZAR
+// ==========================================
+
+
+function updateZoom(){
+
+
+
+if(!DOM.map)
+return;
+
 
 
 
 DOM.map.style.transform =
 
 `
-translate(
-${App.mapOffset.x}px,
-${App.mapOffset.y}px
-)
+
 translate(-50%,-50%)
 scale(${App.zoom})
+
 `;
 
 
@@ -35,16 +208,13 @@ scale(${App.zoom})
 if(DOM.zoomLabel){
 
 
-DOM.zoomLabel.innerText =
+
+DOM.zoomLabel.innerHTML =
 
 Math.round(
 App.zoom*100
 )
-+
-"%";
-
-
-}
++"%";
 
 
 
@@ -52,131 +222,9 @@ App.zoom*100
 
 
 
-// ==========================================
-// SCROLL ZOOM
-// ==========================================
-
-
-function zoomWheel(e){
-
-
-e.preventDefault();
-
-
-
-
-const oldZoom =
-App.zoom;
-
-
-
-
-
-if(e.deltaY < 0){
-
-
-App.zoom += 0.1;
-
-
-}else{
-
-
-App.zoom -= 0.1;
-
-
 }
 
 
-
-
-
-App.zoom = Math.max(
-
-App.minZoom,
-
-Math.min(
-App.maxZoom,
-App.zoom
-)
-
-);
-
-
-
-
-
-// manter mouse como centro
-
-
-const rect =
-DOM.map.getBoundingClientRect();
-
-
-
-
-const mouseX =
-
-e.clientX -
-
-rect.left;
-
-
-
-const mouseY =
-
-e.clientY -
-
-rect.top;
-
-
-
-
-
-const scaleChange =
-
-App.zoom / oldZoom;
-
-
-
-
-
-App.mapOffset.x -=
-
-(
-mouseX -
-rect.width/2
-)
-*
-(
-scaleChange-1
-);
-
-
-
-
-
-App.mapOffset.y -=
-
-(
-mouseY -
-rect.height/2
-)
-*
-(
-scaleChange-1
-);
-
-
-
-
-
-applyZoom();
-
-showZoomIndicator();
-
-
-
-}
 
 
 
@@ -185,166 +233,26 @@ showZoomIndicator();
 
 
 // ==========================================
-// INDICADOR
+// RESET
 // ==========================================
 
 
-function showZoomIndicator(){
+function resetZoom(){
 
 
 
-const indicator =
+App.zoom=1;
 
-document.getElementById(
-"zoomIndicator"
+
+
+updateZoom();
+
+
+
+toast(
+"Zoom restaurado."
 );
-
-
-
-if(!indicator)
-return;
-
-
-
-
-indicator.innerText =
-
-Math.round(
-App.zoom*100
-)
-+
-"%";
-
-
-
-indicator.classList.add(
-"show"
-);
-
-
-
-clearTimeout(
-zoomTimeout
-);
-
-
-
-zoomTimeout =
-
-setTimeout(()=>{
-
-
-indicator.classList.remove(
-"show"
-);
-
-
-
-},800);
 
 
 
 }
-
-
-
-
-
-
-
-// ==========================================
-// BOTÕES
-// ==========================================
-
-
-window.addEventListener(
-"load",
-()=>{
-
-
-
-document
-.getElementById(
-"zoomIn"
-)
-?.addEventListener(
-"click",
-()=>{
-
-
-App.zoom += .1;
-
-
-
-if(App.zoom > App.maxZoom)
-
-App.zoom =
-App.maxZoom;
-
-
-
-applyZoom();
-
-
-
-});
-
-
-
-
-
-
-document
-.getElementById(
-"zoomOut"
-)
-?.addEventListener(
-"click",
-()=>{
-
-
-App.zoom -= .1;
-
-
-
-if(App.zoom < App.minZoom)
-
-App.zoom =
-App.minZoom;
-
-
-
-applyZoom();
-
-
-
-});
-
-
-
-
-
-if(DOM.wrapper){
-
-
-DOM.wrapper.addEventListener(
-
-"wheel",
-
-zoomWheel,
-
-{
-
-passive:false
-
-}
-
-);
-
-
-}
-
-
-
-
-});
