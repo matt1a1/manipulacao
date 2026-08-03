@@ -1,10 +1,10 @@
 // ==========================================
-// STORAGE
+// STORAGE RPG
 // ==========================================
 
 
 const STORAGE_KEY =
-"manipulacao_rpg";
+"manipulacao_rpg_save";
 
 
 
@@ -13,51 +13,69 @@ const STORAGE_KEY =
 // SALVAR
 // ==========================================
 
+
 function saveStorage(){
 
 
-    const data={
+
+const data = {
 
 
-        tokens:
-
-
-        tokens,
-
-
-        zoom:
-
-
-        App.zoom,
-
-
-        grid:
-
-
-        App.gridVisible,
-
-
-        snap:
-
-
-        App.snapGrid
-
-
-    };
+version:
+App.version,
 
 
 
-    localStorage.setItem(
+zoom:
+App.zoom,
 
-        STORAGE_KEY,
 
-        JSON.stringify(data)
 
-    );
+gridVisible:
+App.gridVisible,
+
+
+
+snapGrid:
+App.snapGrid,
+
+
+
+fogEnabled:
+App.fogEnabled,
+
+
+
+measureMode:
+App.measureMode,
+
+
+
+tokens:
+tokens
+
+
+
+};
+
+
+
+
+localStorage.setItem(
+
+STORAGE_KEY,
+
+JSON.stringify(data)
+
+);
 
 
 
 }
+
+
+
+
 
 
 
@@ -66,72 +84,166 @@ function saveStorage(){
 // CARREGAR
 // ==========================================
 
+
 function loadStorage(){
 
 
 
-    const saved =
-    localStorage.getItem(
-        STORAGE_KEY
-    );
+const save =
+
+localStorage.getItem(
+STORAGE_KEY
+);
 
 
 
-    if(!saved){
+if(!save){
 
 
-        tokens=[];
+return;
 
 
-        return;
-
-
-    }
+}
 
 
 
-    try{
 
-
-        const data =
-        JSON.parse(saved);
+try{
 
 
 
-        tokens =
-        data.tokens || [];
+const data =
+JSON.parse(save);
 
 
 
-        App.zoom =
-        data.zoom || 1;
+
+
+// CONFIGURAÇÕES
 
 
 
-        App.gridVisible =
-        data.grid ?? true;
+if(data.zoom)
+
+App.zoom =
+data.zoom;
 
 
 
-        App.snapGrid =
-        data.snap ?? true;
+if(
+data.gridVisible !== undefined
+)
+
+App.gridVisible =
+data.gridVisible;
 
 
 
-    }
-    catch(e){
+
+if(
+data.snapGrid !== undefined
+)
+
+App.snapGrid =
+data.snapGrid;
 
 
-        console.error(
-            "Erro carregando dados:",
-            e
-        );
 
 
-        tokens=[];
+if(
+data.fogEnabled !== undefined
+)
+
+App.fogEnabled =
+data.fogEnabled;
 
 
-    }
+
+
+if(
+data.measureMode !== undefined
+)
+
+App.measureMode =
+data.measureMode;
+
+
+
+
+
+
+
+// TOKENS
+
+
+
+if(
+Array.isArray(data.tokens)
+){
+
+
+
+tokens =
+data.tokens.map(t=>({
+
+
+
+id:
+t.id || Date.now()+Math.random(),
+
+
+
+name:
+t.name || "Token",
+
+
+
+color:
+t.color || "#6366f1",
+
+
+
+image:
+t.image || null,
+
+
+
+x:
+t.x || 100,
+
+
+
+y:
+t.y || 100,
+
+
+
+size:
+t.size || 60,
+
+
+
+hp:
+t.hp ?? 100,
+
+
+
+maxHp:
+t.maxHp ?? 100,
+
+
+
+rotation:
+t.rotation || 0,
+
+
+
+status:
+t.status || []
+
+
+
+}));
 
 
 
@@ -140,60 +252,26 @@ function loadStorage(){
 
 
 
-// ==========================================
-// EXPORTAR CAMPANHA
-// ==========================================
 
-function exportCampaign(){
-
-
-    const data =
-    JSON.stringify(
-        tokens,
-        null,
-        2
-    );
+}catch(error){
 
 
 
-    const blob =
-    new Blob(
-        [data],
-        {
-            type:"application/json"
-        }
-    );
+console.error(
+"Erro ao carregar save:",
+error
+);
 
 
 
-    const url =
-    URL.createObjectURL(
-        blob
-    );
+toast(
+"Erro ao carregar dados."
+);
 
 
 
-    const a =
-    document.createElement(
-        "a"
-    );
+}
 
-
-    a.href=url;
-
-
-    a.download =
-    "campanha-rpg.json";
-
-
-
-    a.click();
-
-
-
-    URL.revokeObjectURL(
-        url
-    );
 
 
 }
@@ -201,45 +279,162 @@ function exportCampaign(){
 
 
 
+
+
+
+
 // ==========================================
-// IMPORTAR CAMPANHA
+// LIMPAR SAVE
 // ==========================================
 
-function importCampaign(file){
 
-
-    const reader =
-    new FileReader();
+function clearStorage(){
 
 
 
-    reader.onload=e=>{
-
-
-        tokens =
-        JSON.parse(
-            e.target.result
-        );
+localStorage.removeItem(
+STORAGE_KEY
+);
 
 
 
-        renderTokens();
-
-
-        saveStorage();
+tokens=[];
 
 
 
-        toast(
-            "Campanha carregada."
-        );
-
-
-    };
+renderTokens();
 
 
 
-    reader.readAsText(file);
+toast(
+"Dados apagados."
+);
+
+
+
+}
+
+
+
+
+
+// ==========================================
+// EXPORTAR MESA
+// ==========================================
+
+
+function exportSave(){
+
+
+
+const data =
+
+localStorage.getItem(
+STORAGE_KEY
+);
+
+
+
+const blob =
+new Blob(
+[data],
+{
+type:
+"application/json"
+}
+);
+
+
+
+const url =
+URL.createObjectURL(
+blob
+);
+
+
+
+const a =
+document.createElement(
+"a"
+);
+
+
+
+a.href=url;
+
+
+
+a.download=
+"mesa-manipulacao.json";
+
+
+
+a.click();
+
+
+
+URL.revokeObjectURL(
+url
+);
+
+
+
+}
+
+
+
+
+
+// ==========================================
+// IMPORTAR MESA
+// ==========================================
+
+
+function importSave(file){
+
+
+
+const reader =
+new FileReader();
+
+
+
+reader.onload=function(){
+
+
+
+localStorage.setItem(
+
+STORAGE_KEY,
+
+reader.result
+
+);
+
+
+
+loadStorage();
+
+
+
+renderTokens();
+
+
+
+toast(
+"Mesa importada."
+);
+
+
+
+};
+
+
+
+reader.readAsText(
+file
+);
+
 
 
 }
