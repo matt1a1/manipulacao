@@ -11,64 +11,71 @@
 const App = {
 
 
-    version:"2.0.0",
+version:"2.1.0",
 
 
-    zoom:1,
+zoom:1,
 
 
-    minZoom:.30,
+minZoom:.30,
 
 
-    maxZoom:4,
+maxZoom:4,
 
 
-    gridSize:50,
+gridSize:50,
 
 
-    snapGrid:true,
+snapGrid:true,
 
 
-    gridVisible:true,
+gridVisible:true,
 
 
-    fogEnabled:false,
+fogEnabled:false,
 
 
-    measureMode:false,
-
-
-
-    selectedTokens:[],
-
-
-    clipboard:[],
+measureMode:false,
 
 
 
-    history:[],
+selectedTokens:[],
 
 
-    redoHistory:[],
+clipboard:[],
+
+
+history:[],
+
+
+redoHistory:[],
+
+
+mouse:{
+
+
+x:0,
+
+y:0
+
+
+},
 
 
 
-    mouse:{
-        x:0,
-        y:0
-    },
+mapOffset:{
 
 
+x:0,
 
-    mapOffset:{
-        x:0,
-        y:0
-    }
+y:0
+
+
+}
+
 
 
 };
-
-
 
 
 
@@ -78,31 +85,31 @@ const App = {
 // ==========================================
 
 
-const DOM = {
+const DOM={
 
 
-    map:null,
+map:null,
 
 
-    wrapper:null,
+wrapper:null,
 
 
-    sidebar:null,
+loading:null,
 
 
-    zoomLabel:null,
+library:null,
 
 
-    loading:null,
+zoomLabel:null,
 
 
-    library:null,
+contextMenu:null,
 
 
-    initiative:null,
+tokenSize:null,
 
 
-    contextMenu:null
+tokenSizeValue:null
 
 
 };
@@ -112,8 +119,9 @@ const DOM = {
 
 
 
+
 // ==========================================
-// INICIAR
+// START
 // ==========================================
 
 
@@ -128,33 +136,36 @@ init
 function init(){
 
 
-    cacheDOM();
+cacheDOM();
 
 
-    registerEvents();
+registerEvents();
 
 
-    loadStorage();
+loadStorage();
 
 
-    renderLibrary();
+renderLibrary();
 
 
-    renderTokens();
+renderTokens();
 
 
-    updateZoom();
+updateZoom();
 
 
-    hideLoading();
+hideLoading();
 
 
-    toast(
-    "Mesa carregada com sucesso."
-    );
+
+toast(
+"Manipulação RPG carregado."
+);
+
 
 
 }
+
 
 
 
@@ -170,55 +181,49 @@ function init(){
 function cacheDOM(){
 
 
-    DOM.map =
-    document.getElementById(
-    "map"
-    );
+
+DOM.map =
+document.getElementById("map");
 
 
-    DOM.wrapper =
-    document.getElementById(
-    "mapWrapper"
-    );
+
+DOM.wrapper =
+document.getElementById("mapWrapper");
 
 
-    DOM.sidebar =
-    document.getElementById(
-    "sidebar"
-    );
+
+DOM.loading =
+document.getElementById("loading");
 
 
-    DOM.zoomLabel =
-    document.getElementById(
-    "zoomValue"
-    );
+
+DOM.library =
+document.getElementById("libraryList");
 
 
-    DOM.loading =
-    document.getElementById(
-    "loading"
-    );
+
+DOM.zoomLabel =
+document.getElementById("zoomValue");
 
 
-    DOM.library =
-    document.getElementById(
-    "libraryList"
-    );
+
+DOM.contextMenu =
+document.getElementById("contextMenu");
 
 
-    DOM.initiative =
-    document.getElementById(
-    "initiativeList"
-    );
+
+DOM.tokenSize =
+document.getElementById("tokenSize");
 
 
-    DOM.contextMenu =
-    document.getElementById(
-    "contextMenu"
-    );
+
+DOM.tokenSizeValue =
+document.getElementById("tokenSizeValue");
+
 
 
 }
+
 
 
 
@@ -255,10 +260,47 @@ keyboardUp
 
 
 
-document.addEventListener(
-"click",
-closeContextMenu
+DOM.wrapper.addEventListener(
+"wheel",
+zoomWheel,
+{
+passive:false
+}
 );
+
+
+
+
+
+const size =
+document.getElementById(
+"tokenSize"
+);
+
+
+
+if(size){
+
+
+size.oninput=function(){
+
+
+DOM.tokenSizeValue.innerHTML =
+this.value+"px";
+
+
+};
+
+
+}
+
+
+
+
+
+document
+.getElementById("createToken")
+.onclick=createNewToken;
 
 
 
@@ -271,37 +313,76 @@ closeContextMenu
 
 
 
+
+
 // ==========================================
-// HISTÓRIA
+// CRIAR TOKEN
 // ==========================================
 
 
-function saveHistory(){
+function createNewToken(){
 
 
-const state={
+
+const name =
+document.getElementById(
+"tokenName"
+).value || "Token";
 
 
-zoom:App.zoom,
+
+const color =
+document.getElementById(
+"tokenColor"
+).value;
 
 
-offset:
-{
-x:App.mapOffset.x,
-y:App.mapOffset.y
-},
+
+const size =
+Number(
+document.getElementById(
+"tokenSize"
+).value
+);
 
 
-grid:App.gridVisible,
+
+const image =
+document.getElementById(
+"tokenImage"
+);
 
 
-snap:App.snapGrid,
+
+if(image.files.length){
 
 
-tokens:
-JSON.parse(
-JSON.stringify(tokens)
-)
+
+const reader =
+new FileReader();
+
+
+
+reader.onload=function(){
+
+
+createToken({
+
+
+name:name,
+
+
+color:color,
+
+
+size:size,
+
+
+image:reader.result
+
+
+
+});
 
 
 
@@ -309,11 +390,82 @@ JSON.stringify(tokens)
 
 
 
-App.history.push(state);
+reader.readAsDataURL(
+image.files[0]
+);
+
+
+
+}
+
+else{
+
+
+createToken({
+
+
+name:name,
+
+
+color:color,
+
+
+size:size
+
+
+
+});
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+// ==========================================
+// HISTÓRICO
+// ==========================================
+
+
+function saveHistory(){
+
+
+
+App.history.push({
+
+
+
+tokens:
+
+JSON.parse(
+JSON.stringify(tokens)
+),
+
+
+zoom:App.zoom,
+
+
+grid:App.gridVisible
+
+
+
+});
 
 
 
 if(App.history.length>50)
+
 
 App.history.shift();
 
@@ -331,9 +483,7 @@ App.redoHistory=[];
 
 
 
-// ==========================================
-// UNDO
-// ==========================================
+
 
 
 function undo(){
@@ -341,47 +491,33 @@ function undo(){
 
 if(!App.history.length){
 
+
 toast(
 "Nada para desfazer."
 );
 
+
 return;
+
 
 }
 
 
 
-const current={
-
-
-zoom:App.zoom,
-
-
-offset:
-{
-x:App.mapOffset.x,
-y:App.mapOffset.y
-},
-
-
-grid:App.gridVisible,
-
-
-snap:App.snapGrid,
+App.redoHistory.push({
 
 
 tokens:
+
 JSON.parse(
 JSON.stringify(tokens)
-)
+),
 
 
-};
+zoom:App.zoom
 
 
-
-App.redoHistory.push(current);
-
+});
 
 
 
@@ -391,32 +527,22 @@ App.history.pop();
 
 
 
-App.zoom =
-state.zoom;
-
-
-
-App.mapOffset =
-state.offset;
-
-
-
-App.gridVisible =
-state.grid;
-
-
-
-App.snapGrid =
-state.snap;
-
-
-
 tokens =
 JSON.parse(
 JSON.stringify(
 state.tokens
 )
 );
+
+
+
+App.zoom =
+state.zoom;
+
+
+
+App.gridVisible =
+state.grid;
 
 
 
@@ -442,9 +568,7 @@ toast(
 
 
 
-// ==========================================
-// REDO
-// ==========================================
+
 
 
 function redo(){
@@ -465,32 +589,21 @@ return;
 
 
 
-const current={
-
-
-zoom:App.zoom,
-
-
-offset:App.mapOffset,
-
-
-grid:App.gridVisible,
-
-
-snap:App.snapGrid,
+App.history.push({
 
 
 tokens:
+
 JSON.parse(
 JSON.stringify(tokens)
-)
+),
 
 
-};
+zoom:App.zoom
 
 
 
-App.history.push(current);
+});
 
 
 
@@ -500,25 +613,6 @@ App.redoHistory.pop();
 
 
 
-App.zoom =
-state.zoom;
-
-
-
-App.mapOffset =
-state.offset;
-
-
-
-App.gridVisible =
-state.grid;
-
-
-
-App.snapGrid =
-state.snap;
-
-
 
 tokens =
 JSON.parse(
@@ -526,6 +620,11 @@ JSON.stringify(
 state.tokens
 )
 );
+
+
+
+App.zoom =
+state.zoom;
 
 
 
@@ -550,6 +649,8 @@ toast(
 
 
 
+
+
 // ==========================================
 // SELEÇÃO
 // ==========================================
@@ -566,6 +667,7 @@ document
 .querySelectorAll(".token")
 .forEach(t=>{
 
+
 t.classList.remove(
 "selected"
 );
@@ -579,8 +681,6 @@ t.classList.remove(
 
 
 
-
-
 function addSelection(id){
 
 
@@ -588,28 +688,12 @@ if(
 !App.selectedTokens.includes(id)
 )
 
+
 App.selectedTokens.push(id);
 
 
-}
-
-
-
-
-
-
-function removeSelection(id){
-
-
-App.selectedTokens =
-App.selectedTokens.filter(
-t=>t!==id
-);
-
 
 }
-
-
 
 
 
@@ -643,11 +727,8 @@ renderSelection();
 
 
 
-
-
-
-
 function renderSelection(){
+
 
 
 document
@@ -664,6 +745,7 @@ t.classList.remove(
 
 
 
+
 App.selectedTokens.forEach(id=>{
 
 
@@ -675,6 +757,7 @@ document.querySelector(
 
 
 if(el)
+
 
 el.classList.add(
 "selected"
@@ -694,66 +777,15 @@ el.classList.add(
 
 
 
-// ==========================================
-// DELETE
-// ==========================================
-
-
-function deleteSelection(){
-
-
-if(!App.selectedTokens.length)
-
-return;
-
-
-
-saveHistory();
-
-
-
-tokens =
-tokens.filter(
-t=>
-!App.selectedTokens.includes(
-t.id
-)
-);
-
-
-
-clearSelection();
-
-
-
-renderTokens();
-
-
-
-saveStorage();
-
-
-
-toast(
-"Token removido."
-);
-
-
-
-}
-
-
-
-
-
 
 
 // ==========================================
-// COPIAR
+// COPIAR / COLAR
 // ==========================================
 
 
 function copySelection(){
+
 
 
 App.clipboard=[];
@@ -763,20 +795,24 @@ App.clipboard=[];
 App.selectedTokens.forEach(id=>{
 
 
-const t =
+const token =
 tokens.find(
-x=>x.id===id
+t=>t.id===id
 );
 
 
 
-if(t)
+if(token)
+
 
 App.clipboard.push(
+
 JSON.parse(
-JSON.stringify(t)
+JSON.stringify(token)
 )
+
 );
+
 
 
 });
@@ -796,19 +832,7 @@ toast(
 
 
 
-
-// ==========================================
-// COLAR
-// ==========================================
-
-
 function pasteSelection(){
-
-
-if(!App.clipboard.length)
-
-return;
-
 
 
 saveHistory();
@@ -816,82 +840,6 @@ saveHistory();
 
 
 App.clipboard.forEach(t=>{
-
-
-tokens.push({
-
-
-...t,
-
-
-id:
-Date.now()+Math.random(),
-
-
-x:t.x+50,
-
-
-y:t.y+50
-
-
-});
-
-
-
-});
-
-
-
-renderTokens();
-
-
-saveStorage();
-
-
-
-toast(
-"Colado."
-);
-
-
-
-}
-
-
-
-
-
-
-
-// ==========================================
-// DUPLICAR
-// ==========================================
-
-
-function duplicateSelection(){
-
-
-if(!App.selectedTokens.length)
-
-return;
-
-
-
-saveHistory();
-
-
-
-App.selectedTokens.forEach(id=>{
-
-
-const t =
-tokens.find(
-x=>x.id===id
-);
-
-
-
-if(t)
 
 
 tokens.push({
@@ -924,6 +872,68 @@ renderTokens();
 saveStorage();
 
 
+
+}
+
+
+
+
+
+
+
+function duplicateSelection(){
+
+
+copySelection();
+
+
+pasteSelection();
+
+
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// DELETE
+// ==========================================
+
+
+function deleteSelection(){
+
+
+saveHistory();
+
+
+
+tokens =
+tokens.filter(t=>
+
+!App.selectedTokens.includes(
+t.id
+)
+
+);
+
+
+
+clearSelection();
+
+
+
+renderTokens();
+
+
+saveStorage();
+
+
+
 }
 
 
@@ -939,58 +949,36 @@ saveStorage();
 // ==========================================
 
 
+function updateViewport(){
+
+
+updateZoom();
+
+
+}
+
+
+
 function updateZoom(){
 
 
-if(typeof applyZoom==="function"){
+
+DOM.map.style.transform =
 
 
-applyZoom();
-
-
-}
-
-
-}
-
+`
+translate(-50%,-50%)
+scale(${App.zoom})
+`;
 
 
 
+DOM.zoomLabel.innerHTML =
 
 
-
-
-// ==========================================
-// LOADING
-// ==========================================
-
-
-function hideLoading(){
-
-
-setTimeout(()=>{
-
-
-if(!DOM.loading)
-return;
-
-
-
-DOM.loading.style.opacity="0";
-
-
-
-setTimeout(()=>{
-
-
-DOM.loading.remove();
-
-
-},500);
-
-
-
-},600);
+Math.round(
+App.zoom*100
+)+"%";
 
 
 
@@ -1000,62 +988,42 @@ DOM.loading.remove();
 
 
 
+function zoomWheel(e){
 
 
-// ==========================================
-// TOAST
-// ==========================================
+
+e.preventDefault();
 
 
-function toast(message){
+
+App.zoom +=
+
+e.deltaY < 0
+?
+0.1
+:
+-0.1;
 
 
-const div =
-document.createElement(
-"div"
+
+App.zoom=Math.max(
+
+App.minZoom,
+
+Math.min(
+App.maxZoom,
+App.zoom
+)
+
 );
 
 
 
-div.className="toast";
-
-
-div.innerText =
-message;
-
-
-
-document.body.appendChild(
-div
-);
-
-
-
-setTimeout(()=>{
-
-
-div.classList.add(
-"hide"
-);
-
-
-
-setTimeout(()=>{
-
-
-div.remove();
-
-
-
-},300);
-
-
-
-},2200);
-
+updateZoom();
 
 
 }
+
 
 
 
@@ -1088,24 +1056,10 @@ clearSelection();
 if(e.ctrlKey){
 
 
+
 switch(
 e.key.toLowerCase()
 ){
-
-
-case "c":
-
-copySelection();
-
-break;
-
-
-
-case "v":
-
-pasteSelection();
-
-break;
 
 
 
@@ -1125,6 +1079,22 @@ break;
 
 
 
+case "c":
+
+copySelection();
+
+break;
+
+
+
+case "v":
+
+pasteSelection();
+
+break;
+
+
+
 case "d":
 
 duplicateSelection();
@@ -1136,18 +1106,112 @@ break;
 }
 
 
-}
-
-
 
 }
 
 
+
+}
 
 
 
 
 function keyboardUp(e){
+
+
+
+if(e.key===" ")
+
+stopPan();
+
+
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// LOADING
+// ==========================================
+
+
+function hideLoading(){
+
+
+if(!DOM.loading)
+return;
+
+
+
+setTimeout(()=>{
+
+
+DOM.loading.style.opacity=0;
+
+
+setTimeout(()=>{
+
+
+DOM.loading.remove();
+
+
+},500);
+
+
+
+},600);
+
+
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// TOAST
+// ==========================================
+
+
+function toast(msg){
+
+
+
+const div =
+document.createElement(
+"div"
+);
+
+
+
+div.className="toast";
+
+
+div.innerHTML=msg;
+
+
+
+document.body.appendChild(div);
+
+
+
+setTimeout(()=>{
+
+
+div.remove();
+
+
+
+},2500);
 
 
 
