@@ -10,6 +10,7 @@
 
 }
 
+
 /* ==========================================
    FADE
 ========================================== */
@@ -20,199 +21,306 @@
 
 }
 
+
 .fadeOut{
 
     animation:fadeOut .25s ease forwards;
 
 }
 
+
+
 @keyframes fadeIn{
 
 from{
 
-opacity:0;
+    opacity:0;
 
-transform:translateY(15px);
+    transform:translateY(15px);
 
 }
 
 to{
 
-opacity:1;
+    opacity:1;
 
-transform:translateY(0);
+    transform:translateY(0);
+
+}
 
 }
 
-}
+
 
 @keyframes fadeOut{
 
 to{
 
-opacity:0;
+    opacity:0;
 
-transform:translateY(-15px);
+    transform:translateY(-15px);
+
+}
 
 }
 
-}
+
 
 /* ==========================================
    SCALE
 ========================================== */
 
+
 .scaleIn{
 
-animation:scaleIn .25s;
+    animation:scaleIn .25s ease;
 
 }
+
+
 
 @keyframes scaleIn{
 
-0%{
+from{
 
-opacity:0;
+    opacity:0;
 
-transform:scale(.5);
-
-}
-
-100%{
-
-opacity:1;
-
-transform:scale(1);
+    transform:scale(.5);
 
 }
 
+
+to{
+
+    opacity:1;
+
+    transform:scale(1);
+
 }
+
+}
+
+
+
+
 
 /* ==========================================
-   TOKEN SPAWN
+   TOKEN NASCENDO
 ========================================== */
+
 
 .tokenSpawn{
 
-animation:tokenSpawn .35s cubic-bezier(.18,.89,.32,1.28);
+    animation:tokenSpawn .35s cubic-bezier(.18,.89,.32,1.28);
 
 }
+
+
 
 @keyframes tokenSpawn{
 
+
 0%{
 
-opacity:0;
+    opacity:0;
 
-transform:scale(.15);
+    transform:scale(.2);
 
 }
+
 
 60%{
 
-transform:scale(1.15);
+    transform:scale(1.15);
 
 }
+
 
 100%{
 
-opacity:1;
+    opacity:1;
 
-transform:scale(1);
+    transform:scale(1);
+
+}
+
 
 }
 
-}
+
+
+
 
 /* ==========================================
-   TOKEN DELETE
+   TOKEN REMOVIDO
 ========================================== */
+
 
 .tokenDelete{
 
-animation:tokenDelete .3s forwards;
+    animation:tokenDelete .3s forwards;
 
 }
+
+
 
 @keyframes tokenDelete{
 
+
 100%{
 
-opacity:0;
+    opacity:0;
 
-transform:scale(.2) rotate(180deg);
+    transform:scale(.2) rotate(180deg);
+
+}
+
 
 }
 
-}
+
+
+
 
 /* ==========================================
-   PULSE
+   PULSO
 ========================================== */
+
 
 .pulse{
 
-animation:pulse 1.2s infinite;
+    animation:pulse 1.2s infinite;
 
 }
+
+
 
 @keyframes pulse{
 
+
 0%{
 
-transform:scale(1);
+    transform:scale(1);
 
 }
+
 
 50%{
 
-transform:scale(1.08);
+    transform:scale(1.08);
 
 }
+
 
 100%{
 
-transform:scale(1);
+    transform:scale(1);
 
 }
 
+
 }
+
+
+
+
 
 /* ==========================================
    GLOW
 ========================================== */
 
+
 .glow{
 
-animation:glow 1.5s infinite;
+    animation:glow 1.5s infinite;
 
 }
+
+
 
 @keyframes glow{
 
+
 0%{
 
-box-shadow:0 0 10px rgba(99,102,241,.2);
+box-shadow:
+0 0 10px rgba(99,102,241,.2);
 
 }
+
 
 50%{
 
-box-shadow:0 0 30px rgba(99,102,241,.8);
+box-shadow:
+0 0 35px rgba(99,102,241,.8);
 
 }
+
 
 100%{
 
-box-shadow:0 0 10px rgba(99,102,241,.2);
+box-shadow:
+0 0 10px rgba(99,102,241,.2);
 
 }
 
+
 }
+
+
+
+
 
 /* ==========================================
-   PING
+   TOKEN SELECIONADO
 ========================================== */
+
+
+.token.selected{
+
+    animation:selectedPulse 1.5s infinite;
+
+}
+
+
+
+@keyframes selectedPulse{
+
+
+0%{
+
+box-shadow:
+0 0 10px rgba(250,204,21,.4);
+
+}
+
+
+50%{
+
+box-shadow:
+0 0 35px rgba(250,204,21,.9);
+
+}
+
+
+100%{
+
+box-shadow:
+0 0 10px rgba(250,204,21,.4);
+
+}
+
+
+}
+
+
+
+
+
+/* ==========================================
+   MAP PING
+========================================== */
+
 
 .mapPing{
 
@@ -232,7 +340,11 @@ animation:ping 1s forwards;
 
 }
 
+
+
+
 @keyframes ping{
+
 
 0%{
 
@@ -242,6 +354,7 @@ opacity:1;
 
 }
 
+
 100%{
 
 transform:scale(5);
@@ -250,11 +363,17 @@ opacity:0;
 
 }
 
+
 }
 
+
+
+
+
 /* ==========================================
-   HP
+   DANO / VIDA
 ========================================== */
+
 
 .hpAnimation{
 
@@ -262,7 +381,10 @@ animation:hpAnimation .4s;
 
 }
 
+
+
 @keyframes hpAnimation{
+
 
 0%{
 
@@ -270,17 +392,24 @@ filter:brightness(2);
 
 }
 
+
 100%{
 
 filter:brightness(1);
 
 }
 
+
 }
 
+
+
+
+
 /* ==========================================
-   SHAKE
+   TREMER
 ========================================== */
+
 
 .shake{
 
@@ -288,7 +417,10 @@ animation:shake .25s;
 
 }
 
+
+
 @keyframes shake{
+
 
 0%{
 
@@ -296,11 +428,13 @@ transform:translateX(0);
 
 }
 
+
 25%{
 
 transform:translateX(-5px);
 
 }
+
 
 50%{
 
@@ -308,11 +442,13 @@ transform:translateX(5px);
 
 }
 
+
 75%{
 
 transform:translateX(-5px);
 
 }
+
 
 100%{
 
@@ -320,11 +456,17 @@ transform:translateX(0);
 
 }
 
+
 }
 
+
+
+
+
 /* ==========================================
-   TOOLBAR BUTTON
+   BOTÕES
 ========================================== */
+
 
 .toolbarButton{
 
@@ -332,11 +474,15 @@ transition:.2s;
 
 }
 
+
+
 .toolbarButton:hover{
 
 transform:translateY(-2px);
 
 }
+
+
 
 .toolbarButton:active{
 
@@ -344,17 +490,25 @@ transform:scale(.95);
 
 }
 
+
+
+
+
 /* ==========================================
-   MENU
+   MENU CONTEXTO
 ========================================== */
+
 
 .menuOpen{
 
-animation:menuOpen .18s ease;
+animation:menuOpen .2s ease;
 
 }
 
+
+
 @keyframes menuOpen{
+
 
 from{
 
@@ -364,6 +518,7 @@ transform:scale(.8);
 
 }
 
+
 to{
 
 opacity:1;
@@ -372,11 +527,17 @@ transform:scale(1);
 
 }
 
+
 }
+
+
+
+
 
 /* ==========================================
    LOADING
 ========================================== */
+
 
 .loadingRotate{
 
@@ -384,7 +545,10 @@ animation:loadingRotate 1s linear infinite;
 
 }
 
+
+
 @keyframes loadingRotate{
+
 
 100%{
 
@@ -392,41 +556,36 @@ transform:rotate(360deg);
 
 }
 
+
 }
 
+
+
+
+
 /* ==========================================
-   NOTIFICAÇÃO
+   TOAST
 ========================================== */
+
 
 .toast{
 
-position:fixed;
-
-bottom:30px;
-
-right:30px;
-
-padding:16px 24px;
-
-background:#111827;
-
-border-left:5px solid #6366f1;
-
-border-radius:12px;
-
-box-shadow:0 20px 40px rgba(0,0,0,.45);
-
-color:white;
-
-font-weight:600;
-
-animation:toastIn .35s;
-
-z-index:99999;
+animation:toastIn .35s ease;
 
 }
 
+
+
+.toast.hide{
+
+animation:toastOut .3s forwards;
+
+}
+
+
+
 @keyframes toastIn{
+
 
 from{
 
@@ -436,6 +595,7 @@ transform:translateX(60px);
 
 }
 
+
 to{
 
 opacity:1;
@@ -444,15 +604,13 @@ transform:translateX(0);
 
 }
 
-}
-
-.toast.hide{
-
-animation:toastOut .3s forwards;
 
 }
+
+
 
 @keyframes toastOut{
+
 
 to{
 
@@ -462,11 +620,17 @@ transform:translateX(60px);
 
 }
 
+
 }
+
+
+
+
 
 /* ==========================================
    RIPPLE
 ========================================== */
+
 
 .ripple{
 
@@ -484,7 +648,10 @@ pointer-events:none;
 
 }
 
+
+
 @keyframes ripple{
+
 
 to{
 
@@ -493,5 +660,134 @@ transform:scale(6);
 opacity:0;
 
 }
+
+
+}
+
+
+
+
+
+/* ==========================================
+   FADE TOKEN
+========================================== */
+
+
+.token.fade{
+
+animation:tokenFade .3s ease;
+
+}
+
+
+
+@keyframes tokenFade{
+
+
+from{
+
+opacity:0;
+
+}
+
+
+to{
+
+opacity:1;
+
+}
+
+
+}
+
+
+
+
+
+/* ==========================================
+   DRAG TOKEN
+========================================== */
+
+
+.token.dragging{
+
+animation:dragPulse .8s infinite;
+
+}
+
+
+
+@keyframes dragPulse{
+
+
+0%{
+
+filter:brightness(1);
+
+}
+
+
+50%{
+
+filter:brightness(1.3);
+
+}
+
+
+100%{
+
+filter:brightness(1);
+
+}
+
+
+}
+
+
+
+
+
+/* ==========================================
+   ZOOM INDICATOR
+========================================== */
+
+
+#zoomIndicator.show{
+
+animation:zoomPulse .25s ease;
+
+}
+
+
+
+@keyframes zoomPulse{
+
+
+0%{
+
+transform:translateX(-50%) scale(.8);
+
+opacity:0;
+
+}
+
+
+50%{
+
+transform:translateX(-50%) scale(1.1);
+
+opacity:1;
+
+}
+
+
+100%{
+
+transform:translateX(-50%) scale(1);
+
+opacity:1;
+
+}
+
 
 }
