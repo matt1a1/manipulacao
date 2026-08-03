@@ -1,82 +1,87 @@
 // ==========================================
-// ZOOM CONTROL
+// ZOOM RPG
 // ==========================================
 
 
-
-window.addEventListener(
-"load",
-()=>{
-
-
-    const zoomIn =
-    document.getElementById(
-        "zoomIn"
-    );
-
-
-    const zoomOut =
-    document.getElementById(
-        "zoomOut"
-    );
-
-
-
-    zoomIn?.addEventListener(
-        "click",
-        ()=>{
-            changeZoom(
-                0.1
-            );
-        }
-    );
-
-
-
-    zoomOut?.addEventListener(
-        "click",
-        ()=>{
-            changeZoom(
-                -0.1
-            );
-        }
-    );
-
-
-
-});
+let zoomTimeout;
 
 
 
 
 // ==========================================
-// ALTERAR ZOOM
+// APLICAR ZOOM
 // ==========================================
 
-function changeZoom(value){
 
-
-    App.zoom += value;
-
-
-
-    if(App.zoom<App.minZoom)
-
-        App.zoom=App.minZoom;
+function applyZoom(){
 
 
 
-    if(App.zoom>App.maxZoom)
+DOM.map.style.transform =
 
-        App.zoom=App.maxZoom;
+`
+translate(
+${App.mapOffset.x}px,
+${App.mapOffset.y}px
+)
+translate(-50%,-50%)
+scale(${App.zoom})
+`;
 
 
 
-    updateZoom();
+
+
+if(DOM.zoomLabel){
+
+
+DOM.zoomLabel.innerText =
+
+Math.round(
+App.zoom*100
+)
++
+"%";
+
+
+}
 
 
 
-    showZoomIndicator();
+}
+
+
+
+// ==========================================
+// SCROLL ZOOM
+// ==========================================
+
+
+function zoomWheel(e){
+
+
+e.preventDefault();
+
+
+
+
+const oldZoom =
+App.zoom;
+
+
+
+
+
+if(e.deltaY < 0){
+
+
+App.zoom += 0.1;
+
+
+}else{
+
+
+App.zoom -= 0.1;
 
 
 }
@@ -84,32 +89,96 @@ function changeZoom(value){
 
 
 
-// ==========================================
-// ZOOM CENTRALIZADO
-// ==========================================
 
-function zoomTo(value){
+App.zoom = Math.max(
 
+App.minZoom,
 
-    App.zoom=value;
+Math.min(
+App.maxZoom,
+App.zoom
+)
 
-
-
-    App.zoom =
-    Math.max(
-        App.minZoom,
-        Math.min(
-            App.maxZoom,
-            App.zoom
-        )
-    );
+);
 
 
 
-    updateZoom();
+
+
+// manter mouse como centro
+
+
+const rect =
+DOM.map.getBoundingClientRect();
+
+
+
+
+const mouseX =
+
+e.clientX -
+
+rect.left;
+
+
+
+const mouseY =
+
+e.clientY -
+
+rect.top;
+
+
+
+
+
+const scaleChange =
+
+App.zoom / oldZoom;
+
+
+
+
+
+App.mapOffset.x -=
+
+(
+mouseX -
+rect.width/2
+)
+*
+(
+scaleChange-1
+);
+
+
+
+
+
+App.mapOffset.y -=
+
+(
+mouseY -
+rect.height/2
+)
+*
+(
+scaleChange-1
+);
+
+
+
+
+
+applyZoom();
+
+showZoomIndicator();
+
 
 
 }
+
+
 
 
 
@@ -119,51 +188,60 @@ function zoomTo(value){
 // INDICADOR
 // ==========================================
 
+
 function showZoomIndicator(){
 
 
-    let indicator =
-    document.getElementById(
-        "zoomIndicator"
-    );
+
+const indicator =
+
+document.getElementById(
+"zoomIndicator"
+);
 
 
 
-    if(!indicator)
-        return;
+if(!indicator)
+return;
 
 
 
-    indicator.textContent =
-    Math.round(
-        App.zoom*100
-    )+"%";
+
+indicator.innerText =
+
+Math.round(
+App.zoom*100
+)
++
+"%";
 
 
 
-    indicator.classList.add(
-        "show"
-    );
+indicator.classList.add(
+"show"
+);
 
 
 
-    clearTimeout(
-        indicator.timer
-    );
+clearTimeout(
+zoomTimeout
+);
 
 
 
-    indicator.timer =
-    setTimeout(
-        ()=>{
+zoomTimeout =
 
-            indicator.classList.remove(
-                "show"
-            );
+setTimeout(()=>{
 
-        },
-        800
-    );
+
+indicator.classList.remove(
+"show"
+);
+
+
+
+},800);
+
 
 
 }
@@ -171,26 +249,102 @@ function showZoomIndicator(){
 
 
 
+
+
+
 // ==========================================
-// ZOOM PELO MOUSE
+// BOTÕES
 // ==========================================
 
-document.addEventListener(
+
+window.addEventListener(
+"load",
+()=>{
+
+
+
+document
+.getElementById(
+"zoomIn"
+)
+?.addEventListener(
+"click",
+()=>{
+
+
+App.zoom += .1;
+
+
+
+if(App.zoom > App.maxZoom)
+
+App.zoom =
+App.maxZoom;
+
+
+
+applyZoom();
+
+
+
+});
+
+
+
+
+
+
+document
+.getElementById(
+"zoomOut"
+)
+?.addEventListener(
+"click",
+()=>{
+
+
+App.zoom -= .1;
+
+
+
+if(App.zoom < App.minZoom)
+
+App.zoom =
+App.minZoom;
+
+
+
+applyZoom();
+
+
+
+});
+
+
+
+
+
+if(DOM.wrapper){
+
+
+DOM.wrapper.addEventListener(
+
 "wheel",
-e=>{
 
+zoomWheel,
 
-    if(
-        !e.ctrlKey &&
-        e.target.closest("#mapWrapper")
-    ){
-
-        return;
-
-    }
-
-
-},
 {
-    passive:true
+
+passive:false
+
+}
+
+);
+
+
+}
+
+
+
+
 });
