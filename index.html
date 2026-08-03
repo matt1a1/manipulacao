@@ -4,12 +4,14 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Manipulação RPG</title>
 
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -29,6 +31,8 @@
 <body>
 
 
+<!-- LOADING -->
+
 <div id="loading">
 
 <div class="loader"></div>
@@ -41,14 +45,11 @@
 
 
 
-
 <div id="app">
 
 
 
-<!-- ==============================
-SIDEBAR
-============================== -->
+<!-- ================= SIDEBAR ================= -->
 
 
 <aside id="sidebar">
@@ -61,6 +62,7 @@ SIDEBAR
 <span>Mesa Virtual</span>
 
 </header>
+
 
 
 
@@ -92,6 +94,10 @@ Restaurar
 
 
 
+
+<!-- CRIAR TOKEN -->
+
+
 <section class="create-token">
 
 
@@ -102,13 +108,10 @@ Restaurar
 <input
 type="text"
 id="tokenName"
-placeholder="Nome do token">
+placeholder="Nome do Token">
 
 
 
-<label>
-Cor
-</label>
 
 
 <input
@@ -120,32 +123,10 @@ value="#6366f1">
 
 
 
-<label>
-Tamanho
-</label>
+<label class="token-label">
 
+Imagem do Token
 
-<input
-type="range"
-id="tokenSize"
-min="25"
-max="150"
-value="50">
-
-
-
-<div id="tokenSizeValue">
-
-50px
-
-</div>
-
-
-
-
-
-<label>
-Imagem
 </label>
 
 
@@ -158,15 +139,41 @@ accept="image/*">
 
 
 
+<label class="token-label">
+
+Tamanho:
+
+<span id="tokenSizeValue">
+50px
+</span>
+
+
+</label>
+
+
+
+<input
+type="range"
+id="tokenSize"
+min="30"
+max="150"
+value="50">
+
+
+
+
+
+
 <button id="createToken">
 
-🎲 Adicionar Token
+Adicionar Token
 
 </button>
 
 
-
 </section>
+
+
 
 
 
@@ -179,11 +186,14 @@ accept="image/*">
 <h3>Ferramentas</h3>
 
 
+
 <button id="toggleGrid">
 
 Grid
 
 </button>
+
+
 
 
 <button id="toggleFog">
@@ -193,11 +203,15 @@ Fog
 </button>
 
 
+
+
 <button id="toggleMeasure">
 
 Régua
 
 </button>
+
+
 
 
 <button id="initiative">
@@ -220,9 +234,9 @@ Iniciativa
 
 
 
-<!-- ==============================
-MAIN
-============================== -->
+
+
+<!-- ================= MAIN ================= -->
 
 
 <main id="main">
@@ -269,7 +283,9 @@ MAIN
 
 
 
+
 <div class="center">
+
 
 
 <button id="undo">
@@ -320,6 +336,7 @@ MAIN
 
 
 
+
 <div class="right">
 
 
@@ -331,6 +348,8 @@ MAIN
 </button>
 
 
+
+
 <span id="zoomValue">
 
 100%
@@ -338,11 +357,15 @@ MAIN
 </span>
 
 
+
+
 <button id="zoomIn">
 
 ➕
 
 </button>
+
+
 
 
 
@@ -362,12 +385,13 @@ MAIN
 
 
 
+
 </div>
 
 
-
-
 </header>
+
+
 
 
 
@@ -400,31 +424,39 @@ MAIN
 
 
 
+
 <footer>
 
 
 <div>
+
 Espaço = mover mapa
+
 </div>
 
 
 <div>
+
 Scroll = Zoom
+
 </div>
 
 
 <div>
+
 Delete = remover
+
 </div>
 
 
 <div>
+
 CTRL+C / CTRL+V
+
 </div>
 
 
 </footer>
-
 
 
 
@@ -440,9 +472,8 @@ CTRL+C / CTRL+V
 
 
 
-<!-- ==============================
-MENU CONTEXTO
-============================== -->
+
+<!-- ================= CONTEXT MENU ================= -->
 
 
 <div id="contextMenu">
@@ -455,6 +486,7 @@ Renomear
 </button>
 
 
+
 <button id="changeColor">
 
 Cor
@@ -462,17 +494,10 @@ Cor
 </button>
 
 
+
 <button id="changeImage">
 
 Imagem
-
-</button>
-
-
-
-<button id="resizeToken">
-
-Tamanho
 
 </button>
 
@@ -485,6 +510,7 @@ Rotacionar
 </button>
 
 
+
 <button id="deleteToken">
 
 Excluir
@@ -492,25 +518,33 @@ Excluir
 </button>
 
 
-
 </div>
 
 
 
 
 
+
+
+
+
+<!-- INICIATIVA -->
 
 
 <div id="initiativePanel">
 
 
 <h2>
+
 Ordem de Iniciativa
+
 </h2>
 
 
 
-<div id="initiativeList"></div>
+<div id="initiativeList">
+
+</div>
 
 
 
@@ -521,12 +555,10 @@ Ordem de Iniciativa
 
 
 
-<input
-type="file"
-id="imageLoader"
-accept="image/*"
-hidden>
 
+
+
+<!-- INPUTS ESCONDIDOS -->
 
 
 <input
@@ -541,15 +573,27 @@ hidden>
 
 
 
+<!-- SCRIPTS -->
+
+
 <script src="main.js"></script>
+
 <script src="library.js"></script>
+
 <script src="drag.js"></script>
+
 <script src="zoom.js"></script>
+
 <script src="storage.js"></script>
+
 <script src="grid.js"></script>
+
 <script src="contextMenu.js"></script>
+
 <script src="ui.js"></script>
+
 <script src="tokens.js"></script>
+
 
 
 </body>
