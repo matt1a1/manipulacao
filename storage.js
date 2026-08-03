@@ -1,73 +1,84 @@
 // ==========================================
-// MANIPULAÇÃO RPG
 // STORAGE.JS
+// MANIPULAÇÃO RPG
 // ==========================================
 
 
-const STORAGE_KEY =
-"manipulacao_rpg_save";
+// ==========================================
+// CHAVES DO STORAGE
+// ==========================================
+
+const STORAGE_KEY = "manipulacao_rpg_save";
+
 
 
 
 
 // ==========================================
-// SALVAR
+// SALVAR TUDO
 // ==========================================
-
 
 function saveStorage(){
 
 
-const data={
+    const data = {
+
+
+        version:"2.0.0",
 
 
 
-version:
-App.version,
+        zoom:App.zoom,
 
 
 
-tokens:
-tokens,
+        gridVisible:App.gridVisible,
 
 
 
-zoom:
-App.zoom,
+        snapGrid:App.snapGrid,
 
 
 
-grid:
-App.gridVisible,
+        fogEnabled:App.fogEnabled,
 
 
 
-snap:
-App.snapGrid,
+        measureMode:App.measureMode,
 
 
 
-fog:
-App.fogEnabled,
+        mapOffset:App.mapOffset,
 
 
 
-mapOffset:
-App.mapOffset
+        tokens:tokens || [],
 
 
 
-};
+        mapImage:
+
+        localStorage.getItem(
+            "manipulacao_map"
+        )
 
 
 
-localStorage.setItem(
+    };
 
-STORAGE_KEY,
 
-JSON.stringify(data)
 
-);
+
+
+    localStorage.setItem(
+
+        STORAGE_KEY,
+
+        JSON.stringify(data)
+
+    );
+
+
 
 
 
@@ -82,230 +93,174 @@ JSON.stringify(data)
 
 
 // ==========================================
-// CARREGAR
+// CARREGAR DADOS
 // ==========================================
-
 
 function loadStorage(){
 
 
+    const save =
 
-const save =
-localStorage.getItem(
-STORAGE_KEY
-);
+    localStorage.getItem(
+        STORAGE_KEY
+    );
 
 
 
+    if(!save){
 
-if(!save){
+        return;
 
+    }
 
 
-return;
 
 
 
-}
+    try{
 
 
+        const data =
 
+        JSON.parse(save);
 
 
-try{
 
 
 
-const data =
-JSON.parse(save);
 
+        if(data.zoom){
 
+            App.zoom=data.zoom;
 
+        }
 
-if(data.tokens){
 
 
 
-tokens =
-data.tokens;
+        if(
+            data.gridVisible !== undefined
+        ){
 
+            App.gridVisible =
+            data.gridVisible;
 
+        }
 
-}
 
 
 
 
-if(data.zoom){
+        if(
+            data.snapGrid !== undefined
+        ){
 
+            App.snapGrid =
+            data.snapGrid;
 
+        }
 
-App.zoom =
-data.zoom;
 
 
 
-}
 
+        if(
+            data.fogEnabled !== undefined
+        ){
 
+            App.fogEnabled =
+            data.fogEnabled;
 
+        }
 
 
-if(data.grid !== undefined){
 
 
 
-App.gridVisible =
-data.grid;
+        if(
+            data.measureMode !== undefined
+        ){
 
+            App.measureMode =
+            data.measureMode;
 
+        }
 
-}
 
 
 
 
 
-if(data.snap !== undefined){
+        if(data.mapOffset){
 
 
+            App.mapOffset =
+            data.mapOffset;
 
-App.snapGrid =
-data.snap;
 
+        }
 
 
-}
 
 
 
 
 
-if(data.fog !== undefined){
+        if(
+            Array.isArray(data.tokens)
+        ){
 
 
+            tokens = data.tokens;
 
-App.fogEnabled =
-data.fog;
 
+        }
 
 
-}
 
 
 
 
 
-if(data.mapOffset){
+        if(data.mapImage){
 
 
+            localStorage.setItem(
 
-App.mapOffset =
-data.mapOffset;
+                "manipulacao_map",
 
+                data.mapImage
 
+            );
 
-}
 
+        }
 
 
-toast(
-"Save carregado."
-);
 
 
 
-}
 
-catch(e){
+    }
 
+    catch(error){
 
 
-console.error(
-"Erro ao carregar save:",
-e
-);
+        console.error(
 
+            "Erro ao carregar save:",
 
+            error
 
-toast(
-"Erro no carregamento."
-);
+        );
 
 
+        toast(
+            "Erro ao carregar dados."
+        );
 
-}
 
-
-
-}
-
-
-
-
-
-
-
-
-
-
-// ==========================================
-// EXPORTAR SAVE
-// ==========================================
-
-
-function exportSave(){
-
-
-
-const data =
-localStorage.getItem(
-STORAGE_KEY
-);
-
-
-
-const blob =
-new Blob(
-
-[data],
-
-{
-type:"application/json"
-}
-
-);
-
-
-
-const url =
-URL.createObjectURL(
-blob
-);
-
-
-
-const a =
-document.createElement(
-"a"
-);
-
-
-
-a.href=url;
-
-
-
-a.download =
-"mesa-rpg-save.json";
-
-
-
-a.click();
-
-
-
-URL.revokeObjectURL(url);
+    }
 
 
 
@@ -320,80 +275,34 @@ URL.revokeObjectURL(url);
 
 
 // ==========================================
-// IMPORTAR SAVE
+// LIMPAR SAVE
 // ==========================================
-
-
-function importSave(file){
-
-
-
-const reader =
-new FileReader();
-
-
-
-reader.onload=function(){
-
-
-
-localStorage.setItem(
-
-STORAGE_KEY,
-
-reader.result
-
-);
-
-
-
-location.reload();
-
-
-
-};
-
-
-
-reader.readAsText(file);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// LIMPAR TUDO
-// ==========================================
-
 
 function clearStorage(){
 
 
 
-if(
-confirm(
-"Apagar toda a mesa?"
-)
+    localStorage.removeItem(
 
-){
+        STORAGE_KEY
 
-
-
-localStorage.removeItem(
-STORAGE_KEY
-);
+    );
 
 
 
-location.reload();
+    localStorage.removeItem(
+
+        "manipulacao_map"
+
+    );
+
+
+
+    toast(
+
+        "Dados apagados."
+
+    );
 
 
 
@@ -401,4 +310,157 @@ location.reload();
 
 
 
+
+
+
+
+
+
+// ==========================================
+// EXPORTAR MESA
+// ==========================================
+
+function exportSave(){
+
+
+
+    const data =
+
+    localStorage.getItem(
+
+        STORAGE_KEY
+
+    );
+
+
+
+    const blob = new Blob(
+
+        [
+            data
+        ],
+
+        {
+            type:
+            "application/json"
+        }
+
+    );
+
+
+
+    const url =
+
+    URL.createObjectURL(blob);
+
+
+
+
+    const link =
+
+    document.createElement("a");
+
+
+
+    link.href=url;
+
+
+
+    link.download=
+
+    "mesa-manipulacao-rpg.json";
+
+
+
+    link.click();
+
+
+
+
+    URL.revokeObjectURL(url);
+
+
+
 }
+
+
+
+
+
+
+
+
+
+// ==========================================
+// IMPORTAR MESA
+// ==========================================
+
+function importSave(file){
+
+
+
+    const reader =
+
+    new FileReader();
+
+
+
+
+
+    reader.onload=function(e){
+
+
+
+        localStorage.setItem(
+
+            STORAGE_KEY,
+
+            e.target.result
+
+        );
+
+
+
+        location.reload();
+
+
+
+    };
+
+
+
+
+
+    reader.readAsText(file);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// AUTO SAVE
+// ==========================================
+
+
+setInterval(()=>{
+
+
+    if(typeof tokens !== "undefined"){
+
+
+        saveStorage();
+
+
+    }
+
+
+
+},30000);
