@@ -1,23 +1,16 @@
 // ==========================================
-// DRAG SYSTEM
-// Tokens + Movimento do mapa
+// DRAG TOKENS RPG
 // ==========================================
 
 
 let draggingToken = null;
 
 let dragOffset = {
+
     x:0,
+
     y:0
-};
 
-
-let mapDragging = false;
-
-
-let lastMouse = {
-    x:0,
-    y:0
 };
 
 
@@ -27,130 +20,108 @@ let lastMouse = {
 // INICIAR
 // ==========================================
 
-window.addEventListener(
-"load",
-()=>{
+
+document.addEventListener(
+"mousedown",
+e=>{
 
 
-    document.addEventListener(
-        "mousedown",
-        startDrag
-    );
+
+const tokenElement =
+e.target.closest(".token");
 
 
-    document.addEventListener(
-        "mousemove",
-        moveDrag
-    );
+
+if(!tokenElement)
+return;
 
 
-    document.addEventListener(
-        "mouseup",
-        endDrag
-    );
+
+// BOTÃO DIREITO
+if(e.button===2)
+return;
+
+
+
+const id =
+Number(
+tokenElement.dataset.id
+);
+
+
+
+draggingToken =
+tokens.find(
+t=>t.id===id
+);
+
+
+
+if(!draggingToken)
+return;
+
+
+
+saveHistory();
+
+
+
+
+// posição relativa ao token
+
+dragOffset.x =
+
+e.clientX -
+
+tokenElement.getBoundingClientRect().left;
+
+
+
+dragOffset.y =
+
+e.clientY -
+
+tokenElement.getBoundingClientRect().top;
+
+
+
+tokenElement.classList.add(
+"dragging"
+);
+
+
+
+
+
+// seleção
+
+if(
+!App.selectedTokens.includes(id)
+){
+
+
+clearSelection();
+
+
+addSelection(id);
+
+
+renderSelection();
+
+
+}
+
+
+
+
+e.preventDefault();
+
 
 
 });
 
 
 
-
-// ==========================================
-// COMEÇAR ARRASTAR
-// ==========================================
-
-function startDrag(e){
-
-
-    const tokenElement =
-    e.target.closest(
-        ".token"
-    );
-
-
-
-    // TOKEN
-
-    if(tokenElement){
-
-
-        const id =
-        Number(
-            tokenElement.dataset.id
-        );
-
-
-
-        const token =
-        tokens.find(
-            t=>t.id===id
-        );
-
-
-
-        if(!token)
-            return;
-
-
-
-        if(typeof saveHistory==="function")
-            saveHistory();
-
-
-
-        draggingToken =
-        token;
-
-
-
-        dragOffset.x =
-        e.clientX-token.x;
-
-
-
-        dragOffset.y =
-        e.clientY-token.y;
-
-
-
-        tokenElement.classList.add(
-            "dragging"
-        );
-
-
-
-        return;
-
-    }
-
-
-
-
-    // MAPA
-
-    if(
-        e.code==="Space" ||
-        App.isPanning
-    ){
-
-        mapDragging=true;
-
-
-        lastMouse.x=e.clientX;
-
-        lastMouse.y=e.clientY;
-
-
-        DOM.mapWrapper
-        ?.classList.add(
-            "grabbing"
-        );
-
-
-    }
-
-
-}
 
 
 
@@ -159,104 +130,83 @@ function startDrag(e){
 // MOVIMENTO
 // ==========================================
 
-function moveDrag(e){
+
+document.addEventListener(
+"mousemove",
+e=>{
 
 
 
-    // TOKEN
-
-    if(draggingToken){
-
-
-        let x =
-        e.clientX -
-        dragOffset.x;
-
-
-
-        let y =
-        e.clientY -
-        dragOffset.y;
+if(!draggingToken)
+return;
 
 
 
 
-        // SNAP GRID
 
-        if(App.snapGrid){
-
-
-            x =
-            Math.round(
-                x/App.gridSize
-            )
-            *
-            App.gridSize;
-
-
-
-            y =
-            Math.round(
-                y/App.gridSize
-            )
-            *
-            App.gridSize;
-
-
-        }
-
-
-
-        draggingToken.x=x;
-
-
-        draggingToken.y=y;
-
-
-
-        renderTokens();
-
-
-
-        return;
-
-
-    }
+const rect =
+DOM.map.getBoundingClientRect();
 
 
 
 
-    // MAPA
 
-    if(mapDragging){
+let x =
 
+(
+e.clientX -
 
-        App.mapOffset.x +=
-        e.clientX-lastMouse.x;
+rect.left -
 
+dragOffset.x
+)
 
-
-        App.mapOffset.y +=
-        e.clientY-lastMouse.y;
-
-
-
-
-        DOM.map.style.left =
-        `calc(50% + ${App.mapOffset.x}px)`;
+/
+App.zoom;
 
 
 
-        DOM.map.style.top =
-        `calc(50% + ${App.mapOffset.y}px)`;
+let y =
+
+(
+e.clientY -
+
+rect.top -
+
+dragOffset.y
+)
+
+/
+App.zoom;
 
 
-        lastMouse.x=e.clientX;
-
-        lastMouse.y=e.clientY;
 
 
-    }
+
+
+// SNAP GRID
+
+
+
+if(App.snapGrid){
+
+
+x =
+Math.round(
+x/App.gridSize
+)
+*
+App.gridSize;
+
+
+
+y =
+Math.round(
+y/App.gridSize
+)
+*
+App.gridSize;
+
 
 
 }
@@ -265,56 +215,78 @@ function moveDrag(e){
 
 
 
-// ==========================================
-// FINALIZAR
-// ==========================================
-
-function endDrag(e){
 
 
-
-    if(draggingToken){
-
+// mover selecionados juntos
 
 
-        const el =
-        document.querySelector(
-            `.token[data-id="${draggingToken.id}"]`
-        );
+if(
+App.selectedTokens.length > 1 &&
+App.selectedTokens.includes(
+draggingToken.id
+)
+
+){
 
 
 
-        el?.classList.remove(
-            "dragging"
-        );
+const oldX =
+draggingToken.x;
 
 
 
-        saveStorage();
+const oldY =
+draggingToken.y;
 
 
 
-        draggingToken=null;
-
-
-    }
-
-
-
-    if(mapDragging){
-
-
-        mapDragging=false;
+const dx =
+x-oldX;
 
 
 
-        DOM.mapWrapper
-        ?.classList.remove(
-            "grabbing"
-        );
+const dy =
+y-oldY;
 
 
-    }
+
+App.selectedTokens.forEach(id=>{
+
+
+const t =
+tokens.find(
+token=>token.id===id
+);
+
+
+
+if(t){
+
+
+t.x += dx;
+
+
+t.y += dy;
+
+
+}
+
+
+
+});
+
+
+
+}else{
+
+
+
+draggingToken.x=x;
+
+
+
+draggingToken.y=y;
+
 
 
 }
@@ -323,20 +295,91 @@ function endDrag(e){
 
 
 
+
+renderTokens();
+
+
+
+});
+
+
+
+
+
+
+
+
 // ==========================================
-// PAN PELO ESPAÇO
+// SOLTAR
 // ==========================================
 
-function startPan(){
 
-    App.isPanning=true;
+document.addEventListener(
+"mouseup",
+e=>{
+
+
+
+if(!draggingToken)
+return;
+
+
+
+
+const el =
+document.querySelector(
+`.token[data-id="${draggingToken.id}"]`
+);
+
+
+
+if(el){
+
+el.classList.remove(
+"dragging"
+);
 
 }
 
 
 
-function stopPan(){
+draggingToken=null;
 
-    App.isPanning=false;
+
+
+saveStorage();
+
+
+
+});
+
+
+
+
+
+
+
+
+// ==========================================
+// IMPEDIR MENU DIREITO
+// ==========================================
+
+
+document.addEventListener(
+"contextmenu",
+e=>{
+
+
+if(
+e.target.closest(".token")
+){
+
+
+e.preventDefault();
+
 
 }
+
+
+
+});
