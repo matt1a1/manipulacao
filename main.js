@@ -1,59 +1,63 @@
 // ==========================================
-// MANIPULAÇÃO RPG
-// MAIN.JS
+// MANIPULAÇÃO RPG - MAIN.JS
+// ==========================================
+
+
+// ==========================================
+// APP
 // ==========================================
 
 const App = {
 
-    version: "2.0.0",
+    version:"2.0.0",
 
-    zoom: 1,
+    zoom:1,
 
-    minZoom: .30,
+    minZoom:.30,
 
-    maxZoom: 4,
+    maxZoom:4,
 
-    gridSize: 50,
+    gridSize:50,
 
-    snapGrid: true,
+    snapGrid:true,
 
-    gridVisible: true,
+    gridVisible:true,
 
-    fogEnabled: false,
+    fogEnabled:false,
 
-    measureMode: false,
+    measureMode:false,
 
-    selectedTokens: [],
 
-    clipboard: [],
+    selectedTokens:[],
 
-    history: [],
+    clipboard:[],
 
-    redoHistory: [],
 
-    mouse: {
+    history:[],
 
+    redoHistory:[],
+
+
+    mouse:{
         x:0,
-
         y:0
-
     },
 
+
     mapOffset:{
-
         x:0,
-
         y:0
-
     }
 
 };
 
+
+
 // ==========================================
-// ELEMENTOS
+// DOM
 // ==========================================
 
-const DOM = {
+const DOM={
 
     map:null,
 
@@ -73,11 +77,14 @@ const DOM = {
 
 };
 
+
+
 // ==========================================
 // INICIALIZAÇÃO
 // ==========================================
 
 window.addEventListener("load",init);
+
 
 function init(){
 
@@ -99,8 +106,10 @@ function init(){
 
 }
 
+
+
 // ==========================================
-// CACHE
+// CACHE ELEMENTOS
 // ==========================================
 
 function cacheDOM(){
@@ -123,25 +132,488 @@ function cacheDOM(){
 
 }
 
+
+
 // ==========================================
 // EVENTOS
 // ==========================================
 
 function registerEvents(){
 
-    window.addEventListener("resize",updateViewport);
+    window.addEventListener(
+        "resize",
+        updateViewport
+    );
 
-    document.addEventListener("keydown",keyboard);
 
-    document.addEventListener("keyup",keyboardUp);
+    document.addEventListener(
+        "keydown",
+        keyboard
+    );
 
-    document.addEventListener("click",closeContextMenu);
 
-    DOM.wrapper.addEventListener("wheel",zoomWheel,{
-        passive:false
+    document.addEventListener(
+        "keyup",
+        keyboardUp
+    );
+
+
+    document.addEventListener(
+        "click",
+        closeContextMenu
+    );
+
+
+    DOM.wrapper.addEventListener(
+        "wheel",
+        zoomWheel,
+        {
+            passive:false
+        }
+    );
+
+}
+
+
+
+// ==========================================
+// HISTÓRICO
+// ==========================================
+
+function saveHistory(){
+
+    const state={
+
+        zoom:App.zoom,
+
+        grid:App.gridVisible,
+
+        snap:App.snapGrid,
+
+        tokens:JSON.parse(JSON.stringify(tokens))
+
+    };
+
+
+    App.history.push(state);
+
+
+    if(App.history.length>50){
+
+        App.history.shift();
+
+    }
+
+
+    App.redoHistory=[];
+
+}
+
+
+
+// ==========================================
+// UNDO
+// ==========================================
+
+function undo(){
+
+    if(App.history.length===0){
+
+        toast("Nada para desfazer.");
+
+        return;
+
+    }
+
+
+    const current={
+
+        zoom:App.zoom,
+
+        grid:App.gridVisible,
+
+        snap:App.snapGrid,
+
+        tokens:JSON.parse(JSON.stringify(tokens))
+
+    };
+
+
+    App.redoHistory.push(current);
+
+
+    const state=App.history.pop();
+
+
+    App.zoom=state.zoom;
+
+    App.gridVisible=state.grid;
+
+    App.snapGrid=state.snap;
+
+
+    tokens=
+    JSON.parse(
+        JSON.stringify(state.tokens)
+    );
+
+
+    renderTokens();
+
+    updateZoom();
+
+
+    toast("Desfeito.");
+
+}
+
+
+
+// ==========================================
+// REDO
+// ==========================================
+
+function redo(){
+
+    if(App.redoHistory.length===0){
+
+        toast("Nada para refazer.");
+
+        return;
+
+    }
+
+
+    const current={
+
+        zoom:App.zoom,
+
+        grid:App.gridVisible,
+
+        snap:App.snapGrid,
+
+        tokens:JSON.parse(JSON.stringify(tokens))
+
+    };
+
+
+    App.history.push(current);
+
+
+    const state=App.redoHistory.pop();
+
+
+    App.zoom=state.zoom;
+
+    App.gridVisible=state.grid;
+
+    App.snapGrid=state.snap;
+
+
+    tokens=
+    JSON.parse(
+        JSON.stringify(state.tokens)
+    );
+
+
+    renderTokens();
+
+    updateZoom();
+
+
+    toast("Refeito.");
+
+}
+
+
+
+// ==========================================
+// SELEÇÃO
+// ==========================================
+
+function clearSelection(){
+
+    App.selectedTokens=[];
+
+
+    document
+    .querySelectorAll(".token")
+    .forEach(token=>{
+
+        token.classList.remove(
+            "selected"
+        );
+
     });
 
 }
+
+
+
+function addSelection(id){
+
+    if(
+        !App.selectedTokens.includes(id)
+    ){
+
+        App.selectedTokens.push(id);
+
+    }
+
+}
+
+
+
+function removeSelection(id){
+
+    App.selectedTokens =
+    App.selectedTokens.filter(
+        t=>t!==id
+    );
+
+}
+
+
+
+function selectAll(){
+
+    clearSelection();
+
+
+    tokens.forEach(token=>{
+
+        App.selectedTokens.push(
+            token.id
+        );
+
+    });
+
+
+    renderSelection();
+
+}
+
+
+
+function renderSelection(){
+
+    document
+    .querySelectorAll(".token")
+    .forEach(token=>{
+
+        token.classList.remove(
+            "selected"
+        );
+
+    });
+
+
+    App.selectedTokens.forEach(id=>{
+
+
+        const el=document.querySelector(
+            `.token[data-id="${id}"]`
+        );
+
+
+        if(el){
+
+            el.classList.add(
+                "selected"
+            );
+
+        }
+
+    });
+
+}
+
+
+
+// ==========================================
+// DELETE
+// ==========================================
+
+function deleteSelection(){
+
+    if(App.selectedTokens.length===0)
+        return;
+
+
+    saveHistory();
+
+
+    tokens=tokens.filter(
+        token=>
+        !App.selectedTokens.includes(
+            token.id
+        )
+    );
+
+
+    clearSelection();
+
+
+    renderTokens();
+
+
+    saveStorage();
+
+
+    toast("Token removido.");
+
+}
+
+
+
+// ==========================================
+// DUPLICAR
+// ==========================================
+
+function duplicateSelection(){
+
+    if(App.selectedTokens.length===0)
+        return;
+
+
+    saveHistory();
+
+
+    const copies=[];
+
+
+    App.selectedTokens.forEach(id=>{
+
+
+        const original =
+        tokens.find(
+            t=>t.id===id
+        );
+
+
+        if(!original)return;
+
+
+        copies.push({
+
+            ...original,
+
+            id:Date.now()+Math.random(),
+
+            x:original.x+40,
+
+            y:original.y+40
+
+        });
+
+
+    });
+
+
+
+    tokens.push(...copies);
+
+
+    renderTokens();
+
+    saveStorage();
+
+
+    toast("Duplicado.");
+
+}
+
+
+
+// ==========================================
+// COPIAR
+// ==========================================
+
+function copySelection(){
+
+
+    if(App.selectedTokens.length===0)
+        return;
+
+
+
+    App.clipboard=[];
+
+
+
+    App.selectedTokens.forEach(id=>{
+
+
+        const token =
+        tokens.find(
+            t=>t.id===id
+        );
+
+
+
+        if(token){
+
+            App.clipboard.push(
+                JSON.parse(
+                    JSON.stringify(token)
+                )
+            );
+
+        }
+
+
+    });
+
+
+    toast("Copiado.");
+
+}
+
+
+
+// ==========================================
+// COLAR
+// ==========================================
+
+function pasteSelection(){
+
+    if(App.clipboard.length===0)
+        return;
+
+
+    saveHistory();
+
+
+    App.clipboard.forEach(token=>{
+
+
+        tokens.push({
+
+            ...token,
+
+            id:Date.now()+Math.random(),
+
+            x:token.x+50,
+
+            y:token.y+50
+
+        });
+
+
+    });
+
+
+
+    renderTokens();
+
+    saveStorage();
+
+
+    toast("Colado.");
+
+}
+
+
 
 // ==========================================
 // LOADING
@@ -153,15 +625,19 @@ function hideLoading(){
 
         DOM.loading.style.opacity="0";
 
+
         setTimeout(()=>{
 
             DOM.loading.remove();
 
         },500);
 
+
     },600);
 
 }
+
+
 
 // ==========================================
 // TOAST
@@ -171,15 +647,22 @@ function toast(message){
 
     const div=document.createElement("div");
 
+
     div.className="toast";
+
 
     div.textContent=message;
 
+
     document.body.appendChild(div);
+
+
 
     setTimeout(()=>{
 
+
         div.classList.add("hide");
+
 
         setTimeout(()=>{
 
@@ -187,12 +670,15 @@ function toast(message){
 
         },300);
 
+
     },2200);
 
 }
 
+
+
 // ==========================================
-// VIEWPORT
+// ZOOM
 // ==========================================
 
 function updateViewport(){
@@ -201,53 +687,46 @@ function updateViewport(){
 
 }
 
-// ==========================================
-// ZOOM
-// ==========================================
+
 
 function updateZoom(){
 
-    DOM.map.style.transform=
-        `translate(-50%,-50%) scale(${App.zoom})`;
+    DOM.map.style.transform =
+    `translate(-50%,-50%) scale(${App.zoom})`;
 
-    DOM.zoomLabel.textContent=
-        Math.round(App.zoom*100)+"%";
+
+    DOM.zoomLabel.textContent =
+    Math.round(App.zoom*100)+"%";
 
 }
 
-// ==========================================
-// MOUSE WHEEL
-// ==========================================
+
 
 function zoomWheel(e){
 
     e.preventDefault();
 
-    if(e.deltaY<0){
 
-        App.zoom+=0.1;
+    App.zoom += e.deltaY < 0
+    ? 0.1
+    : -0.1;
 
-    }else{
 
-        App.zoom-=0.1;
 
-    }
+    App.zoom=Math.max(
+        App.minZoom,
+        Math.min(
+            App.maxZoom,
+            App.zoom
+        )
+    );
 
-    if(App.zoom<App.minZoom){
-
-        App.zoom=App.minZoom;
-
-    }
-
-    if(App.zoom>App.maxZoom){
-
-        App.zoom=App.maxZoom;
-
-    }
 
     updateZoom();
 
 }
+
+
 
 // ==========================================
 // TECLADO
@@ -255,7 +734,9 @@ function zoomWheel(e){
 
 function keyboard(e){
 
+
     switch(e.key){
+
 
         case "Delete":
 
@@ -263,11 +744,13 @@ function keyboard(e){
 
         break;
 
+
         case "Escape":
 
             clearSelection();
 
         break;
+
 
         case " ":
 
@@ -277,9 +760,13 @@ function keyboard(e){
 
     }
 
+
+
     if(e.ctrlKey){
 
+
         switch(e.key.toLowerCase()){
+
 
             case "c":
 
@@ -287,11 +774,15 @@ function keyboard(e){
 
             break;
 
+
+
             case "v":
 
                 pasteSelection();
 
             break;
+
+
 
             case "z":
 
@@ -299,11 +790,15 @@ function keyboard(e){
 
             break;
 
+
+
             case "y":
 
                 redo();
 
             break;
+
+
 
             case "d":
 
@@ -311,15 +806,16 @@ function keyboard(e){
 
             break;
 
+
         }
+
 
     }
 
+
 }
 
-// ==========================================
-// KEYUP
-// ==========================================
+
 
 function keyboardUp(e){
 
