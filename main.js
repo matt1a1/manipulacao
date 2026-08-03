@@ -1,10 +1,11 @@
 // ==========================================
-// MANIPULAÇÃO RPG - MAIN.JS
+// MANIPULAÇÃO RPG
+// MAIN.JS - CORE
 // ==========================================
 
 
 // ==========================================
-// APP
+// ESTADO GLOBAL
 // ==========================================
 
 const App = {
@@ -13,15 +14,17 @@ const App = {
 
     zoom:1,
 
-    minZoom:.30,
+    minZoom:0.3,
 
     maxZoom:4,
 
+
     gridSize:50,
+
+    gridVisible:true,
 
     snapGrid:true,
 
-    gridVisible:true,
 
     fogEnabled:false,
 
@@ -38,40 +41,37 @@ const App = {
     redoHistory:[],
 
 
+    mapOffset:{
+        x:0,
+        y:0
+    },
+
+
     mouse:{
         x:0,
         y:0
     },
 
 
-    mapOffset:{
-        x:0,
-        y:0
-    }
+    isPanning:false
 
 };
 
 
 
 // ==========================================
-// DOM
+// DOM GLOBAL
 // ==========================================
 
 const DOM={
 
     map:null,
 
-    wrapper:null,
+    mapWrapper:null,
 
-    sidebar:null,
-
-    zoomLabel:null,
+    zoomValue:null,
 
     loading:null,
-
-    library:null,
-
-    initiative:null,
 
     contextMenu:null
 
@@ -80,57 +80,93 @@ const DOM={
 
 
 // ==========================================
-// INICIALIZAÇÃO
+// START
 // ==========================================
 
-window.addEventListener("load",init);
+window.addEventListener(
+    "load",
+    startApp
+);
 
 
-function init(){
+
+function startApp(){
+
 
     cacheDOM();
 
+
     registerEvents();
 
-    loadStorage();
 
-    renderLibrary();
+    if(typeof loadStorage==="function")
+        loadStorage();
 
-    renderTokens();
+
+
+    if(typeof renderLibrary==="function")
+        renderLibrary();
+
+
+
+    if(typeof renderTokens==="function")
+        renderTokens();
+
+
 
     updateZoom();
 
+
     hideLoading();
 
-    toast("Mesa carregada com sucesso.");
+
+    toast(
+        "Manipulação RPG carregado."
+    );
+
 
 }
 
 
 
+
 // ==========================================
-// CACHE ELEMENTOS
+// CACHE
 // ==========================================
 
 function cacheDOM(){
 
-    DOM.map=document.getElementById("map");
 
-    DOM.wrapper=document.getElementById("mapWrapper");
+    DOM.map =
+    document.getElementById("map");
 
-    DOM.sidebar=document.getElementById("sidebar");
 
-    DOM.zoomLabel=document.getElementById("zoomValue");
+    DOM.mapWrapper =
+    document.getElementById(
+        "mapWrapper"
+    );
 
-    DOM.loading=document.getElementById("loading");
 
-    DOM.library=document.getElementById("libraryList");
+    DOM.zoomValue =
+    document.getElementById(
+        "zoomValue"
+    );
 
-    DOM.initiative=document.getElementById("initiativeList");
 
-    DOM.contextMenu=document.getElementById("contextMenu");
+    DOM.loading =
+    document.getElementById(
+        "loading"
+    );
+
+
+    DOM.contextMenu =
+    document.getElementById(
+        "contextMenu"
+    );
+
 
 }
+
 
 
 
@@ -140,9 +176,10 @@ function cacheDOM(){
 
 function registerEvents(){
 
+
     window.addEventListener(
         "resize",
-        updateViewport
+        updateZoom
     );
 
 
@@ -160,19 +197,31 @@ function registerEvents(){
 
     document.addEventListener(
         "click",
-        closeContextMenu
-    );
+        ()=>{
+            
+            if(typeof closeContextMenu==="function")
+                closeContextMenu();
 
-
-    DOM.wrapper.addEventListener(
-        "wheel",
-        zoomWheel,
-        {
-            passive:false
         }
     );
 
+
+
+    if(DOM.mapWrapper){
+
+        DOM.mapWrapper.addEventListener(
+            "wheel",
+            zoomWheel,
+            {
+                passive:false
+            }
+        );
+
+    }
+
+
 }
+
 
 
 
@@ -180,9 +229,9 @@ function registerEvents(){
 // HISTÓRICO
 // ==========================================
 
-function saveHistory(){
+function createState(){
 
-    const state={
+    return {
 
         zoom:App.zoom,
 
@@ -190,12 +239,33 @@ function saveHistory(){
 
         snap:App.snapGrid,
 
-        tokens:JSON.parse(JSON.stringify(tokens))
+
+        tokens:
+        JSON.parse(
+            JSON.stringify(
+                tokens || []
+            )
+        ),
+
+
+        selection:
+        [
+            ...App.selectedTokens
+        ]
 
     };
 
+}
 
-    App.history.push(state);
+
+
+
+function saveHistory(){
+
+
+    App.history.push(
+        createState()
+    );
 
 
     if(App.history.length>50){
@@ -207,7 +277,9 @@ function saveHistory(){
 
     App.redoHistory=[];
 
+
 }
+
 
 
 
@@ -217,55 +289,40 @@ function saveHistory(){
 
 function undo(){
 
+
     if(App.history.length===0){
 
-        toast("Nada para desfazer.");
+        toast(
+            "Nada para desfazer."
+        );
 
         return;
 
     }
 
 
-    const current={
 
-        zoom:App.zoom,
-
-        grid:App.gridVisible,
-
-        snap:App.snapGrid,
-
-        tokens:JSON.parse(JSON.stringify(tokens))
-
-    };
-
-
-    App.redoHistory.push(current);
-
-
-    const state=App.history.pop();
-
-
-    App.zoom=state.zoom;
-
-    App.gridVisible=state.grid;
-
-    App.snapGrid=state.snap;
-
-
-    tokens=
-    JSON.parse(
-        JSON.stringify(state.tokens)
+    App.redoHistory.push(
+        createState()
     );
 
 
-    renderTokens();
 
-    updateZoom();
+    const state =
+    App.history.pop();
 
 
-    toast("Desfeito.");
+
+    restoreState(state);
+
+
+
+    toast(
+        "Desfeito."
+    );
 
 }
+
 
 
 
@@ -275,53 +332,82 @@ function undo(){
 
 function redo(){
 
+
     if(App.redoHistory.length===0){
 
-        toast("Nada para refazer.");
+        toast(
+            "Nada para refazer."
+        );
 
         return;
 
     }
 
 
-    const current={
 
-        zoom:App.zoom,
-
-        grid:App.gridVisible,
-
-        snap:App.snapGrid,
-
-        tokens:JSON.parse(JSON.stringify(tokens))
-
-    };
-
-
-    App.history.push(current);
-
-
-    const state=App.redoHistory.pop();
-
-
-    App.zoom=state.zoom;
-
-    App.gridVisible=state.grid;
-
-    App.snapGrid=state.snap;
-
-
-    tokens=
-    JSON.parse(
-        JSON.stringify(state.tokens)
+    App.history.push(
+        createState()
     );
 
 
-    renderTokens();
+
+    const state =
+    App.redoHistory.pop();
+
+
+
+    restoreState(state);
+
+
+
+    toast(
+        "Refeito."
+    );
+
+}
+
+
+
+
+function restoreState(state){
+
+
+    App.zoom =
+    state.zoom;
+
+
+    App.gridVisible =
+    state.grid;
+
+
+    App.snapGrid =
+    state.snap;
+
+
+
+    tokens =
+    JSON.parse(
+        JSON.stringify(
+            state.tokens
+        )
+    );
+
+
+
+    App.selectedTokens =
+    [
+        ...state.selection
+    ];
+
+
+
+    if(typeof renderTokens==="function")
+        renderTokens();
+
+
 
     updateZoom();
 
-
-    toast("Refeito.");
 
 }
 
@@ -333,24 +419,31 @@ function redo(){
 
 function clearSelection(){
 
+
     App.selectedTokens=[];
 
 
-    document
-    .querySelectorAll(".token")
-    .forEach(token=>{
 
-        token.classList.remove(
+    document
+    .querySelectorAll(
+        ".token"
+    )
+    .forEach(t=>{
+
+        t.classList.remove(
             "selected"
         );
 
     });
 
+
 }
 
 
 
+
 function addSelection(id){
+
 
     if(
         !App.selectedTokens.includes(id)
@@ -364,12 +457,15 @@ function addSelection(id){
 
 
 
+
 function removeSelection(id){
+
 
     App.selectedTokens =
     App.selectedTokens.filter(
         t=>t!==id
     );
+
 
 }
 
@@ -377,164 +473,79 @@ function removeSelection(id){
 
 function selectAll(){
 
+
     clearSelection();
 
 
-    tokens.forEach(token=>{
+
+    tokens.forEach(t=>{
 
         App.selectedTokens.push(
-            token.id
+            t.id
         );
 
     });
 
 
+
     renderSelection();
+
 
 }
 
 
 
+
 function renderSelection(){
 
-    document
-    .querySelectorAll(".token")
-    .forEach(token=>{
 
-        token.classList.remove(
+    document
+    .querySelectorAll(
+        ".token"
+    )
+    .forEach(t=>{
+
+        t.classList.remove(
             "selected"
         );
 
     });
 
 
+
     App.selectedTokens.forEach(id=>{
 
 
-        const el=document.querySelector(
+        const token =
+        document.querySelector(
             `.token[data-id="${id}"]`
         );
 
 
-        if(el){
 
-            el.classList.add(
+        if(token){
+
+            token.classList.add(
                 "selected"
             );
 
         }
 
-    });
-
-}
-
-
-
-// ==========================================
-// DELETE
-// ==========================================
-
-function deleteSelection(){
-
-    if(App.selectedTokens.length===0)
-        return;
-
-
-    saveHistory();
-
-
-    tokens=tokens.filter(
-        token=>
-        !App.selectedTokens.includes(
-            token.id
-        )
-    );
-
-
-    clearSelection();
-
-
-    renderTokens();
-
-
-    saveStorage();
-
-
-    toast("Token removido.");
-
-}
-
-
-
-// ==========================================
-// DUPLICAR
-// ==========================================
-
-function duplicateSelection(){
-
-    if(App.selectedTokens.length===0)
-        return;
-
-
-    saveHistory();
-
-
-    const copies=[];
-
-
-    App.selectedTokens.forEach(id=>{
-
-
-        const original =
-        tokens.find(
-            t=>t.id===id
-        );
-
-
-        if(!original)return;
-
-
-        copies.push({
-
-            ...original,
-
-            id:Date.now()+Math.random(),
-
-            x:original.x+40,
-
-            y:original.y+40
-
-        });
-
 
     });
 
 
-
-    tokens.push(...copies);
-
-
-    renderTokens();
-
-    saveStorage();
-
-
-    toast("Duplicado.");
-
 }
 
 
 
+
 // ==========================================
-// COPIAR
+// COPIAR / COLAR
 // ==========================================
+
 
 function copySelection(){
-
-
-    if(App.selectedTokens.length===0)
-        return;
-
 
 
     App.clipboard=[];
@@ -550,13 +561,10 @@ function copySelection(){
         );
 
 
-
         if(token){
 
             App.clipboard.push(
-                JSON.parse(
-                    JSON.stringify(token)
-                )
+                structuredClone(token)
             );
 
         }
@@ -565,37 +573,45 @@ function copySelection(){
     });
 
 
-    toast("Copiado.");
+
+    toast(
+        "Copiado."
+    );
+
 
 }
 
 
 
-// ==========================================
-// COLAR
-// ==========================================
+
 
 function pasteSelection(){
 
-    if(App.clipboard.length===0)
+
+    if(
+        App.clipboard.length===0
+    )
         return;
+
 
 
     saveHistory();
 
 
-    App.clipboard.forEach(token=>{
+
+    App.clipboard.forEach(t=>{
 
 
         tokens.push({
 
-            ...token,
+            ...t,
 
-            id:Date.now()+Math.random(),
+            id:
+            Date.now()+Math.random(),
 
-            x:token.x+50,
+            x:t.x+50,
 
-            y:token.y+50
+            y:t.y+50
 
         });
 
@@ -606,72 +622,52 @@ function pasteSelection(){
 
     renderTokens();
 
+
     saveStorage();
 
 
-    toast("Colado.");
 
 }
 
 
 
-// ==========================================
-// LOADING
-// ==========================================
-
-function hideLoading(){
-
-    setTimeout(()=>{
-
-        DOM.loading.style.opacity="0";
-
-
-        setTimeout(()=>{
-
-            DOM.loading.remove();
-
-        },500);
-
-
-    },600);
-
-}
-
-
 
 // ==========================================
-// TOAST
+// DELETE
 // ==========================================
 
-function toast(message){
-
-    const div=document.createElement("div");
+function deleteSelection(){
 
 
-    div.className="toast";
-
-
-    div.textContent=message;
-
-
-    document.body.appendChild(div);
+    if(
+        App.selectedTokens.length===0
+    )
+    return;
 
 
 
-    setTimeout(()=>{
+    saveHistory();
 
 
-        div.classList.add("hide");
+
+    tokens =
+    tokens.filter(
+        t=>
+        !App.selectedTokens.includes(
+            t.id
+        )
+    );
 
 
-        setTimeout(()=>{
 
-            div.remove();
-
-        },300);
+    clearSelection();
 
 
-    },2200);
+    renderTokens();
+
+
+    saveStorage();
+
 
 }
 
@@ -681,22 +677,31 @@ function toast(message){
 // ZOOM
 // ==========================================
 
-function updateViewport(){
-
-    updateZoom();
-
-}
-
-
-
 function updateZoom(){
 
+
+    if(!DOM.map)
+        return;
+
+
+
     DOM.map.style.transform =
-    `translate(-50%,-50%) scale(${App.zoom})`;
+    `
+    translate(-50%,-50%)
+    scale(${App.zoom})
+    `;
 
 
-    DOM.zoomLabel.textContent =
-    Math.round(App.zoom*100)+"%";
+
+    if(DOM.zoomValue){
+
+        DOM.zoomValue.textContent =
+        Math.round(
+            App.zoom*100
+        )+"%";
+
+    }
+
 
 }
 
@@ -704,16 +709,20 @@ function updateZoom(){
 
 function zoomWheel(e){
 
+
     e.preventDefault();
 
 
-    App.zoom += e.deltaY < 0
-    ? 0.1
-    : -0.1;
+
+    App.zoom +=
+    e.deltaY < 0
+    ?0.1
+    :-0.1;
 
 
 
-    App.zoom=Math.max(
+    App.zoom =
+    Math.max(
         App.minZoom,
         Math.min(
             App.maxZoom,
@@ -723,6 +732,7 @@ function zoomWheel(e){
 
 
     updateZoom();
+
 
 }
 
@@ -735,74 +745,48 @@ function zoomWheel(e){
 function keyboard(e){
 
 
-    switch(e.key){
+    if(
+        e.ctrlKey
+    ){
 
 
-        case "Delete":
-
-            deleteSelection();
-
-        break;
-
-
-        case "Escape":
-
-            clearSelection();
-
-        break;
-
-
-        case " ":
-
-            startPan();
-
-        break;
-
-    }
-
-
-
-    if(e.ctrlKey){
-
-
-        switch(e.key.toLowerCase()){
-
-
-            case "c":
-
-                copySelection();
-
-            break;
-
-
-
-            case "v":
-
-                pasteSelection();
-
-            break;
-
+        switch(
+            e.key.toLowerCase()
+        ){
 
 
             case "z":
+
+                e.preventDefault();
 
                 undo();
 
             break;
 
 
-
             case "y":
+
+                e.preventDefault();
 
                 redo();
 
             break;
 
 
+            case "c":
 
-            case "d":
+                e.preventDefault();
 
-                duplicateSelection();
+                copySelection();
+
+            break;
+
+
+            case "v":
+
+                e.preventDefault();
+
+                pasteSelection();
 
             break;
 
@@ -813,16 +797,144 @@ function keyboard(e){
     }
 
 
+
+
+    switch(e.key){
+
+
+        case "Delete":
+
+            deleteSelection();
+
+        break;
+
+
+
+        case "Escape":
+
+            clearSelection();
+
+        break;
+
+
+
+        case " ":
+
+            e.preventDefault();
+
+            if(typeof startPan==="function")
+                startPan();
+
+        break;
+
+
+
+    }
+
+
+
 }
 
 
 
 function keyboardUp(e){
 
-    if(e.key===" "){
 
-        stopPan();
+    if(
+        e.code==="Space"
+    ){
+
+        if(typeof stopPan==="function")
+            stopPan();
 
     }
+
+
+}
+
+
+
+
+// ==========================================
+// LOADING
+// ==========================================
+
+function hideLoading(){
+
+
+    if(!DOM.loading)
+        return;
+
+
+
+    setTimeout(()=>{
+
+
+        DOM.loading.style.opacity=0;
+
+
+
+        setTimeout(()=>{
+
+            DOM.loading.remove();
+
+        },500);
+
+
+
+    },600);
+
+
+
+}
+
+
+
+
+// ==========================================
+// TOAST
+// ==========================================
+
+function toast(msg){
+
+
+    const div =
+    document.createElement(
+        "div"
+    );
+
+
+    div.className="toast";
+
+
+    div.textContent=msg;
+
+
+
+    document.body.appendChild(
+        div
+    );
+
+
+
+    setTimeout(()=>{
+
+
+        div.classList.add(
+            "hide"
+        );
+
+
+
+        setTimeout(()=>{
+
+            div.remove();
+
+        },300);
+
+
+
+    },2000);
+
 
 }
