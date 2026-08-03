@@ -4,32 +4,7 @@
 
 
 /* ==========================================
-   MAIN
-========================================== */
-
-
-#main{
-
-    display:flex;
-
-    flex-direction:column;
-
-    width:100%;
-
-    height:100vh;
-
-    overflow:hidden;
-
-    background:#0b1120;
-
-}
-
-
-
-
-
-/* ==========================================
-   ÁREA DO MAPA
+   ÁREA PRINCIPAL
 ========================================== */
 
 
@@ -42,16 +17,13 @@
     overflow:hidden;
 
     background:
-
     radial-gradient(
-        circle at center,
+        circle,
         #1e293b,
         #020617
     );
 
 }
-
-
 
 
 
@@ -62,17 +34,22 @@
 
 #mapWrapper{
 
+
     width:100%;
 
     height:100%;
 
+    position:relative;
+
+
     overflow:hidden;
 
-    position:relative;
 
     cursor:grab;
 
+
     user-select:none;
+
 
 }
 
@@ -80,7 +57,9 @@
 
 #mapWrapper.grabbing{
 
+
     cursor:grabbing;
+
 
 }
 
@@ -88,8 +67,9 @@
 
 
 
+
 /* ==========================================
-   MAPA PRINCIPAL
+   MAPA
 ========================================== */
 
 
@@ -106,6 +86,7 @@
 
 
     width:3000px;
+
 
     height:3000px;
 
@@ -129,20 +110,26 @@
 
     background-image:
 
+
     linear-gradient(
 
-        rgba(255,255,255,.05) 1px,
+        rgba(255,255,255,.05)
+
+        1px,
 
         transparent 1px
 
     ),
 
 
+
     linear-gradient(
 
         90deg,
 
-        rgba(255,255,255,.05) 1px,
+        rgba(255,255,255,.05)
+
+        1px,
 
         transparent 1px
 
@@ -150,81 +137,19 @@
 
 
 
-    background-size:50px 50px;
+    background-size:
+
+    50px 50px;
 
 
 
     transition:
 
-    transform .1s linear,
-
-    background .25s;
+    transform .1s linear;
 
 
 
 }
-
-
-
-
-
-/* ==========================================
-   TAMANHOS DO GRID
-========================================== */
-
-
-#map.grid25{
-
-
-    background-size:25px 25px;
-
-
-}
-
-
-
-#map.grid50{
-
-
-    background-size:50px 50px;
-
-
-}
-
-
-
-#map.grid75{
-
-
-    background-size:75px 75px;
-
-
-}
-
-
-
-#map.grid100{
-
-
-    background-size:100px 100px;
-
-
-}
-
-
-
-
-/* SEM GRID */
-
-
-#map.no-grid{
-
-
-    background-image:none;
-
-
-}
-
 
 
 
@@ -254,8 +179,65 @@
 
 
 
+
 /* ==========================================
-   BORDA DE SOMBRA
+   GRID
+========================================== */
+
+
+#map.grid25{
+
+
+    background-size:
+
+    25px 25px;
+
+
+}
+
+
+
+#map.grid50{
+
+
+    background-size:
+
+    50px 50px;
+
+
+}
+
+
+
+#map.grid75{
+
+
+    background-size:
+
+    75px 75px;
+
+
+}
+
+
+
+#map.grid100{
+
+
+    background-size:
+
+    100px 100px;
+
+
+}
+
+
+
+
+
+
+/* ==========================================
+   EFEITO DE BORDA
 ========================================== */
 
 
@@ -278,123 +260,17 @@
 
     box-shadow:
 
-    inset 0 0 120px rgba(0,0,0,.65);
+
+    inset 0 0 120px rgba(0,0,0,.7);
 
 
 
     z-index:20;
 
 
-}
-
-
-
-
-
-
-
-/* ==========================================
-   PAN
-========================================== */
-
-
-.panning{
-
-
-    cursor:grabbing !important;
-
 
 }
 
-
-
-
-
-
-
-/* ==========================================
-   RÉGUA
-========================================== */
-
-
-#measureLine{
-
-
-    position:absolute;
-
-
-    height:3px;
-
-
-
-    background:#22c55e;
-
-
-
-    transform-origin:left center;
-
-
-
-    pointer-events:none;
-
-
-
-    z-index:500;
-
-
-
-    box-shadow:
-
-    0 0 15px rgba(34,197,94,.8);
-
-
-
-}
-
-
-
-
-
-#measureText{
-
-
-    position:absolute;
-
-
-
-    padding:6px 10px;
-
-
-
-    background:#111827;
-
-
-
-    color:white;
-
-
-
-    border-radius:8px;
-
-
-
-    border:1px solid #22c55e;
-
-
-
-    font-size:13px;
-
-
-
-    pointer-events:none;
-
-
-
-    z-index:600;
-
-
-
-}
 
 
 
@@ -413,10 +289,7 @@
     position:absolute;
 
 
-    left:0;
-
-
-    top:0;
+    inset:0;
 
 
 
@@ -441,9 +314,98 @@
 
 
 
+/* ==========================================
+   LINHA DE MEDIDA
+========================================== */
+
+
+#measureLine{
+
+
+    position:absolute;
+
+
+
+    height:3px;
+
+
+
+    background:#22c55e;
+
+
+
+    transform-origin:left center;
+
+
+
+    pointer-events:none;
+
+
+
+    z-index:500;
+
+
+
+    box-shadow:
+
+
+    0 0 20px rgba(34,197,94,.8);
+
+
+
+}
+
+
+
+
+
+
+#measureText{
+
+
+    position:absolute;
+
+
+
+    padding:8px 12px;
+
+
+
+    background:#111827;
+
+
+
+    color:white;
+
+
+
+    border-radius:10px;
+
+
+
+    border:
+
+    1px solid #22c55e;
+
+
+
+    font-size:13px;
+
+
+
+    z-index:600;
+
+
+}
+
+
+
+
+
+
 
 /* ==========================================
-   SELEÇÃO DE ÁREA
+   CAIXA DE SELEÇÃO
 ========================================== */
 
 
@@ -451,6 +413,10 @@
 
 
     position:absolute;
+
+
+
+    display:none;
 
 
 
@@ -466,15 +432,12 @@
 
 
 
-    display:none;
-
-
-
     z-index:900;
 
 
 
 }
+
 
 
 
@@ -497,11 +460,12 @@
     bottom:15px;
 
 
+
     right:15px;
 
 
 
-    padding:8px 14px;
+    padding:10px 15px;
 
 
 
@@ -527,11 +491,12 @@
 
 
 
-    z-index:700;
+    z-index:600;
 
 
 
 }
+
 
 
 
@@ -554,11 +519,13 @@
     right:20px;
 
 
+
     top:20px;
 
 
 
     width:230px;
+
 
 
     height:150px;
@@ -573,23 +540,24 @@
 
 
 
+    overflow:hidden;
+
+
+
     border:
 
     2px solid #334155;
 
 
 
-    overflow:hidden;
+    z-index:600;
 
 
 
     box-shadow:
 
+
     0 15px 40px rgba(0,0,0,.5);
-
-
-
-    z-index:600;
 
 
 
@@ -604,64 +572,6 @@
 
 
     height:100%;
-
-
-}
-
-
-
-
-
-
-
-
-/* ==========================================
-   FPS
-========================================== */
-
-
-#fps{
-
-
-    position:absolute;
-
-
-
-    left:20px;
-
-
-    top:20px;
-
-
-
-    padding:8px 12px;
-
-
-
-    border-radius:12px;
-
-
-
-    background:#111827;
-
-
-
-    color:#22c55e;
-
-
-
-    border:
-
-    1px solid #334155;
-
-
-
-    font-size:13px;
-
-
-
-    z-index:600;
-
 
 
 }
@@ -687,6 +597,7 @@
     bottom:20px;
 
 
+
     left:50%;
 
 
@@ -701,6 +612,10 @@
 
 
 
+    border-radius:999px;
+
+
+
     background:#111827;
 
 
@@ -709,17 +624,7 @@
 
 
 
-    border-radius:999px;
-
-
-
     font-weight:700;
-
-
-
-    border:
-
-    1px solid #334155;
 
 
 
@@ -739,6 +644,7 @@
 
 
 
+
 #zoomIndicator.show{
 
 
@@ -746,6 +652,7 @@
 
 
 }
+
 
 
 
