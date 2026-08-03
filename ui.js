@@ -1,7 +1,6 @@
 // ==========================================
-// INTERFACE
+// INTERFACE RPG
 // ==========================================
-
 
 
 window.addEventListener(
@@ -9,21 +8,72 @@ window.addEventListener(
 ()=>{
 
 
-// BOTÃO CRIAR TOKEN
 
-document
-.getElementById(
+// ==========================================
+// TAMANHO DO TOKEN
+// ==========================================
+
+
+const sizeInput =
+document.getElementById(
+"tokenSize"
+);
+
+
+
+const sizeValue =
+document.getElementById(
+"tokenSizeValue"
+);
+
+
+
+if(sizeInput){
+
+
+sizeInput.addEventListener(
+"input",
+()=>{
+
+
+sizeValue.innerText =
+sizeInput.value+"px";
+
+
+});
+
+
+}
+
+
+
+
+
+// ==========================================
+// CRIAR TOKEN
+// ==========================================
+
+
+const createButton =
+document.getElementById(
 "createToken"
-)
-?.addEventListener(
+);
+
+
+
+if(createButton){
+
+
+createButton.addEventListener(
 "click",
 ()=>{
+
 
 
 const name =
 document.getElementById(
 "tokenName"
-).value;
+).value.trim();
 
 
 
@@ -34,8 +84,45 @@ document.getElementById(
 
 
 
-if(!name)
+const size =
+Number(
+document.getElementById(
+"tokenSize"
+).value
+);
+
+
+
+const imageInput =
+document.getElementById(
+"newTokenImage"
+);
+
+
+
+
+
+if(name===""){
+
+
+toast(
+"Digite um nome para o token."
+);
+
+
 return;
+
+
+}
+
+
+
+
+// SEM IMAGEM
+
+if(
+!imageInput.files.length
+){
 
 
 
@@ -43,10 +130,94 @@ createToken({
 
 name:name,
 
-color:color
+color:color,
+
+size:size
 
 });
 
+
+
+limparFormulario();
+
+
+
+return;
+
+
+}
+
+
+
+
+
+
+// COM IMAGEM
+
+const file =
+imageInput.files[0];
+
+
+
+const reader =
+new FileReader();
+
+
+
+
+reader.onload=function(){
+
+
+
+createToken({
+
+
+name:name,
+
+
+color:color,
+
+
+size:size,
+
+
+image:reader.result
+
+
+
+});
+
+
+
+limparFormulario();
+
+
+
+};
+
+
+
+reader.readAsDataURL(
+file
+);
+
+
+
+});
+
+
+}
+
+
+
+
+
+// ==========================================
+// LIMPAR FORMULARIO
+// ==========================================
+
+
+function limparFormulario(){
 
 
 document.getElementById(
@@ -55,13 +226,23 @@ document.getElementById(
 
 
 
-});
+document.getElementById(
+"newTokenImage"
+).value="";
+
+
+
+}
+
+
+
+
 
 
 
 
 // ==========================================
-// UNDO REDO
+// UNDO
 // ==========================================
 
 
@@ -74,6 +255,14 @@ document
 undo
 );
 
+
+
+
+
+
+// ==========================================
+// REDO
+// ==========================================
 
 
 document
@@ -89,8 +278,9 @@ redo
 
 
 
+
 // ==========================================
-// COPIAR COLAR
+// COPIAR
 // ==========================================
 
 
@@ -105,6 +295,14 @@ copySelection
 
 
 
+
+
+
+// ==========================================
+// COLAR
+// ==========================================
+
+
 document
 .getElementById(
 "paste"
@@ -113,6 +311,9 @@ document
 "click",
 pasteSelection
 );
+
+
+
 
 
 
@@ -129,24 +330,11 @@ document
 )
 ?.addEventListener(
 "click",
-()=>{
-
-
-App.clipboard =
-tokens.filter(
-t=>
-App.selectedTokens.includes(
-t.id
-)
+duplicateSelection
 );
 
 
 
-pasteSelection();
-
-
-
-});
 
 
 
@@ -164,8 +352,26 @@ document
 )
 ?.addEventListener(
 "click",
-()=>changeZoom(.1)
-);
+()=>{
+
+
+App.zoom+=0.1;
+
+
+if(App.zoom>App.maxZoom)
+App.zoom=App.maxZoom;
+
+
+
+updateZoom();
+
+
+
+});
+
+
+
+
 
 
 
@@ -175,8 +381,25 @@ document
 )
 ?.addEventListener(
 "click",
-()=>changeZoom(-.1)
-);
+()=>{
+
+
+App.zoom-=0.1;
+
+
+if(App.zoom<App.minZoom)
+App.zoom=App.minZoom;
+
+
+
+updateZoom();
+
+
+
+});
+
+
+
 
 
 
@@ -200,12 +423,16 @@ document
 saveStorage();
 
 
+
 toast(
-"Jogo salvo."
+"Salvo."
 );
 
 
+
 });
+
+
 
 
 
@@ -229,7 +456,9 @@ document
 loadStorage();
 
 
+
 renderTokens();
+
 
 
 toast(
@@ -237,7 +466,10 @@ toast(
 );
 
 
+
 });
+
+
 
 
 
@@ -258,14 +490,31 @@ document
 ()=>{
 
 
+
 if(
 confirm(
-"Limpar todos tokens?"
+"Remover todos os tokens?"
 )
 ){
 
 
-clearTokens();
+
+tokens=[];
+
+
+
+renderTokens();
+
+
+
+saveStorage();
+
+
+
+toast(
+"Mapa limpo."
+);
+
 
 
 }
@@ -273,6 +522,7 @@ clearTokens();
 
 
 });
+
 
 
 
@@ -311,8 +561,11 @@ DOM.map.style.backgroundColor=
 
 
 
+
+
+
 // ==========================================
-// UPLOAD MAPA
+// IMPORTAR MAPA
 // ==========================================
 
 
@@ -339,6 +592,8 @@ document
 
 
 
+
+
 document
 .getElementById(
 "mapLoader"
@@ -348,8 +603,10 @@ document
 e=>{
 
 
+
 const file =
 e.target.files[0];
+
 
 
 if(!file)
@@ -362,18 +619,21 @@ new FileReader();
 
 
 
-reader.onload=()=>{
+
+reader.onload=function(){
 
 
-DOM.map.style.backgroundImage=
+
+DOM.map.style.backgroundImage =
 `
 url(${reader.result})
 `;
 
 
 
-DOM.map.style.backgroundSize=
-"cover";
+DOM.map.classList.add(
+"image"
+);
 
 
 
