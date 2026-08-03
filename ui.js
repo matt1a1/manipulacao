@@ -1,335 +1,64 @@
 // ==========================================
-// INTERFACE RPG
+// MANIPULAÇÃO RPG
+// UI.JS
+// ==========================================
+
+
+
+// ==========================================
+// INICIAR
 // ==========================================
 
 
 window.addEventListener(
 "load",
-()=>{
-
-
-
-// ==========================================
-// TAMANHO DO TOKEN
-// ==========================================
-
-
-const sizeInput =
-document.getElementById(
-"tokenSize"
-);
-
-
-
-const sizeValue =
-document.getElementById(
-"tokenSizeValue"
-);
-
-
-
-if(sizeInput){
-
-
-sizeInput.addEventListener(
-"input",
-()=>{
-
-
-sizeValue.innerText =
-sizeInput.value+"px";
-
-
-});
-
-
-}
-
-
-
-
-
-// ==========================================
-// CRIAR TOKEN
-// ==========================================
-
-
-const createButton =
-document.getElementById(
-"createToken"
-);
-
-
-
-if(createButton){
-
-
-createButton.addEventListener(
-"click",
-()=>{
-
-
-
-const name =
-document.getElementById(
-"tokenName"
-).value.trim();
-
-
-
-const color =
-document.getElementById(
-"tokenColor"
-).value;
-
-
-
-const size =
-Number(
-document.getElementById(
-"tokenSize"
-).value
-);
-
-
-
-const imageInput =
-document.getElementById(
-"newTokenImage"
+initUI
 );
 
 
 
 
 
-if(name===""){
+function initUI(){
 
 
-toast(
-"Digite um nome para o token."
-);
 
+// HISTÓRICO
 
-return;
 
-
-}
-
-
-
-
-// SEM IMAGEM
-
-if(
-!imageInput.files.length
-){
-
-
-
-createToken({
-
-name:name,
-
-color:color,
-
-size:size
-
-});
-
-
-
-limparFormulario();
-
-
-
-return;
-
-
-}
-
-
-
-
-
-
-// COM IMAGEM
-
-const file =
-imageInput.files[0];
-
-
-
-const reader =
-new FileReader();
-
-
-
-
-reader.onload=function(){
-
-
-
-createToken({
-
-
-name:name,
-
-
-color:color,
-
-
-size:size,
-
-
-image:reader.result
-
-
-
-});
-
-
-
-limparFormulario();
-
-
-
-};
-
-
-
-reader.readAsDataURL(
-file
-);
-
-
-
-});
-
-
-}
-
-
-
-
-
-// ==========================================
-// LIMPAR FORMULARIO
-// ==========================================
-
-
-function limparFormulario(){
-
-
-document.getElementById(
-"tokenName"
-).value="";
-
-
-
-document.getElementById(
-"newTokenImage"
-).value="";
-
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// UNDO
-// ==========================================
-
-
-document
-.getElementById(
-"undo"
-)
-?.addEventListener(
-"click",
+bind(
+"undo",
 undo
 );
 
 
 
-
-
-
-// ==========================================
-// REDO
-// ==========================================
-
-
-document
-.getElementById(
-"redo"
-)
-?.addEventListener(
-"click",
+bind(
+"redo",
 redo
 );
 
 
 
-
-
-
-// ==========================================
 // COPIAR
-// ==========================================
 
 
-document
-.getElementById(
-"copy"
-)
-?.addEventListener(
-"click",
+bind(
+"copy",
 copySelection
 );
 
 
 
-
-
-
-// ==========================================
-// COLAR
-// ==========================================
-
-
-document
-.getElementById(
-"paste"
-)
-?.addEventListener(
-"click",
+bind(
+"paste",
 pasteSelection
 );
 
 
 
-
-
-
-
-
-// ==========================================
-// DUPLICAR
-// ==========================================
-
-
-document
-.getElementById(
-"duplicate"
-)
-?.addEventListener(
-"click",
+bind(
+"duplicate",
 duplicateSelection
 );
 
@@ -337,120 +66,33 @@ duplicateSelection
 
 
 
+// SAVE
 
 
-
-
-// ==========================================
-// ZOOM
-// ==========================================
-
-
-document
-.getElementById(
-"zoomIn"
-)
-?.addEventListener(
-"click",
-()=>{
-
-
-App.zoom+=0.1;
-
-
-if(App.zoom>App.maxZoom)
-App.zoom=App.maxZoom;
-
-
-
-updateZoom();
-
-
-
-});
-
-
-
-
-
-
-
-document
-.getElementById(
-"zoomOut"
-)
-?.addEventListener(
-"click",
-()=>{
-
-
-App.zoom-=0.1;
-
-
-if(App.zoom<App.minZoom)
-App.zoom=App.minZoom;
-
-
-
-updateZoom();
-
-
-
-});
-
-
-
-
-
-
-
-
-
-// ==========================================
-// SALVAR
-// ==========================================
-
-
-document
-.getElementById(
-"save"
-)
-?.addEventListener(
-"click",
-()=>{
-
-
-saveStorage();
-
-
-
-toast(
-"Salvo."
+bind(
+"save",
+saveStorage
 );
 
 
 
-});
 
 
+// LOAD
 
 
-
-
-
-
-// ==========================================
-// CARREGAR
-// ==========================================
-
-
-document
-.getElementById(
+const load =
+document.getElementById(
 "load"
-)
-?.addEventListener(
-"click",
-()=>{
+);
+
+
+
+if(load){
+
+
+load.onclick=function(){
+
 
 
 loadStorage();
@@ -467,7 +109,11 @@ toast(
 
 
 
-});
+};
+
+
+
+}
 
 
 
@@ -475,26 +121,252 @@ toast(
 
 
 
-
-// ==========================================
 // LIMPAR MAPA
-// ==========================================
+
+
+bind(
+"clearMap",
+clearMap
+);
+
+
+
+
+
+
+
+// MAPA PADRÃO
+
+
+bind(
+"defaultMap",
+defaultMap
+);
+
+
+
+
+
+
+
+// UPLOAD MAPA
+
+
+const upload =
+document.getElementById(
+"uploadMap"
+);
+
+
+
+if(upload){
+
+
+
+upload.onclick=function(){
+
 
 
 document
 .getElementById(
-"clearMap"
+"mapLoader"
 )
-?.addEventListener(
-"click",
-()=>{
+.click();
+
+
+
+};
+
+
+
+}
+
+
+
+
+
+
+
+
+
+const loader =
+document.getElementById(
+"mapLoader"
+);
+
+
+
+if(loader){
+
+
+
+loader.onchange=function(e){
+
+
+
+const file =
+e.target.files[0];
+
+
+
+if(!file)
+return;
+
+
+
+const reader =
+new FileReader();
+
+
+
+reader.onload=function(){
+
+
+
+DOM.map.style.backgroundImage =
+
+`url(${reader.result})`;
+
+
+
+DOM.map.classList.add(
+"image"
+);
+
+
+
+saveStorage();
+
+
+
+};
+
+
+
+reader.readAsDataURL(
+file
+);
+
+
+
+};
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+// FOG
+
+
+bind(
+"toggleFog",
+toggleFog
+);
+
+
+
+
+// GRID
+
+
+bind(
+"toggleGrid",
+toggleGrid
+);
+
+
+
+
+// RÉGUA
+
+
+bind(
+"toggleMeasure",
+toggleMeasure
+);
+
+
+
+
+// INICIATIVA
+
+
+bind(
+"initiative",
+openInitiative
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// BIND
+// ==========================================
+
+
+function bind(id,fn){
+
+
+
+const el =
+document.getElementById(id);
+
+
+
+if(el){
+
+
+
+el.onclick=fn;
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// MAPA
+// ==========================================
+
+
+function clearMap(){
 
 
 
 if(
 confirm(
-"Remover todos os tokens?"
+"Limpar tokens?"
 )
+
 ){
 
 
@@ -521,7 +393,7 @@ toast(
 
 
 
-});
+}
 
 
 
@@ -529,126 +401,261 @@ toast(
 
 
 
+function defaultMap(){
 
-
-// ==========================================
-// MAPA PADRÃO
-// ==========================================
-
-
-document
-.getElementById(
-"defaultMap"
-)
-?.addEventListener(
-"click",
-()=>{
 
 
 DOM.map.style.backgroundImage="";
 
 
 
-DOM.map.style.backgroundColor=
-"#0f172a";
-
-
-
-});
-
-
-
-
-
-
-
-
-
-// ==========================================
-// IMPORTAR MAPA
-// ==========================================
-
-
-document
-.getElementById(
-"uploadMap"
-)
-?.addEventListener(
-"click",
-()=>{
-
-
-document
-.getElementById(
-"mapLoader"
-)
-.click();
-
-
-
-});
-
-
-
-
-
-
-
-document
-.getElementById(
-"mapLoader"
-)
-?.addEventListener(
-"change",
-e=>{
-
-
-
-const file =
-e.target.files[0];
-
-
-
-if(!file)
-return;
-
-
-
-const reader =
-new FileReader();
-
-
-
-
-reader.onload=function(){
-
-
-
-DOM.map.style.backgroundImage =
-`
-url(${reader.result})
-`;
-
-
-
-DOM.map.classList.add(
+DOM.map.classList.remove(
 "image"
 );
 
 
 
+App.mapOffset={
+
+x:0,
+
+y:0
+
 };
 
 
 
-reader.readAsDataURL(
-file
+DOM.map.style.left="50%";
+
+DOM.map.style.top="50%";
+
+
+
+saveStorage();
+
+
+
+toast(
+"Mapa padrão."
 );
 
 
 
-});
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// FOG
+// ==========================================
+
+
+function toggleFog(){
+
+
+
+App.fogEnabled =
+!App.fogEnabled;
+
+
+
+if(App.fogEnabled){
+
+
+
+DOM.map.classList.add(
+"fog"
+);
+
+
+
+toast(
+"Fog ativado."
+);
+
+
+
+}
+
+else{
+
+
+DOM.map.classList.remove(
+"fog"
+);
+
+
+
+toast(
+"Fog desativado."
+);
+
+
+
+}
+
+
+
+saveStorage();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// RÉGUA
+// ==========================================
+
+
+function toggleMeasure(){
+
+
+
+App.measureMode =
+!App.measureMode;
+
+
+
+if(App.measureMode){
+
+
+
+toast(
+"Régua ativada."
+);
+
+
+
+}
+
+else{
+
+
+toast(
+"Régua desativada."
+);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// INICIATIVA
+// ==========================================
+
+
+function openInitiative(){
+
+
+
+const panel =
+document.getElementById(
+"initiativePanel"
+);
+
+
+
+if(!panel)
+return;
+
+
+
+panel.classList.toggle(
+"open"
+);
+
+
+
+renderInitiative();
+
+
+
+}
+
+
+
+
+
+
+
+function renderInitiative(){
+
+
+
+const list =
+document.getElementById(
+"initiativeList"
+);
+
+
+
+if(!list)
+return;
+
+
+
+list.innerHTML="";
+
+
+
+tokens.forEach(t=>{
+
+
+
+const div =
+document.createElement(
+"div"
+);
+
+
+
+div.className =
+"initiative-item";
+
+
+
+div.innerHTML=
+
+`
+<b>${t.name}</b>
+<br>
+HP: ${t.hp}/${t.maxHp}
+`;
+
+
+
+list.appendChild(div);
 
 
 
 });
+
+
+
+}
