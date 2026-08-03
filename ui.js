@@ -1,660 +1,661 @@
 // ==========================================
-// MANIPULAÇÃO RPG
 // UI.JS
+// MANIPULAÇÃO RPG
 // ==========================================
 
 
-
 // ==========================================
-// INICIAR
+// INICIALIZAÇÃO
 // ==========================================
-
 
 window.addEventListener(
 "load",
-initUI
-);
+()=>{
 
-
-
-
-
-function initUI(){
-
-
-
-// HISTÓRICO
-
-
-bind(
-"undo",
-undo
-);
-
-
-
-bind(
-"redo",
-redo
-);
-
-
-
-// COPIAR
-
-
-bind(
-"copy",
-copySelection
-);
-
-
-
-bind(
-"paste",
-pasteSelection
-);
-
-
-
-bind(
-"duplicate",
-duplicateSelection
-);
-
-
-
-
-
-// SAVE
-
-
-bind(
-"save",
-saveStorage
-);
-
-
-
-
-
-// LOAD
-
-
-const load =
-document.getElementById(
-"load"
-);
-
-
-
-if(load){
-
-
-load.onclick=function(){
-
-
-
-loadStorage();
-
-
-
-renderTokens();
-
-
-
-toast(
-"Carregado."
-);
-
-
-
-};
-
-
-
-}
-
-
-
-
-
-
-
-// LIMPAR MAPA
-
-
-bind(
-"clearMap",
-clearMap
-);
-
-
-
-
-
-
-
-// MAPA PADRÃO
-
-
-bind(
-"defaultMap",
-defaultMap
-);
-
-
-
-
-
-
-
-// UPLOAD MAPA
-
-
-const upload =
-document.getElementById(
-"uploadMap"
-);
-
-
-
-if(upload){
-
-
-
-upload.onclick=function(){
-
-
-
-document
-.getElementById(
-"mapLoader"
-)
-.click();
-
-
-
-};
-
-
-
-}
-
-
-
-
-
-
-
-
-
-const loader =
-document.getElementById(
-"mapLoader"
-);
-
-
-
-if(loader){
-
-
-
-loader.onchange=function(e){
-
-
-
-const file =
-e.target.files[0];
-
-
-
-if(!file)
-return;
-
-
-
-const reader =
-new FileReader();
-
-
-
-reader.onload=function(){
-
-
-
-DOM.map.style.backgroundImage =
-
-`url(${reader.result})`;
-
-
-
-DOM.map.classList.add(
-"image"
-);
-
-
-
-saveStorage();
-
-
-
-};
-
-
-
-reader.readAsDataURL(
-file
-);
-
-
-
-};
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-// FOG
-
-
-bind(
-"toggleFog",
-toggleFog
-);
-
-
-
-
-// GRID
-
-
-bind(
-"toggleGrid",
-toggleGrid
-);
-
-
-
-
-// RÉGUA
-
-
-bind(
-"toggleMeasure",
-toggleMeasure
-);
-
-
-
-
-// INICIATIVA
-
-
-bind(
-"initiative",
-openInitiative
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// BIND
-// ==========================================
-
-
-function bind(id,fn){
-
-
-
-const el =
-document.getElementById(id);
-
-
-
-if(el){
-
-
-
-el.onclick=fn;
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// MAPA
-// ==========================================
-
-
-function clearMap(){
-
-
-
-if(
-confirm(
-"Limpar tokens?"
-)
-
-){
-
-
-
-tokens=[];
-
-
-
-renderTokens();
-
-
-
-saveStorage();
-
-
-
-toast(
-"Mapa limpo."
-);
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-function defaultMap(){
-
-
-
-DOM.map.style.backgroundImage="";
-
-
-
-DOM.map.classList.remove(
-"image"
-);
-
-
-
-App.mapOffset={
-
-x:0,
-
-y:0
-
-};
-
-
-
-DOM.map.style.left="50%";
-
-DOM.map.style.top="50%";
-
-
-
-saveStorage();
-
-
-
-toast(
-"Mapa padrão."
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// FOG
-// ==========================================
-
-
-function toggleFog(){
-
-
-
-App.fogEnabled =
-!App.fogEnabled;
-
-
-
-if(App.fogEnabled){
-
-
-
-DOM.map.classList.add(
-"fog"
-);
-
-
-
-toast(
-"Fog ativado."
-);
-
-
-
-}
-
-else{
-
-
-DOM.map.classList.remove(
-"fog"
-);
-
-
-
-toast(
-"Fog desativado."
-);
-
-
-
-}
-
-
-
-saveStorage();
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// RÉGUA
-// ==========================================
-
-
-function toggleMeasure(){
-
-
-
-App.measureMode =
-!App.measureMode;
-
-
-
-if(App.measureMode){
-
-
-
-toast(
-"Régua ativada."
-);
-
-
-
-}
-
-else{
-
-
-toast(
-"Régua desativada."
-);
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ==========================================
-// INICIATIVA
-// ==========================================
-
-
-function openInitiative(){
-
-
-
-const panel =
-document.getElementById(
-"initiativePanel"
-);
-
-
-
-if(!panel)
-return;
-
-
-
-panel.classList.toggle(
-"open"
-);
-
-
-
-renderInitiative();
-
-
-
-}
-
-
-
-
-
-
-
-function renderInitiative(){
-
-
-
-const list =
-document.getElementById(
-"initiativeList"
-);
-
-
-
-if(!list)
-return;
-
-
-
-list.innerHTML="";
-
-
-
-tokens.forEach(t=>{
-
-
-
-const div =
-document.createElement(
-"div"
-);
-
-
-
-div.className =
-"initiative-item";
-
-
-
-div.innerHTML=
-
-`
-<b>${t.name}</b>
-<br>
-HP: ${t.hp}/${t.maxHp}
-`;
-
-
-
-list.appendChild(div);
-
-
+    registerUI();
 
 });
+
+
+
+
+
+// ==========================================
+// REGISTRAR EVENTOS DA UI
+// ==========================================
+
+
+function registerUI(){
+
+
+
+    // ==========================
+    // ZOOM
+    // ==========================
+
+
+    const zoomIn =
+    document.getElementById(
+        "zoomIn"
+    );
+
+
+    const zoomOut =
+    document.getElementById(
+        "zoomOut"
+    );
+
+
+
+    if(zoomIn){
+
+
+        zoomIn.onclick=()=>{
+
+
+            App.zoom+=0.1;
+
+
+            if(App.zoom>App.maxZoom){
+
+                App.zoom=App.maxZoom;
+
+            }
+
+
+            updateZoom();
+
+
+        };
+
+
+    }
+
+
+
+
+
+    if(zoomOut){
+
+
+        zoomOut.onclick=()=>{
+
+
+            App.zoom-=0.1;
+
+
+            if(App.zoom<App.minZoom){
+
+                App.zoom=App.minZoom;
+
+            }
+
+
+            updateZoom();
+
+
+        };
+
+
+    }
+
+
+
+
+
+
+    // ==========================
+    // HISTÓRICO
+    // ==========================
+
+
+    const undoButton =
+    document.getElementById(
+        "undo"
+    );
+
+
+    const redoButton =
+    document.getElementById(
+        "redo"
+    );
+
+
+
+    if(undoButton){
+
+        undoButton.onclick=undo;
+
+    }
+
+
+
+    if(redoButton){
+
+        redoButton.onclick=redo;
+
+    }
+
+
+
+
+
+
+
+    // ==========================
+    // COPIAR
+    // ==========================
+
+
+    const copy =
+    document.getElementById(
+        "copy"
+    );
+
+
+
+    if(copy){
+
+        copy.onclick=
+        copySelection;
+
+    }
+
+
+
+
+
+
+
+    // ==========================
+    // COLAR
+    // ==========================
+
+
+    const paste =
+    document.getElementById(
+        "paste"
+    );
+
+
+
+    if(paste){
+
+        paste.onclick=
+        pasteSelection;
+
+    }
+
+
+
+
+
+
+
+    // ==========================
+    // DUPLICAR
+    // ==========================
+
+
+    const duplicate =
+    document.getElementById(
+        "duplicate"
+    );
+
+
+
+    if(duplicate){
+
+        duplicate.onclick=
+        duplicateSelection;
+
+    }
+
+
+
+
+
+
+
+
+    // ==========================
+    // SALVAR
+    // ==========================
+
+
+    const save =
+    document.getElementById(
+        "save"
+    );
+
+
+
+    if(save){
+
+
+        save.onclick=()=>{
+
+
+            saveStorage();
+
+
+            toast(
+                "Mesa salva."
+            );
+
+
+        };
+
+
+    }
+
+
+
+
+
+
+
+    // ==========================
+    // CARREGAR
+    // ==========================
+
+
+    const load =
+    document.getElementById(
+        "load"
+    );
+
+
+
+    if(load){
+
+
+        load.onclick=()=>{
+
+
+            loadStorage();
+
+
+            renderTokens();
+
+
+            updateZoom();
+
+
+            toast(
+                "Mesa carregada."
+            );
+
+
+        };
+
+
+    }
+
+
+
+
+
+
+
+
+    // ==========================
+    // CRIAR TOKEN
+    // ==========================
+
+
+    const create =
+    document.getElementById(
+        "createToken"
+    );
+
+
+
+    if(create){
+
+
+        create.onclick=
+        createToken;
+
+
+    }
+
+
+
+
+
+
+
+
+    // ==========================
+    // GRID
+    // ==========================
+
+
+    const grid =
+    document.getElementById(
+        "toggleGrid"
+    );
+
+
+
+    if(grid){
+
+
+        grid.onclick=()=>{
+
+
+            App.gridVisible =
+            !App.gridVisible;
+
+
+
+            if(
+                typeof updateGrid === "function"
+            ){
+
+                updateGrid();
+
+            }
+
+
+
+            saveStorage();
+
+
+
+            toast(
+
+                App.gridVisible
+
+                ?
+
+                "Grid ativado."
+
+                :
+
+                "Grid desativado."
+
+            );
+
+
+        };
+
+
+    }
+
+
+
+
+
+
+
+    // ==========================
+    // FOG
+    // ==========================
+
+
+    const fog =
+    document.getElementById(
+        "toggleFog"
+    );
+
+
+
+    if(fog){
+
+
+        fog.onclick=()=>{
+
+
+            App.fogEnabled =
+            !App.fogEnabled;
+
+
+
+            if(
+                typeof toggleFog === "function"
+            ){
+
+                toggleFog();
+
+            }
+
+
+
+            saveStorage();
+
+
+
+            toast(
+
+                App.fogEnabled
+
+                ?
+
+                "Fog ativado."
+
+                :
+
+                "Fog desativado."
+
+            );
+
+
+        };
+
+
+    }
+
+
+
+
+
+
+
+
+    // ==========================
+    // RÉGUA
+    // ==========================
+
+
+    const measure =
+    document.getElementById(
+        "toggleMeasure"
+    );
+
+
+
+    if(measure){
+
+
+        measure.onclick=()=>{
+
+
+            App.measureMode =
+            !App.measureMode;
+
+
+
+            toast(
+
+                App.measureMode
+
+                ?
+
+                "Régua ativada."
+
+                :
+
+                "Régua desativada."
+
+            );
+
+
+        };
+
+
+    }
+
+
+
+
+
+
+
+
+    // ==========================
+    // MAPA PADRÃO
+    // ==========================
+
+
+    const defaultMap =
+    document.getElementById(
+        "defaultMap"
+    );
+
+
+
+    if(defaultMap){
+
+
+        defaultMap.onclick=()=>{
+
+
+            DOM.map.style.backgroundImage="";
+
+
+
+            DOM.map.classList.remove(
+                "image"
+            );
+
+
+
+            localStorage.removeItem(
+                "manipulacao_map"
+            );
+
+
+
+            toast(
+                "Mapa padrão."
+            );
+
+
+        };
+
+
+    }
+
+
+
+
+
+
+
+
+    // ==========================
+    // LIMPAR MAPA
+    // ==========================
+
+
+    const clear =
+    document.getElementById(
+        "clearMap"
+    );
+
+
+
+    if(clear){
+
+
+        clear.onclick=()=>{
+
+
+            if(
+                confirm(
+                    "Apagar todos os tokens?"
+                )
+            ){
+
+
+                saveHistory();
+
+
+
+                tokens=[];
+
+
+
+                renderTokens();
+
+
+
+                saveStorage();
+
+
+
+                toast(
+                    "Mapa limpo."
+                );
+
+
+            }
+
+
+        };
+
+
+    }
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// ATUALIZAR BOTÃO GRID
+// ==========================================
+
+
+function updateUI(){
+
+
+
+    const grid =
+    document.getElementById(
+        "toggleGrid"
+    );
+
+
+
+    if(grid){
+
+
+        grid.textContent =
+
+        App.gridVisible
+
+        ?
+
+        "Grid ON"
+
+        :
+
+        "Grid OFF";
+
+
+    }
+
 
 
 
