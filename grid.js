@@ -6,18 +6,13 @@
 
 
 // ==========================================
-// INICIALIZAÇÃO
+// INICIAR GRID
 // ==========================================
 
 
 window.addEventListener(
 "load",
-()=>{
-
-    initGrid();
-
-}
-
+initGrid
 );
 
 
@@ -27,31 +22,39 @@ window.addEventListener(
 function initGrid(){
 
 
-    const button =
-    document.getElementById(
-    "toggleGrid"
-    );
+
+const button =
+document.getElementById(
+"toggleGrid"
+);
 
 
 
-    if(button){
+if(button){
 
 
-        button.addEventListener(
-        "click",
-        toggleGrid
-        );
-
-
-    }
+button.onclick=function(){
 
 
 
-    updateGrid();
+toggleGrid();
+
+
+
+};
 
 
 
 }
+
+
+
+applyGrid();
+
+
+
+}
+
 
 
 
@@ -67,36 +70,42 @@ function initGrid(){
 function toggleGrid(){
 
 
-    saveHistory();
+
+App.gridVisible =
+!App.gridVisible;
 
 
 
-    App.gridVisible =
-    !App.gridVisible;
+applyGrid();
 
 
 
-    updateGrid();
+saveStorage();
 
 
 
-    saveStorage();
+if(App.gridVisible){
 
 
 
-    toast(
+toast(
+"Grid ativado."
+);
 
-    App.gridVisible
 
-    ?
 
-    "Grid ativado."
+}
 
-    :
+else{
 
-    "Grid desativado."
 
-    );
+toast(
+"Grid desativado."
+);
+
+
+
+}
 
 
 
@@ -108,42 +117,52 @@ function toggleGrid(){
 
 
 
+
+
 // ==========================================
-// ATUALIZAR GRID
+// APLICAR GRID
 // ==========================================
 
 
-function updateGrid(){
-
-
-    if(!DOM.map)
-    return;
+function applyGrid(){
 
 
 
-    if(App.gridVisible){
+if(!DOM.map)
+return;
 
 
-        DOM.map.classList.add(
-        "grid50"
-        );
 
 
-    }
-
-    else{
-
-
-        DOM.map.classList.remove(
-        "grid50"
-        );
+if(
+App.gridVisible
+){
 
 
-    }
+
+DOM.map.classList.add(
+"grid50"
+);
 
 
 
 }
+
+else{
+
+
+DOM.map.style.backgroundImage =
+"none";
+
+
+
+}
+
+
+
+}
+
+
 
 
 
@@ -156,128 +175,18 @@ function updateGrid(){
 // ==========================================
 
 
-function setGridSize(size){
+function changeGridSize(size){
 
 
-    App.gridSize =
-    size;
 
+App.gridSize =
+size;
 
 
-    DOM.map.classList.remove(
-    "grid25",
-    "grid50",
-    "grid75",
-    "grid100"
-    );
 
+DOM.map.style.backgroundSize =
 
-
-    DOM.map.classList.add(
-    "grid"+size
-    );
-
-
-
-    saveStorage();
-
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// SNAP
-// ==========================================
-
-
-function snapPosition(x,y){
-
-
-
-if(!App.snapGrid)
-
-return {
-
-x:x,
-
-y:y
-
-};
-
-
-
-
-const grid =
-App.gridSize;
-
-
-
-return {
-
-
-x:
-Math.round(
-x/grid
-)
-*
-grid,
-
-
-
-y:
-Math.round(
-y/grid
-)
-*
-grid
-
-
-
-};
-
-
-
-}
-
-
-
-
-
-
-
-// ==========================================
-// ATIVAR/DESATIVAR SNAP
-// ==========================================
-
-
-function toggleSnap(){
-
-
-App.snapGrid =
-!App.snapGrid;
-
-
-
-toast(
-
-App.snapGrid
-
-?
-
-"Snap ativado."
-
-:
-
-"Snap desativado."
-
-);
+size+"px "+size+"px";
 
 
 
@@ -293,105 +202,37 @@ saveStorage();
 
 
 
+
+
 // ==========================================
-// CALCULAR POSIÇÃO DO MOUSE
+// RESET GRID
 // ==========================================
 
 
-function getMapPosition(event){
+function resetGrid(){
 
 
 
-const rect =
-DOM.map.getBoundingClientRect();
+App.gridSize=50;
 
 
 
-
-let x =
-(event.clientX - rect.left)
-/
-App.zoom;
+App.gridVisible=true;
 
 
 
-let y =
-(event.clientY - rect.top)
-/
-App.zoom;
+applyGrid();
 
 
 
+saveStorage();
 
 
-return snapPosition(
-x,
-y
+
+toast(
+"Grid restaurado."
 );
 
 
 
 }
-
-
-
-
-
-
-
-// ==========================================
-// GRID DINÂMICO COM ZOOM
-// ==========================================
-
-
-function refreshGridZoom(){
-
-
-
-if(!DOM.map)
-return;
-
-
-
-
-const size =
-App.gridSize *
-App.zoom;
-
-
-
-DOM.map.style.backgroundSize =
-
-`${size}px ${size}px`;
-
-
-
-}
-
-
-
-
-
-
-// Atualiza quando zoom mudar
-
-const oldUpdateZoom =
-window.updateZoom;
-
-
-
-window.updateZoom =
-function(){
-
-
-if(oldUpdateZoom)
-
-oldUpdateZoom();
-
-
-
-refreshGridZoom();
-
-
-
-};
