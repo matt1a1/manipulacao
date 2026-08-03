@@ -1,0 +1,393 @@
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+#sidebar{
+
+    width:100%;
+    height:100vh;
+
+    display:flex;
+    flex-direction:column;
+
+    background:linear-gradient(
+        180deg,
+        #111827,
+        #0f172a
+    );
+
+    border-right:1px solid #334155;
+
+    overflow:hidden;
+
+}
+
+/* ==========================
+HEADER
+========================== */
+
+#sidebar header{
+
+    padding:30px;
+
+    border-bottom:1px solid #334155;
+
+}
+
+#sidebar header h1{
+
+    font-size:30px;
+    font-weight:800;
+
+    color:#ffffff;
+
+    letter-spacing:-1px;
+
+}
+
+#sidebar header span{
+
+    display:block;
+
+    margin-top:8px;
+
+    color:#94a3b8;
+
+    font-size:13px;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+}
+
+/* ==========================
+SECTIONS
+========================== */
+
+#sidebar section{
+
+    padding:22px;
+
+}
+
+#sidebar h2,
+#sidebar h3{
+
+    font-size:15px;
+
+    margin-bottom:18px;
+
+    color:#f8fafc;
+
+}
+
+/* ==========================
+LIBRARY
+========================== */
+
+.library{
+
+    flex:1;
+
+    overflow-y:auto;
+
+}
+
+.library-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+/* ==========================
+TOKEN CARD
+========================== */
+
+.token-card{
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:15px;
+
+    margin-bottom:12px;
+
+    background:#1e293b;
+
+    border:1px solid #334155;
+
+    border-radius:18px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.token-card:hover{
+
+    transform:translateY(-4px);
+
+    border-color:#6366f1;
+
+    box-shadow:
+
+        0 10px 25px rgba(99,102,241,.25);
+
+}
+
+.token-preview{
+
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-weight:bold;
+
+    color:white;
+
+    flex-shrink:0;
+
+    border:3px solid rgba(255,255,255,.25);
+
+}
+
+.token-info{
+
+    flex:1;
+
+}
+
+.token-name{
+
+    font-weight:700;
+
+    color:white;
+
+    margin-bottom:4px;
+
+}
+
+.token-type{
+
+    font-size:12px;
+
+    color:#94a3b8;
+
+}
+
+/* ==========================
+DELETE
+========================== */
+
+.delete-library{
+
+    width:28px;
+    height:28px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#ef4444;
+
+    color:white;
+
+    font-size:18px;
+
+    opacity:0;
+
+    transition:.2s;
+
+}
+
+.token-card:hover .delete-library{
+
+    opacity:1;
+
+}
+
+/* ==========================
+NOVO TOKEN
+========================== */
+
+.create-token{
+
+    border-top:1px solid #334155;
+
+    background:#111827;
+
+}
+
+.create-token input{
+
+    margin-bottom:15px;
+
+}
+
+.create-token button{
+
+    width:100%;
+
+    height:48px;
+
+    font-size:15px;
+
+}
+
+/* ==========================
+FERRAMENTAS
+========================== */
+
+.quickTools{
+
+    border-top:1px solid #334155;
+
+}
+
+.quickTools button{
+
+    width:100%;
+
+    margin-bottom:10px;
+
+    background:#1e293b;
+
+}
+
+.quickTools button:hover{
+
+    background:#6366f1;
+
+}
+
+/* ==========================
+BADGES
+========================== */
+
+.badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:4px 10px;
+
+    border-radius:999px;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    color:white;
+
+    background:#6366f1;
+
+}
+
+/* ==========================
+PESQUISA
+========================== */
+
+.library-search{
+
+    margin-bottom:18px;
+
+}
+
+.library-search input{
+
+    width:100%;
+
+}
+
+/* ==========================
+SCROLL
+========================== */
+
+.library::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.library::-webkit-scrollbar-thumb{
+
+    background:#475569;
+
+    border-radius:999px;
+
+}
+
+/* ==========================
+ANIMAÇÃO
+========================== */
+
+.token-card{
+
+    animation:fadeCard .25s ease;
+
+}
+
+@keyframes fadeCard{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(-15px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+}
+
+/* ==========================
+RESPONSIVO
+========================== */
+
+@media(max-width:760px){
+
+    #sidebar{
+
+        width:320px;
+
+        position:absolute;
+
+        z-index:999;
+
+        box-shadow:0 0 40px rgba(0,0,0,.6);
+
+    }
+
+}
