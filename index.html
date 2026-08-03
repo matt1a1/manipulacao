@@ -1,623 +1,343 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manipulação • Mesa Virtual de RPG</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap');
 
-        :root {
-            --map-width: 1280px;
-            --map-height: 720px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * {
-            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 200ms;
-        }
+<title>Manipulação RPG</title>
 
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        #map {
-            width: var(--map-width);
-            height: var(--map-height);
-            background-color: #0f172a;
-            background-image: 
-                linear-gradient(#1e2937 1px, transparent 0),
-                linear-gradient(90deg, #1e2937 1px, transparent 0);
-            background-size: 50px 50px;
-            box-shadow: 0 25px 50px -12px rgb(15 23 42);
-            position: relative;
-            overflow: hidden;
-            border: 8px solid #1e2937;
-            border-radius: 16px;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-        .token {
-            position: absolute;
-            width: 72px;
-            height: 72px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9999px;
-            box-shadow: 
-                0 10px 15px -3px rgb(15 23 42),
-                0 0 0 5px rgba(255,255,255,0.15) inset;
-            cursor: grab;
-            user-select: none;
-            font-family: 'Inter', system-ui, sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            text-align: center;
-            line-height: 1.1;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-            border: 4px solid rgba(255,255,255,0.25);
-            z-index: 10;
-            letter-spacing: -0.02em;
-        }
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/map.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/toolbar.css">
+<link rel="stylesheet" href="css/animations.css">
 
-        .token:active {
-            cursor: grabbing;
-        }
-
-        .token .label {
-            max-width: 56px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            padding: 2px 4px;
-            background: rgba(15, 23, 42, 0.7);
-            border-radius: 9999px;
-        }
-
-        .delete-btn {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background: #ef4444;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 700;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 30;
-            line-height: 1;
-        }
-
-        .library-card {
-            position: relative;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .library-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgb(15 23 42);
-        }
-
-        .map-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: calc(100vh - 4rem);
-            background: linear-gradient(180deg, #0f172a 0%, #1e2937 100%);
-        }
-
-        .header-title {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.04em;
-            color: #f1f5f9;
-        }
-    </style>
 </head>
-<body class="bg-slate-950 text-slate-200">
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <!-- SIDEBAR - Biblioteca de Tokens -->
-        <div class="w-80 bg-slate-900 border-r border-slate-700 flex flex-col shadow-xl">
-            
-            <!-- Cabeçalho -->
-            <div class="p-8 border-b border-slate-700">
-                <div class="flex items-center gap-4">
-                    <div class="w-9 h-9 bg-indigo-600 rounded-2xl flex items-center justify-center text-xl shadow-inner">🌀</div>
-                    <div>
-                        <h1 class="header-title">MANIPULAÇÃO</h1>
-                        <p class="text-slate-400 text-sm tracking-widest">MESA VIRTUAL DE RPG</p>
-                    </div>
-                </div>
-            </div>
+<body>
 
-            <!-- Biblioteca -->
-            <div class="flex-1 p-8 overflow-y-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
-                        Biblioteca de Tokens
-                    </h2>
-                    <button onclick="resetLibrary()" 
-                            class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 px-4 py-2 rounded-xl flex items-center gap-1 font-medium">
-                        RESTAURAR PADRÃO
-                    </button>
-                </div>
+<div id="loading">
 
-                <div id="library" class="grid grid-cols-2 gap-4"></div>
-            </div>
+<div class="loader"></div>
 
-            <!-- Adicionar novo token -->
-            <div class="p-8 border-t border-slate-700 bg-slate-950">
-                <h3 class="text-sm font-medium text-slate-400 mb-4">ADICIONAR NOVO TOKEN</h3>
-                <div class="flex gap-3">
-                    <input id="new-token-name" 
-                           type="text" 
-                           placeholder="Nome do token"
-                           class="flex-1 bg-slate-800 border border-slate-600 focus:border-indigo-500 rounded-2xl px-5 py-4 text-sm outline-none">
-                    <input id="new-token-color" 
-                           type="color" 
-                           value="#6366f1"
-                           class="w-14 h-12 bg-slate-800 border border-slate-600 rounded-2xl cursor-pointer">
-                    <button onclick="addNewToken()"
-                            class="bg-indigo-600 hover:bg-indigo-500 px-8 rounded-2xl font-semibold text-sm flex items-center justify-center">
-                        +
-                    </button>
-                </div>
-                <p class="text-xs text-slate-500 mt-4">Clique em um token para posicioná-lo no mapa</p>
-            </div>
-        </div>
+<h2>Manipulação RPG</h2>
 
-        <!-- ÁREA PRINCIPAL -->
-        <div class="flex-1 flex flex-col">
-            
-            <!-- Toolbar -->
-            <div class="h-16 bg-slate-900 border-b border-slate-700 px-8 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <button onclick="uploadBackground()" 
-                            class="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 text-slate-200 px-6 py-3 rounded-2xl text-sm font-medium">
-                        📸 ALTERAR MAPA
-                    </button>
-                    
-                    <button onclick="clearBackground()" 
-                            class="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 text-slate-200 px-6 py-3 rounded-2xl text-sm font-medium">
-                        🗺️ MAPA PADRÃO
-                    </button>
+<p>Carregando recursos...</p>
 
-                    <button onclick="clearMap()" 
-                            class="flex items-center gap-3 bg-red-900/70 hover:bg-red-900 text-red-200 px-6 py-3 rounded-2xl text-sm font-medium">
-                        🗑️ LIMPAR MAPA
-                    </button>
-                </div>
+</div>
 
-                <div class="flex items-center gap-8">
-                    <div class="flex items-center gap-2 text-emerald-400 text-sm font-medium">
-                        <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full"></div>
-                        MESA PRONTA
-                    </div>
+<div id="app">
 
-                    <button onclick="saveState()" 
-                            class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 px-7 py-3 rounded-2xl text-sm font-semibold">
-                        💾 SALVAR SESSÃO
-                    </button>
+<!-- ====================================== -->
+<!-- SIDEBAR -->
+<!-- ====================================== -->
 
-                    <button onclick="loadState()" 
-                            class="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-7 py-3 rounded-2xl text-sm font-semibold">
-                        📂 CARREGAR SESSÃO
-                    </button>
+<aside id="sidebar">
 
-                    <a href="https://github.com" target="_blank"
-                       class="flex items-center gap-2 text-slate-400 hover:text-slate-100 text-sm font-medium">
-                        <span class="text-xl">🐙</span>
-                        GitHub
-                    </a>
-                </div>
+<header>
 
-                <div class="text-xs text-slate-400 font-medium">
-                    Manipulação v1.1 • Totalmente personalizável
-                </div>
-            </div>
+<h1>🎲 Manipulação</h1>
 
-            <!-- Mapa -->
-            <div class="flex-1 map-container p-8 overflow-auto">
-                <div id="map" class="shadow-2xl mx-auto"></div>
-            </div>
+<span>Mesa Virtual</span>
 
-            <!-- Rodapé -->
-            <div class="h-14 bg-slate-900 border-t border-slate-700 flex items-center px-8 text-xs text-slate-400 font-medium">
-                <div class="flex-1">
-                    Arraste os tokens para mover • Clique no × para remover • Posição salva automaticamente
-                </div>
-                <div class="flex items-center gap-8">
-                    <div onclick="toggleGrid()" class="cursor-pointer flex items-center gap-2 hover:text-slate-200">
-                        <span id="grid-status" class="font-semibold text-emerald-400">GRID: ATIVADO</span>
-                    </div>
-                    <div class="text-slate-500">© 2026 • Desenvolvido para uso pessoal</div>
-                </div>
-            </div>
-        </div>
-    </div>
+</header>
 
-    <script>
-        // ==================== DADOS INICIAIS ====================
-        let library = [
-            { id: 1, name: "Alec", color: "#ef4444" },
-            { id: 2, name: "Franck", color: "#f59e0b" },
-            { id: 3, name: "Audric", color: "#3b82f6" },
-            { id: 4, name: "Anthony", color: "#10b981" },
-            { id: 5, name: "Joúta", color: "#a855f7" },
-            { id: 6, name: "Flora", color: "#ec4899" },
-            { id: 7, name: "Connor", color: "#14b8a6" },
-            { id: 8, name: "Cyrus", color: "#eab308" },
-            { id: 9, name: "Rabisco", color: "#78716c" },
-            { id: 10, name: "Hachi", color: "#06b67f" },
-            { id: 11, name: "NPC", color: "#64748b" },
-            { id: 12, name: "BOSS", color: "#b91c1c" }
-        ]
+<section class="library">
 
-        let placedTokens = []
-        let maxZ = 100
-        let currentBgUrl = null
-        let gridEnabled = true
+<div class="library-header">
 
-        // ==================== RENDER BIBLIOTECA ====================
-        function renderLibrary() {
-            const container = document.getElementById('library')
-            container.innerHTML = ''
+<h2>Biblioteca</h2>
 
-            library.forEach(token => {
-                const card = document.createElement('div')
-                card.className = `library-card bg-slate-800 border border-slate-600 rounded-3xl p-5 flex flex-col items-center cursor-pointer`
-                card.innerHTML = `
-                    <div class="w-14 h-14 rounded-3xl flex items-center justify-center text-3xl mb-3 shadow-inner" 
-                         style="background-color: ${token.color}">
-                        ${token.name === 'BOSS' ? '👹' : token.name === 'NPC' ? '🧙' : '🔮'}
-                    </div>
-                    <span class="text-base font-semibold text-slate-100">${token.name}</span>
-                    
-                    <div onclick="event.stopImmediatePropagation(); removeFromLibrary(${token.id});" 
-                         class="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white w-6 h-6 rounded-2xl flex items-center justify-center text-xl leading-none shadow-md">
-                        ×
-                    </div>
-                `
-                card.onclick = () => addTokenToMap(token)
-                container.appendChild(card)
-            })
+<button id="resetLibrary">
 
-            if (library.length === 0) {
-                container.innerHTML = `<div class="col-span-2 text-center py-12 text-slate-400 text-sm">Nenhum token cadastrado.<br>Utilize o campo abaixo para adicionar.</div>`
-            }
-        }
+Restaurar
 
-        // ==================== ADICIONAR TOKEN NO MAPA ====================
-        function addTokenToMap(token) {
-            const map = document.getElementById('map')
-            
-            const newToken = {
-                id: Date.now(),
-                name: token.name,
-                color: token.color,
-                left: `${15 + Math.random() * 70}%`,
-                top: `${15 + Math.random() * 65}%`
-            }
-            
-            placedTokens.push(newToken)
-            renderPlacedTokens()
-            
-            // Feedback discreto
-            const toast = document.createElement('div')
-            toast.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1e2937; color:#e0f2fe; padding:12px 28px; border-radius:9999px; box-shadow:0 10px 15px -3px rgb(15 23 42); font-size:13px; z-index:9999; border:1px solid #334155;'
-            toast.textContent = `${token.name} adicionado ao mapa`
-            document.body.appendChild(toast)
-            setTimeout(() => toast.remove(), 1600)
-        }
+</button>
 
-        // ==================== RENDER TOKENS NO MAPA ====================
-        function renderPlacedTokens() {
-            const map = document.getElementById('map')
-            const existing = map.querySelectorAll('.token')
-            existing.forEach(el => el.remove())
+</div>
 
-            placedTokens.forEach(tokenData => {
-                const tokenEl = document.createElement('div')
-                tokenEl.className = 'token'
-                tokenEl.style.left = tokenData.left
-                tokenEl.style.top = tokenData.top
-                tokenEl.style.backgroundColor = tokenData.color
-                tokenEl.innerHTML = `
-                    <div class="label">${tokenData.name}</div>
-                    <div class="delete-btn" onclick="deleteToken(${tokenData.id}); event.stopImmediatePropagation();">×</div>
-                `
-                map.appendChild(tokenEl)
-                makeDraggable(tokenEl, tokenData)
-            })
-        }
+<div id="libraryList">
 
-        // ==================== DRAG AND DROP ====================
-        function makeDraggable(element, tokenData) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0
+</div>
 
-            element.onmousedown = dragMouseDown
+</section>
 
-            function dragMouseDown(e) {
-                if (e.target.classList.contains('delete-btn')) return
-                
-                element.style.zIndex = ++maxZ
-                
-                e.preventDefault()
-                pos3 = e.clientX
-                pos4 = e.clientY
-                
-                document.onmouseup = closeDragElement
-                document.onmousemove = elementDrag
-            }
+<section class="create-token">
 
-            function elementDrag(e) {
-                e.preventDefault()
-                
-                pos1 = pos3 - e.clientX
-                pos2 = pos4 - e.clientY
-                pos3 = e.clientX
-                pos4 = e.clientY
-                
-                const mapRect = document.getElementById('map').getBoundingClientRect()
-                
-                let newLeft = element.offsetLeft - pos1
-                let newTop = element.offsetTop - pos2
-                
-                newLeft = Math.max(0, Math.min(newLeft, mapRect.width - element.offsetWidth))
-                newTop = Math.max(0, Math.min(newTop, mapRect.height - element.offsetHeight))
-                
-                const leftPercent = Math.round((newLeft / mapRect.width) * 100)
-                const topPercent = Math.round((newTop / mapRect.height) * 100)
-                
-                element.style.left = `${leftPercent}%`
-                element.style.top = `${topPercent}%`
-                
-                tokenData.left = `${leftPercent}%`
-                tokenData.top = `${topPercent}%`
-            }
+<h3>Novo Token</h3>
 
-            function closeDragElement() {
-                document.onmouseup = null
-                document.onmousemove = null
-                saveState()
-            }
-        }
+<input
+type="text"
+id="tokenName"
+placeholder="Nome">
 
-        // ==================== DELETAR TOKEN ====================
-        function deleteToken(id) {
-            placedTokens = placedTokens.filter(t => t.id !== id)
-            renderPlacedTokens()
-        }
+<input
+type="color"
+id="tokenColor"
+value="#6366f1">
 
-        // ==================== ADICIONAR NOVO TOKEN NA BIBLIOTECA ====================
-        function addNewToken() {
-            const nameInput = document.getElementById('new-token-name')
-            const colorInput = document.getElementById('new-token-color')
-            
-            const name = nameInput.value.trim()
-            
-            if (!name) {
-                alert('Por favor, insira um nome para o token.')
-                return
-            }
-            
-            const newToken = {
-                id: Date.now(),
-                name: name,
-                color: colorInput.value
-            }
-            
-            library.unshift(newToken)
-            renderLibrary()
-            nameInput.value = ''
-            saveState()
-        }
+<button id="createToken">
 
-        // ==================== REMOVER DA BIBLIOTECA ====================
-        function removeFromLibrary(id) {
-            if (confirm('Remover este token da biblioteca permanentemente?')) {
-                library = library.filter(t => t.id !== id)
-                renderLibrary()
-                saveState()
-            }
-        }
+Adicionar
 
-        // ==================== RESETAR BIBLIOTECA ====================
-        function resetLibrary() {
-            if (confirm('Restaurar todos os tokens originais?')) {
-                library = [
-                    { id: 1, name: "Alec", color: "#ef4444" },
-                    { id: 2, name: "Franck", color: "#f59e0b" },
-                    { id: 3, name: "Audric", color: "#3b82f6" },
-                    { id: 4, name: "Anthony", color: "#10b981" },
-                    { id: 5, name: "Joúta", color: "#a855f7" },
-                    { id: 6, name: "Flora", color: "#ec4899" },
-                    { id: 7, name: "Connor", color: "#14b8a6" },
-                    { id: 8, name: "Cyrus", color: "#eab308" },
-                    { id: 9, name: "Rabisco", color: "#78716c" },
-                    { id: 10, name: "Hachi", color: "#06b67f" },
-                    { id: 11, name: "NPC", color: "#64748b" },
-                    { id: 12, name: "BOSS", color: "#b91c1c" }
-                ]
-                renderLibrary()
-                saveState()
-            }
-        }
+</button>
 
-        // ==================== UPLOAD DE MAPA ====================
-        function uploadBackground() {
-            const input = document.createElement('input')
-            input.type = 'file'
-            input.accept = 'image/*'
-            input.onchange = function(e) {
-                const file = e.target.files[0]
-                if (!file) return
-                
-                const reader = new FileReader()
-                reader.onload = function(ev) {
-                    const map = document.getElementById('map')
-                    currentBgUrl = ev.target.result
-                    map.style.backgroundImage = `url('${currentBgUrl}')`
-                    map.style.backgroundSize = 'cover'
-                    map.style.backgroundPosition = 'center'
-                    gridEnabled = false
-                    updateGridStatus()
-                    saveState()
-                }
-                reader.readAsDataURL(file)
-            }
-            input.click()
-        }
+</section>
 
-        // ==================== MAPA PADRÃO ====================
-        function clearBackground() {
-            const map = document.getElementById('map')
-            currentBgUrl = null
-            map.style.backgroundImage = ''
-            map.style.backgroundColor = '#0f172a'
-            map.style.backgroundSize = '50px 50px'
-            gridEnabled = true
-            updateGridStatus()
-            saveState()
-        }
+<section class="quickTools">
 
-        // ==================== LIMPAR MAPA ====================
-        function clearMap() {
-            if (confirm('Remover TODOS os tokens do mapa? Esta ação não pode ser desfeita.')) {
-                placedTokens = []
-                renderPlacedTokens()
-            }
-        }
+<h3>Ferramentas</h3>
 
-        // ==================== SALVAR ESTADO ====================
-        function saveState() {
-            const state = {
-                library: library,
-                placedTokens: placedTokens,
-                background: currentBgUrl,
-                gridEnabled: gridEnabled
-            }
-            localStorage.setItem('manipulacaoRPG_v1', JSON.stringify(state))
-        }
+<button id="toggleGrid">
 
-        // ==================== CARREGAR ESTADO ====================
-        function loadState() {
-            const saved = localStorage.getItem('manipulacaoRPG_v1')
-            if (!saved) {
-                alert('Nenhuma sessão salva encontrada.')
-                return
-            }
-            
-            const state = JSON.parse(saved)
-            
-            if (state.library) library = state.library
-            if (state.placedTokens) placedTokens = state.placedTokens
-            if (typeof state.gridEnabled !== 'undefined') gridEnabled = state.gridEnabled
-            
-            renderLibrary()
-            renderPlacedTokens()
-            
-            const map = document.getElementById('map')
-            if (state.background) {
-                currentBgUrl = state.background
-                map.style.backgroundImage = `url('${currentBgUrl}')`
-                map.style.backgroundSize = 'cover'
-                map.style.backgroundPosition = 'center'
-            } else {
-                currentBgUrl = null
-                map.style.backgroundImage = ''
-                map.style.backgroundColor = '#0f172a'
-                map.style.backgroundSize = '50px 50px'
-            }
-            
-            updateGridStatus()
-            alert('Sessão carregada com sucesso.')
-        }
+Grid
 
-        // ==================== TOGGLE GRID ====================
-        function toggleGrid() {
-            const map = document.getElementById('map')
-            gridEnabled = !gridEnabled
-            
-            if (gridEnabled) {
-                if (currentBgUrl) {
-                    map.style.backgroundImage = `
-                        linear-gradient(#1e2937 1px, transparent 0),
-                        linear-gradient(90deg, #1e2937 1px, transparent 0),
-                        url('${currentBgUrl}')
-                    `
-                    map.style.backgroundSize = '50px 50px, 50px 50px, cover'
-                } else {
-                    map.style.backgroundImage = `
-                        linear-gradient(#1e2937 1px, transparent 0),
-                        linear-gradient(90deg, #1e2937 1px, transparent 0)
-                    `
-                    map.style.backgroundSize = '50px 50px'
-                }
-            } else {
-                if (currentBgUrl) {
-                    map.style.backgroundImage = `url('${currentBgUrl}')`
-                    map.style.backgroundSize = 'cover'
-                } else {
-                    map.style.backgroundImage = 'none'
-                }
-            }
-            
-            updateGridStatus()
-            saveState()
-        }
+</button>
 
-        function updateGridStatus() {
-            const statusEl = document.getElementById('grid-status')
-            statusEl.textContent = gridEnabled ? 'GRID: ATIVADO' : 'GRID: DESATIVADO'
-            statusEl.className = gridEnabled 
-                ? 'font-semibold text-emerald-400' 
-                : 'font-semibold text-slate-400'
-        }
+<button id="toggleFog">
 
-        // ==================== INICIALIZAÇÃO ====================
-        function init() {
-            renderLibrary()
-            
-            // Carregar sessão salva
-            const saved = localStorage.getItem('manipulacaoRPG_v1')
-            if (saved) {
-                const state = JSON.parse(saved)
-                
-                if (state.library) library = state.library
-                if (state.placedTokens) placedTokens = state.placedTokens
-                if (typeof state.gridEnabled !== 'undefined') gridEnabled = state.gridEnabled
-                
-                renderLibrary()
-                renderPlacedTokens()
-                
-                const map = document.getElementById('map')
-                if (state.background) {
-                    currentBgUrl = state.background
-                    map.style.backgroundImage = `url('${currentBgUrl}')`
-                    map.style.backgroundSize = 'cover'
-                    map.style.backgroundPosition = 'center'
-                }
-                
-                updateGridStatus()
-            } else {
-                updateGridStatus()
-            }
-            
-            console.log('%c✅ Manipulação • Mesa Virtual de RPG inicializada com sucesso (estilo formal)', 'color:#6366f1; font-size:13px;')
-        }
+Fog
 
-        window.onload = init
-    </script>
+</button>
+
+<button id="toggleMeasure">
+
+Régua
+
+</button>
+
+<button id="initiative">
+
+Iniciativa
+
+</button>
+
+</section>
+
+</aside>
+
+<!-- ====================================== -->
+<!-- MAIN -->
+<!-- ====================================== -->
+
+<main id="main">
+
+<header id="toolbar">
+
+<div class="left">
+
+<button id="uploadMap">
+
+🖼️ Mapa
+
+</button>
+
+<button id="defaultMap">
+
+🌎 Padrão
+
+</button>
+
+<button id="clearMap">
+
+🗑 Limpar
+
+</button>
+
+</div>
+
+<div class="center">
+
+<button id="undo">
+
+↶
+
+</button>
+
+<button id="redo">
+
+↷
+
+</button>
+
+<button id="copy">
+
+📄
+
+</button>
+
+<button id="paste">
+
+📋
+
+</button>
+
+<button id="duplicate">
+
+➕
+
+</button>
+
+</div>
+
+<div class="right">
+
+<button id="zoomOut">
+
+➖
+
+</button>
+
+<span id="zoomValue">
+
+100%
+
+</span>
+
+<button id="zoomIn">
+
+➕
+
+</button>
+
+<button id="save">
+
+💾 Salvar
+
+</button>
+
+<button id="load">
+
+📂 Carregar
+
+</button>
+
+</div>
+
+</header>
+
+<section id="workspace">
+
+<div id="mapWrapper">
+
+<div id="map">
+
+<!-- Tokens serão adicionados via JavaScript -->
+
+</div>
+
+</div>
+
+</section>
+
+<footer>
+
+<div>
+
+Espaço = mover mapa
+
+</div>
+
+<div>
+
+Scroll = Zoom
+
+</div>
+
+<div>
+
+Delete = remover
+
+</div>
+
+<div>
+
+CTRL + C / CTRL + V
+
+</div>
+
+</footer>
+
+</main>
+
+<!-- ====================================== -->
+<!-- MENUS -->
+<!-- ====================================== -->
+
+<div id="contextMenu">
+
+<button id="renameToken">
+
+Renomear
+
+</button>
+
+<button id="changeColor">
+
+Cor
+
+</button>
+
+<button id="changeImage">
+
+Imagem
+
+</button>
+
+<button id="rotateToken">
+
+Rotacionar
+
+</button>
+
+<button id="deleteToken">
+
+Excluir
+
+</button>
+
+</div>
+
+<div id="initiativePanel">
+
+<h2>Ordem de Iniciativa</h2>
+
+<div id="initiativeList">
+
+</div>
+
+</div>
+
+<input
+type="file"
+id="imageLoader"
+accept="image/*"
+hidden>
+
+<input
+type="file"
+id="mapLoader"
+accept="image/*"
+hidden>
+
+<script src="js/main.js"></script>
+<script src="js/library.js"></script>
+<script src="js/drag.js"></script>
+<script src="js/zoom.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/grid.js"></script>
+<script src="js/contextMenu.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/tokens.js"></script>
+
 </body>
+
 </html>
