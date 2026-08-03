@@ -3,7 +3,7 @@
 // ==========================================
 
 
-let tokens = [];
+let tokens=[];
 
 
 
@@ -11,276 +11,223 @@ let tokens = [];
 // CRIAR TOKEN
 // ==========================================
 
-function createToken(data = {}){
+function createToken(data={}){
 
 
-    const token = {
+const token={
 
 
-        id:
-        Date.now()+Math.random(),
-
-
-        name:
-        data.name || "Novo Token",
-
-
-        color:
-        data.color || "#6366f1",
-
-
-        image:
-        data.image || null,
-
-
-        x:
-        data.x || 300,
-
-
-        y:
-        data.y || 300,
-
-
-        hp:100,
-
-
-        maxHp:100,
-
-
-        rotation:0,
-
-
-        status:[]
-
-
-    };
+id:
+Date.now()+Math.random(),
 
 
 
-    tokens.push(token);
+name:
+data.name || "Novo Token",
 
 
 
-    if(typeof saveHistory==="function")
-        saveHistory();
+color:
+data.color || "#6366f1",
 
 
 
-    renderTokens();
+image:
+data.image || null,
 
 
 
-    saveStorage();
+size:
+Number(data.size) || 60,
 
 
 
-    toast(
-        "Token criado."
-    );
+x:300,
+
+y:300,
 
 
 
-    return token;
+rotation:0,
+
+
+
+hp:100,
+
+maxHp:100,
+
+
+
+status:[]
+
+
+};
+
+
+
+tokens.push(token);
+
+
+
+if(typeof saveHistory==="function")
+{
+saveHistory();
+}
+
+
+
+renderTokens();
+
+
+saveStorage();
+
+
+
+toast(
+"Token criado."
+);
+
+
 
 }
 
 
 
 
+
 // ==========================================
-// RENDERIZAR TOKENS
+// RENDER TOKENS
 // ==========================================
 
 function renderTokens(){
 
 
-    const map =
-    document.getElementById(
-        "map"
-    );
+const map =
+document.getElementById(
+"map"
+);
 
 
 
-    if(!map)
-        return;
+if(!map)
+return;
 
 
 
-    map
-    .querySelectorAll(
-        ".token"
-    )
-    .forEach(t=>t.remove());
+map
+.querySelectorAll(".token")
+.forEach(
+t=>t.remove()
+);
 
 
 
 
-    tokens.forEach(token=>{
+tokens.forEach(token=>{
 
 
-        const element =
-        document.createElement(
-            "div"
-        );
+const element =
+document.createElement(
+"div"
+);
 
 
 
-        element.className =
-        "token";
+element.className =
+"token";
 
 
 
-        element.dataset.id =
-        token.id;
+element.dataset.id =
+token.id;
 
 
 
-        element.style.left =
-        token.x+"px";
+element.style.left =
+token.x+"px";
 
 
 
-        element.style.top =
-        token.y+"px";
+element.style.top =
+token.y+"px";
 
 
 
-        element.style.transform =
-        `
-        rotate(${token.rotation}deg)
-        `;
+element.style.width =
+token.size+"px";
 
 
 
-        element.style.background =
-        token.color;
+element.style.height =
+token.size+"px";
 
 
 
-        if(token.image){
+element.style.background =
+token.color;
 
 
-            const img =
-            document.createElement(
-                "img"
-            );
 
+element.style.transform =
+`
+rotate(${token.rotation}deg)
+`;
 
-            img.src =
-            token.image;
 
 
-            element.appendChild(
-                img
-            );
 
 
-        }else{
+// IMAGEM
 
+if(token.image){
 
-            const fallback =
-            document.createElement(
-                "div"
-            );
 
+const img =
+document.createElement(
+"img"
+);
 
-            fallback.className =
-            "fallback";
 
+img.src =
+token.image;
 
-            fallback.textContent =
-            token.name
-            .charAt(0)
-            .toUpperCase();
 
+element.appendChild(
+img
+);
 
-
-            element.appendChild(
-                fallback
-            );
-
-
-        }
-
-
-
-        const name =
-        document.createElement(
-            "div"
-        );
-
-
-        name.className =
-        "tokenName";
-
-
-        name.textContent =
-        token.name;
-
-
-
-        element.appendChild(
-            name
-        );
-
-
-
-
-        element.addEventListener(
-            "click",
-            e=>{
-
-
-                e.stopPropagation();
-
-
-                selectToken(
-                    token.id,
-                    e
-                );
-
-
-            }
-        );
-
-
-
-        map.appendChild(
-            element
-        );
-
-
-    });
-
-
-
-    renderSelection();
 
 }
 
 
+// SEM IMAGEM
 
-// ==========================================
-// SELEÇÃO DE TOKEN
-// ==========================================
-
-function selectToken(id,e){
+else{
 
 
-
-    if(!e.shiftKey){
-
-        clearSelection();
-
-    }
+const fallback =
+document.createElement(
+"div"
+);
 
 
 
-    addSelection(id);
+fallback.className =
+"fallback";
 
 
 
-    renderSelection();
+fallback.innerText =
+token.name
+.charAt(0)
+.toUpperCase();
+
+
+
+element.appendChild(
+fallback
+);
+
 
 
 }
@@ -288,161 +235,83 @@ function selectToken(id,e){
 
 
 
-// ==========================================
-// ATUALIZAR TOKEN
-// ==========================================
+// NOME
 
-function updateToken(id,data){
-
-
-    const token =
-    tokens.find(
-        t=>t.id===id
-    );
+const label =
+document.createElement(
+"div"
+);
 
 
 
-    if(!token)
-        return;
+label.className =
+"tokenName";
 
 
 
-    Object.assign(
-        token,
-        data
-    );
+label.innerText =
+token.name;
 
 
 
-    renderTokens();
-
-
-    saveStorage();
-
-
-}
+element.appendChild(
+label
+);
 
 
 
-// ==========================================
-// REMOVER TOKEN
-// ==========================================
-
-function removeToken(id){
-
-
-    saveHistory();
 
 
 
-    tokens =
-    tokens.filter(
-        t=>t.id!==id
-    );
+// CLICK
+
+element.addEventListener(
+"click",
+e=>{
+
+
+e.stopPropagation();
 
 
 
-    renderTokens();
+if(typeof addSelection==="function")
+{
 
 
-    saveStorage();
+clearSelection();
+
+
+
+addSelection(
+token.id
+);
+
+
+
+renderSelection();
 
 
 }
 
 
-
-// ==========================================
-// ROTACIONAR
-// ==========================================
-
-function rotateToken(id){
-
-
-    const token =
-    tokens.find(
-        t=>t.id===id
-    );
+});
 
 
 
-    if(!token)
-        return;
+
+
+map.appendChild(
+element
+);
 
 
 
-    token.rotation +=45;
+});
 
 
 
-    renderTokens();
+renderSelection();
 
-
-    saveStorage();
-
-
-}
-
-
-
-// ==========================================
-// ALTERAR HP
-// ==========================================
-
-function changeHP(id,value){
-
-
-    const token =
-    tokens.find(
-        t=>t.id===id
-    );
-
-
-    if(!token)
-        return;
-
-
-
-    token.hp += value;
-
-
-
-    if(token.hp<0)
-        token.hp=0;
-
-
-
-    if(token.hp>token.maxHp)
-        token.hp=token.maxHp;
-
-
-
-    renderTokens();
-
-
-
-}
-
-
-
-// ==========================================
-// LIMPAR MAPA
-// ==========================================
-
-function clearTokens(){
-
-
-    saveHistory();
-
-
-
-    tokens=[];
-
-
-    renderTokens();
-
-
-    saveStorage();
 
 
 }
