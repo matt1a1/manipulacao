@@ -77,12 +77,50 @@ Restaurar
 <input
 type="text"
 id="tokenName"
-placeholder="Nome">
+placeholder="Nome do Token">
+
+
+
+<label>
+Cor do Token
+</label>
 
 <input
 type="color"
 id="tokenColor"
 value="#6366f1">
+
+
+
+<label>
+Imagem do Token
+</label>
+
+<input
+type="file"
+id="newTokenImage"
+accept="image/*">
+
+
+
+<label>
+Tamanho do Token
+</label>
+
+<input
+type="range"
+id="tokenSize"
+min="30"
+max="150"
+value="60">
+
+
+
+<div id="tokenSizeValue">
+60px
+</div>
+
+
 
 <button id="createToken">
 
@@ -90,8 +128,8 @@ Adicionar
 
 </button>
 
-</section>
 
+</section>
 <section class="quickTools">
 
 <h3>Ferramentas</h3>
