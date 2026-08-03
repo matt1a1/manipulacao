@@ -1,9 +1,83 @@
 // ==========================================
-// CONTEXT MENU TOKEN
+// MANIPULAÇÃO RPG
+// CONTEXT MENU.JS
 // ==========================================
 
 
-let selectedContextToken = null;
+let contextTokenId = null;
+
+
+
+
+// ==========================================
+// INICIAR
+// ==========================================
+
+
+window.addEventListener(
+"load",
+initContextMenu
+);
+
+
+
+function initContextMenu(){
+
+
+
+document.addEventListener(
+"contextmenu",
+openContextMenu
+);
+
+
+
+document
+.getElementById(
+"renameToken"
+)
+.onclick=renameContextToken;
+
+
+
+document
+.getElementById(
+"changeColor"
+)
+.onclick=changeContextColor;
+
+
+
+document
+.getElementById(
+"changeImage"
+)
+.onclick=changeContextImage;
+
+
+
+document
+.getElementById(
+"rotateToken"
+)
+.onclick=rotateContextToken;
+
+
+
+document
+.getElementById(
+"deleteToken"
+)
+.onclick=deleteContextToken;
+
+
+
+}
+
+
+
+
+
 
 
 
@@ -12,59 +86,52 @@ let selectedContextToken = null;
 // ABRIR MENU
 // ==========================================
 
-document.addEventListener(
-"contextmenu",
-e=>{
 
-
-    const token =
-    e.target.closest(
-        ".token"
-    );
+function openContextMenu(e){
 
 
 
-    if(!token)
-        return;
+const token =
+e.target.closest(
+".token"
+);
 
 
 
-    e.preventDefault();
+if(!token)
+return;
 
 
 
-    selectedContextToken =
-    Number(
-        token.dataset.id
-    );
+e.preventDefault();
 
 
 
-    const menu =
-    document.getElementById(
-        "contextMenu"
-    );
+contextTokenId =
+Number(
+token.dataset.id
+);
 
 
 
-    if(!menu)
-        return;
+DOM.contextMenu.style.display="block";
 
 
 
-    menu.style.display="block";
+DOM.contextMenu.style.left =
+e.pageX+"px";
 
 
 
-    menu.style.left =
-    e.pageX+"px";
+DOM.contextMenu.style.top =
+e.pageY+"px";
 
 
-    menu.style.top =
-    e.pageY+"px";
+
+}
 
 
-});
+
 
 
 
@@ -75,21 +142,28 @@ e=>{
 // FECHAR
 // ==========================================
 
+
 function closeContextMenu(){
 
 
-    const menu =
-    document.getElementById(
-        "contextMenu"
-    );
+
+if(DOM.contextMenu){
 
 
-
-    if(menu)
-        menu.style.display="none";
+DOM.contextMenu.style.display =
+"none";
 
 
 }
+
+
+
+}
+
+
+
+
+
 
 
 
@@ -98,49 +172,51 @@ function closeContextMenu(){
 // RENOMEAR
 // ==========================================
 
-function renameToken(){
 
-
-    const token =
-    tokens.find(
-        t=>
-        t.id===selectedContextToken
-    );
+function renameContextToken(){
 
 
 
-    if(!token)
-        return;
+const token =
+tokens.find(
+t=>t.id===contextTokenId
+);
 
 
 
-    const name =
-    prompt(
-        "Novo nome:",
-        token.name
-    );
+if(!token)
+return;
 
 
 
-    if(name){
-
-
-        saveHistory();
-
-
-
-        token.name=name;
+const name =
+prompt(
+"Novo nome:",
+token.name
+);
 
 
 
-        renderTokens();
+if(name){
+
+
+token.name=name;
 
 
 
-        saveStorage();
+renderTokens();
 
 
-    }
+
+saveStorage();
+
+
+
+}
+
+
+
+closeContextMenu();
 
 
 
@@ -151,51 +227,67 @@ function renameToken(){
 
 
 
+
+
+
 // ==========================================
-// ALTERAR COR
+// COR
 // ==========================================
 
-function changeTokenColor(){
 
-
-    const token =
-    tokens.find(
-        t=>
-        t.id===selectedContextToken
-    );
+function changeContextColor(){
 
 
 
-    if(!token)
-        return;
+const token =
+tokens.find(
+t=>t.id===contextTokenId
+);
 
 
 
-    const color =
-    prompt(
-        "Digite a cor:",
-        token.color
-    );
+if(!token)
+return;
 
 
 
-    if(color){
+const color =
+prompt(
+"Digite a cor HEX:",
+token.color
+);
 
 
-        token.color=color;
+
+if(color){
 
 
-        renderTokens();
+
+token.color=color;
 
 
-        saveStorage();
+
+renderTokens();
 
 
-    }
+
+saveStorage();
 
 
 
 }
+
+
+
+closeContextMenu();
+
+
+
+}
+
+
+
+
 
 
 
@@ -205,86 +297,25 @@ function changeTokenColor(){
 // IMAGEM
 // ==========================================
 
-function changeTokenImage(){
 
-
-    const input =
-    document.getElementById(
-        "imageLoader"
-    );
+function changeContextImage(){
 
 
 
-    if(!input)
-        return;
+changeTokenImage(
+contextTokenId
+);
 
 
 
-    input.click();
-
-
-
-    input.onchange=e=>{
-
-
-        const file =
-        e.target.files[0];
-
-
-
-        if(!file)
-            return;
-
-
-
-        const reader =
-        new FileReader();
-
-
-
-        reader.onload=()=>{
-
-
-            const token =
-            tokens.find(
-                t=>
-                t.id===selectedContextToken
-            );
-
-
-
-            if(token){
-
-
-                token.image =
-                reader.result;
-
-
-
-                renderTokens();
-
-
-
-                saveStorage();
-
-
-            }
-
-
-        };
-
-
-
-        reader.readAsDataURL(
-            file
-        );
-
-
-    };
+closeContextMenu();
 
 
 
 }
+
+
+
 
 
 
@@ -295,12 +326,19 @@ function changeTokenImage(){
 // ROTACIONAR
 // ==========================================
 
-function rotateSelectedToken(){
+
+function rotateContextToken(){
 
 
-    rotateToken(
-        selectedContextToken
-    );
+
+rotateToken(
+contextTokenId
+);
+
+
+
+closeContextMenu();
+
 
 
 }
@@ -311,87 +349,25 @@ function rotateSelectedToken(){
 
 
 
+
+
 // ==========================================
-// DELETE
+// EXCLUIR
 // ==========================================
 
-function deleteSelectedToken(){
+
+function deleteContextToken(){
 
 
-    removeToken(
-        selectedContextToken
-    );
+
+deleteToken(
+contextTokenId
+);
+
+
+
+closeContextMenu();
+
 
 
 }
-
-
-
-
-
-
-
-// ==========================================
-// EVENTOS
-// ==========================================
-
-window.addEventListener(
-"load",
-()=>{
-
-
-    document
-    .getElementById(
-        "renameToken"
-    )
-    ?.addEventListener(
-        "click",
-        renameToken
-    );
-
-
-
-    document
-    .getElementById(
-        "changeColor"
-    )
-    ?.addEventListener(
-        "click",
-        changeTokenColor
-    );
-
-
-
-    document
-    .getElementById(
-        "changeImage"
-    )
-    ?.addEventListener(
-        "click",
-        changeTokenImage
-    );
-
-
-
-    document
-    .getElementById(
-        "rotateToken"
-    )
-    ?.addEventListener(
-        "click",
-        rotateSelectedToken
-    );
-
-
-
-    document
-    .getElementById(
-        "deleteToken"
-    )
-    ?.addEventListener(
-        "click",
-        deleteSelectedToken
-    );
-
-
-});
