@@ -681,6 +681,55 @@ toast(
 
 
 
+function deleteSelection(){
+
+
+if(App.selectedTokens.length===0){
+
+
+toast("Nenhum token selecionado.");
+
+
+return;
+
+
+}
+
+
+
+saveHistory();
+
+
+
+tokens = tokens.filter(
+t=>!App.selectedTokens.includes(t.id)
+);
+
+
+
+App.selectedTokens = [];
+
+
+
+renderTokens();
+
+
+
+saveStorage();
+
+
+
+toast("Tokens excluídos.");
+
+
+}
+
+
+
+
+
+
+
 
 // ==========================================
 // HP
