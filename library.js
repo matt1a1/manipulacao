@@ -1,5 +1,5 @@
 // ==========================================
-// MANIPULAÇÃO RPG
+// ESCANDINAVO RPG
 // LIBRARY.JS
 // ==========================================
 
@@ -44,7 +44,7 @@ let tokenLibrary=[];
 
 
 const LIBRARY_KEY =
-"manipulacao_library";
+"escandinavo_library";
 
 
 

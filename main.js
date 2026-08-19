@@ -1,5 +1,5 @@
 // ==========================================
-// MANIPULAÇÃO RPG
+// ESCANDINAVO RPG
 // MAIN.JS
 // ==========================================
 
@@ -11,7 +11,7 @@
 const App = {
 
 
-    version:"2.0.0",
+    version:"2.1.0",
 
 
     zoom:1,
@@ -206,7 +206,7 @@ function init(){
 
     toast(
 
-        "Mesa carregada com sucesso."
+        "Mesa Escandinavo carregada com sucesso."
 
     );
 

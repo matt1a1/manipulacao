@@ -1,6 +1,6 @@
 // ==========================================
 // UI.JS
-// MANIPULAÇÃO RPG
+// ESCANDINAVO RPG
 // ==========================================
 
 
@@ -533,7 +533,7 @@ function registerUI(){
 
 
             localStorage.removeItem(
-                "manipulacao_map"
+                "escandinavo_map"
             );
 
 

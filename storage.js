@@ -1,6 +1,6 @@
 // ==========================================
 // STORAGE.JS
-// MANIPULAÇÃO RPG
+// ESCANDINAVO RPG
 // ==========================================
 
 
@@ -8,7 +8,7 @@
 // CHAVES DO STORAGE
 // ==========================================
 
-const STORAGE_KEY = "manipulacao_rpg_save";
+const STORAGE_KEY = "escandinavo_rpg_save";
 
 
 
@@ -24,7 +24,7 @@ function saveStorage(){
     const data = {
 
 
-        version:"2.0.0",
+        version:"2.1.0",
 
 
 
@@ -59,7 +59,7 @@ function saveStorage(){
         mapImage:
 
         localStorage.getItem(
-            "manipulacao_map"
+            "escandinavo_map"
         )
 
 
@@ -227,7 +227,7 @@ function loadStorage(){
 
             localStorage.setItem(
 
-                "manipulacao_map",
+                "escandinavo_map",
 
                 data.mapImage
 
@@ -292,7 +292,7 @@ function clearStorage(){
 
     localStorage.removeItem(
 
-        "manipulacao_map"
+        "escandinavo_map"
 
     );
 
@@ -368,7 +368,7 @@ function exportSave(){
 
     link.download=
 
-    "mesa-manipulacao-rpg.json";
+    "mesa-escandinavo-rpg.json";
 
 
 

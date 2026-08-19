@@ -1,11 +1,11 @@
 // ==========================================
-// MANIPULAÇÃO RPG
+// ESCANDINAVO RPG
 // TOKENS.JS
 // ==========================================
 
 
-let tokens = [];
-
+// Nota: a variável global `tokens` é declarada em main.js
+// para evitar duplicação.
 
 
 
