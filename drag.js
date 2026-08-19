@@ -1,633 +1,133 @@
 // ==========================================
-// DRAG.JS
-// ESCANDINAVO RPG
+// ESCANDINAVO RPG - DRAG / PAN
 // ==========================================
-
-
 
 let draggingToken = null;
-
-
-let dragOffset = {
-
-    x:0,
-
-    y:0
-
-};
-
-
-
+let dragOffset = { x: 0, y: 0 };
 let panning = false;
+let panStart = { x: 0, y: 0 };
+let mapStart = { x: 0, y: 0 };
+let spaceHeld = false;
 
-
-let panStart = {
-
-    x:0,
-
-    y:0
-
-};
-
-
-let mapStart = {
-
-    x:0,
-
-    y:0
-
-};
-
-
-
-
-
-
-
-// ==========================================
-// INICIAR
-// ==========================================
-
-
-window.addEventListener(
-
-"load",
-
-()=>{
-
-
-    registerDrag();
-
-
+window.addEventListener("load", () => {
+  registerDrag();
 });
 
-
-
-
-
-
-
-// ==========================================
-// REGISTRAR EVENTOS
-// ==========================================
-
-
 function registerDrag(){
+  if(!DOM.map || !DOM.wrapper) return;
 
+  DOM.map.addEventListener("mousedown", mouseDown);
+  DOM.wrapper.addEventListener("mousedown", mouseDownOnWrapper);
+  document.addEventListener("mousemove", mouseMove);
+  document.addEventListener("mouseup", mouseUp);
 
-
-    if(!DOM.map)
-        return;
-
-
-
-    DOM.map.addEventListener(
-
-        "mousedown",
-
-        mouseDown
-
-    );
-
-
-
-    document.addEventListener(
-
-        "mousemove",
-
-        mouseMove
-
-    );
-
-
-
-    document.addEventListener(
-
-        "mouseup",
-
-        mouseUp
-
-    );
-
-
-
+  document.addEventListener("keydown", e => {
+    if(e.code === "Space" && e.target.tagName !== "INPUT"){
+      e.preventDefault();
+      spaceHeld = true;
+    }
+  });
+  document.addEventListener("keyup", e => {
+    if(e.code === "Space"){
+      spaceHeld = false;
+      stopPan();
+    }
+  });
 }
 
+/** Converte clientX/Y para coordenadas dentro do #map */
+function clientToMap(clientX, clientY){
+  if(!DOM.map) return { x: 0, y: 0 };
+  const rect = DOM.map.getBoundingClientRect();
+  const x = (clientX - rect.left) / App.zoom;
+  const y = (clientY - rect.top) / App.zoom;
+  return { x, y };
+}
 
+function mouseDownOnWrapper(e){
+  if(e.target.closest(".token")) return;
+  if(e.button !== 0) return;
 
-
-
-
-
-
-// ==========================================
-// MOUSE DOWN
-// ==========================================
-
+  if(spaceHeld || e.target === DOM.wrapper || e.target === DOM.map){
+    startPan();
+    panStart.x = e.clientX;
+    panStart.y = e.clientY;
+    mapStart.x = App.mapOffset.x;
+    mapStart.y = App.mapOffset.y;
+  }
+}
 
 function mouseDown(e){
-
-
-
-    const tokenElement =
-
-    e.target.closest(
-        ".token"
-    );
-
-
-
-
-
-    // ======================
-    // TOKEN
-    // ======================
-
-
-    if(tokenElement){
-
-
-
-        const id =
-
-        Number(
-            tokenElement.dataset.id
-        );
-
-
-
-        const token =
-
-        tokens.find(
-
-            t=>t.id===id
-
-        );
-
-
-
-        if(!token)
-            return;
-
-
-
-
-
-        saveHistory();
-
-
-
-
-
-        if(
-            !e.ctrlKey
-            &&
-            !App.selectedTokens.includes(id)
-        ){
-
-
-            clearSelection();
-
-
-            addSelection(id);
-
-
-
-        }
-
-
-
-
-
-
-
-        draggingToken = token;
-
-
-
-
-
-        dragOffset.x =
-
-        e.clientX -
-
-        token.x;
-
-
-
-        dragOffset.y =
-
-        e.clientY -
-
-        token.y;
-
-
-
-
-
-        tokenElement.classList.add(
-
-            "dragging"
-
-        );
-
-
-
-        return;
-
-
-
-    }
-
-
-
-
-
-
-
-    // ======================
-    // PAN MAPA
-    // ======================
-
-
-    if(e.button===0){
-
-
-        if(
-            e.target===DOM.map
-            ||
-            e.target===DOM.wrapper
-        ){
-
-
-
-            startPan();
-
-
-
-            panStart.x=e.clientX;
-
-
-            panStart.y=e.clientY;
-
-
-
-            mapStart.x=
-
-            App.mapOffset.x;
-
-
-
-            mapStart.y=
-
-            App.mapOffset.y;
-
-
-
-        }
-
-
-    }
-
-
-
+  const tokenElement = e.target.closest(".token");
+  if(!tokenElement) return;
+
+  e.stopPropagation();
+
+  const id = tokenElement.dataset.id;
+  const token = tokens.find(t => String(t.id) === String(id));
+  if(!token) return;
+
+  saveHistory();
+
+  if(!e.ctrlKey && !e.metaKey && !App.selectedTokens.includes(String(id))){
+    clearSelection();
+    addSelection(id);
+    renderSelection();
+  }
+
+  draggingToken = token;
+  const pos = clientToMap(e.clientX, e.clientY);
+  dragOffset.x = pos.x - token.x;
+  dragOffset.y = pos.y - token.y;
+  tokenElement.classList.add("dragging");
 }
-
-
-
-
-
-
-
-
-
-// ==========================================
-// MOVIMENTO
-// ==========================================
-
 
 function mouseMove(e){
+  if(draggingToken){
+    const pos = clientToMap(e.clientX, e.clientY);
+    let x = pos.x - dragOffset.x;
+    let y = pos.y - dragOffset.y;
 
-
-
-    // =====================
-    // TOKEN
-    // =====================
-
-
-
-    if(draggingToken){
-
-
-
-        let x =
-
-        e.clientX -
-
-        dragOffset.x;
-
-
-
-        let y =
-
-        e.clientY -
-
-        dragOffset.y;
-
-
-
-
-
-
-
-        if(App.snapGrid){
-
-
-
-            x =
-
-            Math.round(
-
-                x/App.gridSize
-
-            )
-
-            *
-
-            App.gridSize;
-
-
-
-            y =
-
-            Math.round(
-
-                y/App.gridSize
-
-            )
-
-            *
-
-            App.gridSize;
-
-
-
-        }
-
-
-
-
-
-
-
-        draggingToken.x=x;
-
-
-        draggingToken.y=y;
-
-
-
-
-
-        renderTokens();
-
-
-
-        return;
-
-
+    if(App.snapGrid){
+      const g = App.gridSize || 50;
+      x = Math.round(x / g) * g;
+      y = Math.round(y / g) * g;
     }
 
+    draggingToken.x = x;
+    draggingToken.y = y;
 
-
-
-
-
-
-
-
-    // =====================
-    // PAN
-    // =====================
-
-
-
-    if(panning){
-
-
-
-        const dx =
-
-        e.clientX -
-
-        panStart.x;
-
-
-
-        const dy =
-
-        e.clientY -
-
-        panStart.y;
-
-
-
-
-
-        App.mapOffset.x =
-
-        mapStart.x + dx;
-
-
-
-        App.mapOffset.y =
-
-        mapStart.y + dy;
-
-
-
-
-
-        updateMapPosition();
-
-
-
+    const el = document.querySelector(`.token[data-id="${draggingToken.id}"]`);
+    if(el){
+      el.style.left = x + "px";
+      el.style.top = y + "px";
     }
+    return;
+  }
 
-
-
+  if(panning){
+    App.mapOffset.x = mapStart.x + (e.clientX - panStart.x);
+    App.mapOffset.y = mapStart.y + (e.clientY - panStart.y);
+    updateMapPosition();
+  }
 }
-
-
-
-
-
-
-
-
-
-// ==========================================
-// SOLTAR
-// ==========================================
-
 
 function mouseUp(){
-
-
-
-    if(draggingToken){
-
-
-
-        const el =
-
-        document.querySelector(
-
-            `.token[data-id="${draggingToken.id}"]`
-
-        );
-
-
-
-        if(el){
-
-
-            el.classList.remove(
-
-                "dragging"
-
-            );
-
-
-        }
-
-
-
-
-
-        draggingToken=null;
-
-
-
-        saveStorage();
-
-
-
-        toast(
-            "Token movido."
-        );
-
-
-
-    }
-
-
-
-
-
-
-
-    stopPan();
-
-
-
+  if(draggingToken){
+    const el = document.querySelector(`.token[data-id="${draggingToken.id}"]`);
+    if(el) el.classList.remove("dragging");
+    draggingToken = null;
+    saveStorage();
+  }
+  stopPan();
 }
-
-
-
-
-
-
-
-
-// ==========================================
-// PAN
-// ==========================================
-
 
 function startPan(){
-
-
-    panning=true;
-
-
-
-    if(DOM.wrapper){
-
-
-        DOM.wrapper.classList.add(
-
-            "grabbing"
-
-        );
-
-
-    }
-
-
+  panning = true;
+  if(DOM.wrapper) DOM.wrapper.classList.add("grabbing");
 }
-
-
-
-
-
-
 
 function stopPan(){
-
-
-    panning=false;
-
-
-
-    if(DOM.wrapper){
-
-
-        DOM.wrapper.classList.remove(
-
-            "grabbing"
-
-        );
-
-
-    }
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// ATUALIZAR POSIÇÃO DO MAPA
-// ==========================================
-
-
-function updateMapPosition(){
-
-
-
-    if(!DOM.map)
-        return;
-
-
-
-
-
-    DOM.map.style.marginLeft =
-
-    App.mapOffset.x+"px";
-
-
-
-    DOM.map.style.marginTop =
-
-    App.mapOffset.y+"px";
-
-
-
+  panning = false;
+  if(DOM.wrapper) DOM.wrapper.classList.remove("grabbing");
 }
