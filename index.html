@@ -8,7 +8,6 @@
 
 <title>Escandinavo RPG</title>
 
-
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="sidebar.css">
 <link rel="stylesheet" href="map.css">
@@ -16,455 +15,143 @@
 <link rel="stylesheet" href="toolbar.css">
 <link rel="stylesheet" href="animations.css">
 
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
 
 </head>
 
-
 <body>
 
-
 <div id="loading">
-
-<div class="loader"></div>
-
-<h2>Escandinavo RPG</h2>
-
-<p>Carregando recursos...</p>
-
+  <div class="loader"></div>
+  <h2>Escandinavo RPG</h2>
+  <p>Carregando recursos...</p>
 </div>
-
-
-
 
 <div id="app">
 
-
-
 <aside id="sidebar">
 
-
-<header>
-
-<h1>🎲 Escandinavo</h1>
-
-<span>Mesa Virtual</span>
-
-</header>
-
-
-
-
-<section class="library">
-
-
-<div class="library-header">
-
-<h2>Biblioteca</h2>
-
-<button id="resetLibrary">
-Restaurar
-</button>
-
-</div>
-
-
-<div id="libraryList"></div>
-
-
-</section>
-
-
-
-
-
-<section class="create-token">
-
-
-<h3>Novo Token</h3>
-
-
-
-<input
-id="tokenName"
-type="text"
-placeholder="Nome do Token">
-
-
-
-<input
-id="tokenColor"
-type="color"
-value="#6366f1">
-
-
-
-
-
-<label>
-
-Imagem do Token
-
-</label>
-
-
-<input
-id="tokenImage"
-type="file"
-accept="image/*">
-
-
-
-
-
-
-<label>
-
-Tamanho:
-
-<span id="tokenSizeValue">
-50px
-</span>
-
-</label>
-
-
-<input
-id="tokenSize"
-type="range"
-min="30"
-max="150"
-value="50">
-
-
-
-
-
-<button id="createToken">
-
-Adicionar Token
-
-</button>
-
-
-
-</section>
-
-
-
-
-
-
-<section class="quickTools">
-
-
-<h3>Ferramentas</h3>
-
-
-<button id="toggleGrid">
-Grid
-</button>
-
-
-
-<button id="toggleFog">
-Fog
-</button>
-
-
-
-<button id="toggleMeasure">
-Régua
-</button>
-
-
-
-<button id="initiative">
-Iniciativa
-</button>
-
-
-
-</section>
-
-
+  <header>
+    <h1>🎲 Escandinavo</h1>
+    <span>Mesa Virtual</span>
+  </header>
+
+  <section class="library">
+    <div class="library-header">
+      <h2>Biblioteca</h2>
+      <button id="resetLibrary" type="button">Restaurar</button>
+    </div>
+    <div id="libraryList"></div>
+  </section>
+
+  <section class="quickTools">
+    <h3>Ferramentas</h3>
+    <button id="openCreateToken" type="button">➕ Novo Token</button>
+    <button id="toggleGrid" type="button">Grid</button>
+    <button id="toggleFog" type="button">Fog</button>
+    <button id="toggleMeasure" type="button">Régua</button>
+    <button id="initiative" type="button">Iniciativa</button>
+  </section>
 
 </aside>
 
-  <!-- ================= MAIN ================= -->
-
 <main id="main">
 
-
-<header id="toolbar">
-
-
-<div class="left">
-
-
-<button id="uploadMap">
-🖼️ Mapa
-</button>
-
-
-<button id="defaultMap">
-🌎 Padrão
-</button>
-
-
-<button id="clearMap">
-🗑 Limpar
-</button>
-
-
-</div>
-
-
-
-
-
-<div class="center">
-
-
-<button id="undo">
-↶
-</button>
-
-
-<button id="redo">
-↷
-</button>
-
-
-<button id="copy">
-📄
-</button>
-
-
-<button id="paste">
-📋
-</button>
-
-
-<button id="duplicate">
-➕
-</button>
-
-
-</div>
-
-
-
-
-
-<div class="right">
-
-
-<button id="zoomOut">
-➖
-</button>
-
-
-
-<span id="zoomValue">
-100%
-</span>
-
-
-
-<button id="zoomIn">
-➕
-</button>
-
-
-
-<button id="save">
-💾 Salvar
-</button>
-
-
-
-<button id="load">
-📂 Carregar
-</button>
-
-
-
-</div>
-
-
-</header>
-
-
-
-
-
-
-
-<section id="workspace">
-
-
-<div id="mapWrapper">
-
-
-<div id="map">
-
-</div>
-
-
-</div>
-
-
-</section>
-
-
-
-
-
-
-<footer>
-
-
-<div>
-Espaço = mover mapa
-</div>
-
-
-<div>
-Scroll = Zoom
-</div>
-
-
-<div>
-Delete = remover
-</div>
-
-
-<div>
-CTRL+C / CTRL+V
-</div>
-
-
-</footer>
-
-
-
+  <header id="toolbar">
+    <div class="left">
+      <button id="uploadMap" type="button">🖼️ Mapa</button>
+      <button id="defaultMap" type="button">🌎 Padrão</button>
+      <button id="clearMap" type="button">🗑 Limpar</button>
+    </div>
+    <div class="center">
+      <button id="undo" type="button">↶</button>
+      <button id="redo" type="button">↷</button>
+      <button id="copy" type="button">📄</button>
+      <button id="paste" type="button">📋</button>
+      <button id="duplicate" type="button">➕</button>
+    </div>
+    <div class="right">
+      <button id="zoomOut" type="button">➖</button>
+      <span id="zoomValue">100%</span>
+      <button id="zoomIn" type="button">➕</button>
+      <button id="save" type="button">💾 Salvar</button>
+      <button id="load" type="button">📂 Carregar</button>
+    </div>
+  </header>
+
+  <section id="workspace">
+    <div id="mapWrapper">
+      <div id="map"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Espaço = mover mapa</div>
+    <div>Scroll = Zoom</div>
+    <div>Delete = remover</div>
+    <div>CTRL+C / CTRL+V</div>
+  </footer>
 
 </main>
 
+</div>
 
+<!-- Modal Novo Token -->
+<div id="createTokenModal" class="modal" hidden>
+  <div class="modal-backdrop" id="closeCreateTokenBackdrop"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Novo Token</h2>
+      <button type="button" id="closeCreateToken" class="modal-close">×</button>
+    </div>
+    <div class="modal-body">
+      <label for="tokenName">Nome</label>
+      <input id="tokenName" type="text" placeholder="Nome do Token">
 
+      <label for="tokenColor">Cor</label>
+      <input id="tokenColor" type="color" value="#6366f1">
 
+      <label for="tokenImage">Imagem (opcional)</label>
+      <input id="tokenImage" type="file" accept="image/*">
 
+      <label for="tokenSize">Tamanho: <span id="tokenSizeValue">50px</span></label>
+      <input id="tokenSize" type="range" min="30" max="150" value="50">
 
+      <button id="createToken" type="button">Adicionar Token</button>
+    </div>
+  </div>
+</div>
 
-<!-- ================= MENU DIREITO ================= -->
-
-
+<!-- Menu direito -->
 <div id="contextMenu">
-
-
-<button id="renameToken">
-Renomear
-</button>
-
-
-
-<button id="changeColor">
-Cor
-</button>
-
-
-
-<button id="changeImage">
-Imagem
-</button>
-
-
-
-<button id="rotateToken">
-Rotacionar
-</button>
-
-
-
-<button id="deleteToken">
-Excluir
-</button>
-
-
-
+  <button id="renameToken" type="button">Renomear</button>
+  <button id="changeColor" type="button">Cor</button>
+  <button id="changeImage" type="button">Imagem</button>
+  <button id="rotateToken" type="button">Rotacionar</button>
+  <button id="deleteToken" type="button">Excluir</button>
 </div>
 
-
-
-
-
-
-
-<!-- ================= INICIATIVA ================= -->
-
-
-<div id="initiativePanel">
-
-
-<h2>
-Ordem de Iniciativa
-</h2>
-
-
-<div id="initiativeList">
-
+<!-- Iniciativa -->
+<div id="initiativePanel" hidden>
+  <div class="modal-header">
+    <h2>Ordem de Iniciativa</h2>
+    <button type="button" id="closeInitiative" class="modal-close">×</button>
+  </div>
+  <div id="initiativeList"></div>
+  <button type="button" id="rollInitiative">Rolar / Atualizar</button>
 </div>
 
-
-</div>
-
-
-
-
-
-
-
-<!-- ================= INPUTS ================= -->
-
-
-<input
-type="file"
-id="mapLoader"
-accept="image/*"
-hidden>
-
-
-
-
-
-
-<!-- ================= JAVASCRIPT ================= -->
-
+<input type="file" id="mapLoader" accept="image/*" hidden>
 
 <script src="main.js"></script>
-
 <script src="library.js"></script>
-
 <script src="drag.js"></script>
-
 <script src="zoom.js"></script>
-
 <script src="storage.js"></script>
-
 <script src="grid.js"></script>
-
 <script src="contextMenu.js"></script>
-
 <script src="ui.js"></script>
-
 <script src="tokens.js"></script>
 
-
-
 </body>
-
 </html>
